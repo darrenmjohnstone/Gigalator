@@ -373,6 +373,95 @@
 
     .status-bar.saved { color: var(--success); }
     .status-bar.error { color: var(--danger); }
+
+    /* ── Live iPad Preview ── */
+
+    .preview-container {
+      margin-top: 8px;
+    }
+
+    .preview-frame {
+      background: #1a1a1a;
+      border-radius: 12px;
+      border: 2px solid #444;
+      padding: 16px 20px;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #333;
+      flex-shrink: 0;
+    }
+
+    .preview-header-title {
+      color: #e8e8e8;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .preview-artist {
+      font-size: 10px;
+      color: #999;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+
+    .preview-lyrics {
+      flex: 1;
+      overflow: hidden;
+      column-count: 2;
+      column-gap: 20px;
+      column-rule: 1px solid #333;
+      white-space: pre-wrap;
+      color: #e8e8e8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      font-size: 11px;
+    }
+
+    .preview-overflow-warn {
+      position: absolute;
+      bottom: 8px;
+      right: 12px;
+      background: #d32f2f;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .preview-overflow-warn.visible {
+      display: block;
+    }
+
+    /* ── Deploy info ── */
+
+    .deploy-info {
+      margin-top: 24px;
+      padding: 16px;
+      background: #f0f7ff;
+      border: 1px solid #c0d8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #335;
+    }
+
+    .deploy-info strong {
+      color: #224;
+    }
   </style>
 </head>
 <body>
@@ -589,18 +678,56 @@
         + '<span class="font-size-value" id="fontsize-val">' + (song.fontSize || 18) + 'px</span>'
         + '</div>'
         + '</div>'
+        + '<div class="form-group">'
+        + '<label>iPad Preview</label>'
+        + '<div class="preview-container">'
+        + '<div class="preview-frame">'
+        + '<div class="preview-header"><span class="preview-header-title">' + esc(song.title) + '</span></div>'
+        + '<div class="preview-artist">' + esc(song.artist) + '</div>'
+        + '<div class="preview-lyrics" id="preview-lyrics">' + esc(song.lyrics) + '</div>'
+        + '<div class="preview-overflow-warn" id="preview-overflow">OVERFLOWS — reduce font size</div>'
+        + '</div>'
+        + '</div>'
+        + '</div>'
+        + '<div class="deploy-info">'
+        + '<strong>To update your iPad app:</strong> Double-click <code>deploy.command</code> in your Gigalator folder. '
+        + 'Then open the app on your iPad with WiFi to pick up the changes.'
+        + '</div>'
         + '<div class="actions-bar">'
         + '<button class="btn btn-danger" id="delete-song-btn">Delete Song</button>'
         + '<div class="spacer"></div>'
         + '<button class="btn btn-primary" id="save-song-btn">Save Changes</button>'
         + '</div>';
 
-      // Font size slider
+      // Font size slider + live preview
       var slider = document.getElementById('song-fontsize');
       var fsVal = document.getElementById('fontsize-val');
+      var previewEl = document.getElementById('preview-lyrics');
+      var overflowWarn = document.getElementById('preview-overflow');
+      var lyricsTextarea = document.getElementById('song-lyrics');
+
+      function updatePreview() {
+        var fontSize = parseInt(slider.value, 10);
+        // Scale font size proportionally for the preview (preview is ~1/3 of real iPad)
+        var scaledSize = Math.max(6, Math.round(fontSize * 0.55));
+        previewEl.style.fontSize = scaledSize + 'px';
+        previewEl.style.lineHeight = '1.6';
+        previewEl.textContent = lyricsTextarea.value;
+
+        // Check overflow
+        var isOverflowing = previewEl.scrollHeight > previewEl.clientHeight;
+        overflowWarn.classList.toggle('visible', isOverflowing);
+      }
+
       slider.addEventListener('input', function () {
         fsVal.textContent = slider.value + 'px';
+        updatePreview();
       });
+
+      lyricsTextarea.addEventListener('input', updatePreview);
+
+      // Initial preview render
+      updatePreview();
 
       // Upload track
       document.getElementById('upload-track-btn').addEventListener('click', function () {
