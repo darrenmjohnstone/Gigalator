@@ -95,6 +95,12 @@ main {
   padding-bottom: calc(16px + var(--safe-bottom));
 }
 
+main.lyrics-mode {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 /* ── Song / Setlist list items ── */
 
 .list-item {
@@ -183,18 +189,76 @@ main {
 
 /* ── Lyrics view ── */
 
-.lyrics {
-  font-size: 22px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  padding-bottom: 100px;
-  font-weight: 300;
+.lyrics-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.lyrics-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  margin-bottom: 12px;
 }
 
 .lyrics-artist {
   font-size: 16px;
   color: var(--text-dim);
-  margin-bottom: 24px;
+}
+
+.font-size-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.font-size-btn {
+  background: var(--bg-card);
+  border: 1px solid #444;
+  color: var(--accent);
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.font-size-btn:active {
+  background: var(--bg-card-hover);
+}
+
+.font-size-label {
+  font-size: 13px;
+  color: var(--text-dim);
+  min-width: 36px;
+  text-align: center;
+}
+
+.lyrics {
+  font-size: 22px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  font-weight: 300;
+  flex: 1;
+  overflow: hidden;
+  column-count: 2;
+  column-gap: 32px;
+  column-rule: 1px solid #333;
+}
+
+/* Portrait fallback — single column, scrollable */
+@media (orientation: portrait) {
+  .lyrics {
+    column-count: 1;
+    overflow-y: auto;
+  }
 }
 
 /* ── Audio player bar ── */

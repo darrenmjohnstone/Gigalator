@@ -54,6 +54,7 @@
   function goBack() {
     if (currentView === 'lyrics') {
       stopAudio();
+      main.classList.remove('lyrics-mode');
       showSongList(currentSetlist);
     } else if (currentView === 'songs') {
       showSetlists();
@@ -177,19 +178,46 @@
   }
 
   // ── View: Lyrics ──
+  var currentFontSize = 18;
+  var DEFAULT_FONT_SIZE = 18;
+  var MIN_FONT_SIZE = 10;
+  var MAX_FONT_SIZE = 36;
+
   function showLyrics(songId) {
     currentView = 'lyrics';
     currentSong = songId;
-    const song = data.songs[songId];
+    var song = data.songs[songId];
     if (!song) return;
 
     setHeader(song.title, true);
 
-    let html = '<div class="lyrics-artist">' + esc(song.artist) + '</div>'
-      + '<div class="lyrics">' + esc(song.lyrics) + '</div>';
+    currentFontSize = song.fontSize || DEFAULT_FONT_SIZE;
+
+    main.classList.add('lyrics-mode');
+
+    var html = '<div class="lyrics-wrap">'
+      + '<div class="lyrics-top-bar">'
+      + '<div class="lyrics-artist">' + esc(song.artist) + '</div>'
+      + '<div class="font-size-controls">'
+      + '<button class="font-size-btn" id="font-dec">&#8722;</button>'
+      + '<span class="font-size-label" id="font-label">' + currentFontSize + 'px</span>'
+      + '<button class="font-size-btn" id="font-inc">&#43;</button>'
+      + '</div>'
+      + '</div>'
+      + '<div class="lyrics" id="lyrics-text">' + esc(song.lyrics) + '</div>'
+      + '</div>';
 
     main.innerHTML = html;
-    main.scrollTop = 0;
+
+    var lyricsEl = document.getElementById('lyrics-text');
+    lyricsEl.style.fontSize = currentFontSize + 'px';
+
+    document.getElementById('font-dec').addEventListener('click', function () {
+      adjustFontSize(-1, lyricsEl);
+    });
+    document.getElementById('font-inc').addEventListener('click', function () {
+      adjustFontSize(1, lyricsEl);
+    });
 
     // Audio
     if (song.track) {
@@ -201,6 +229,12 @@
     } else {
       player.classList.add('hidden');
     }
+  }
+
+  function adjustFontSize(delta, lyricsEl) {
+    currentFontSize = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, currentFontSize + delta));
+    lyricsEl.style.fontSize = currentFontSize + 'px';
+    document.getElementById('font-label').textContent = currentFontSize + 'px';
   }
 
   // ── Audio Controls ──

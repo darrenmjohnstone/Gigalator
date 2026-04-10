@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gigalator Manager</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f5f5;
+      --bg-white: #fff;
+      --bg-hover: #eee;
+      --border: #ddd;
+      --text: #222;
+      --text-dim: #666;
+      --accent: #e08820;
+      --accent-light: #fff3e0;
+      --danger: #d32f2f;
+      --danger-light: #ffebee;
+      --success: #2e7d32;
+      --sidebar-w: 280px;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    /* ── Layout ── */
+
+    #app { display: flex; height: 100%; }
+
+    #sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--bg-white);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #editor {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+    }
+
+    /* ── Welcome screen ── */
+
+    #welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      gap: 16px;
+    }
+
+    #welcome h1 { font-size: 28px; font-weight: 700; }
+    #welcome p { color: var(--text-dim); max-width: 400px; line-height: 1.5; }
+
+    /* ── Buttons ── */
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-white);
+      color: var(--text);
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn:hover { background: var(--bg-hover); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover { background: #c07010; }
+
+    .btn-danger {
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .btn-danger:hover { background: var(--danger-light); }
+
+    .btn-sm { padding: 4px 10px; font-size: 13px; }
+
+    /* ── Sidebar ── */
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-header h2 { font-size: 16px; font-weight: 600; }
+
+    .sidebar-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+    }
+
+    .sidebar-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .sidebar-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .sidebar-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-item:hover { background: var(--bg); }
+    .sidebar-item.active { background: var(--accent-light); }
+
+    .sidebar-item-title {
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-item-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .sidebar-item-badge {
+      font-size: 11px;
+      background: var(--accent);
+      color: #fff;
+      padding: 1px 6px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Editor form ── */
+
+    .editor-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .form-group input[type="text"],
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg-white);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .form-group input[type="text"]:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .form-group textarea {
+      min-height: 200px;
+      resize: vertical;
+      font-family: "SF Mono", "Menlo", "Monaco", monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .form-row .form-group { flex: 1; }
+
+    /* ── Track upload ── */
+
+    .track-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .track-name {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .track-none {
+      color: var(--text-dim);
+      font-style: italic;
+    }
+
+    /* ── Font size slider ── */
+
+    .font-size-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .font-size-row input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+
+    .font-size-value {
+      font-size: 14px;
+      font-weight: 600;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    /* ── Setlist editor ── */
+
+    .setlist-songs {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .setlist-song-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-white);
+    }
+
+    .setlist-song-item:last-child { border-bottom: none; }
+
+    .setlist-song-item .song-name { flex: 1; font-size: 14px; }
+
+    .setlist-song-item .move-btns {
+      display: flex;
+      gap: 4px;
+    }
+
+    .move-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .move-btn:hover { background: var(--bg); }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+    }
+
+    /* ── Add song to setlist ── */
+
+    .add-song-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .add-song-row select {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    /* ── Actions bar ── */
+
+    .actions-bar {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .actions-bar .spacer { flex: 1; }
+
+    /* ── Status bar ── */
+
+    .status-bar {
+      padding: 8px 16px;
+      font-size: 12px;
+      color: var(--text-dim);
+      border-top: 1px solid var(--border);
+      background: var(--bg-white);
+      text-align: center;
+    }
+
+    .status-bar.saved { color: var(--success); }
+    .status-bar.error { color: var(--danger); }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="sidebar">
+      <div class="sidebar-header">
+        <h2>Gigalator</h2>
+        <button class="btn btn-sm" id="open-folder-btn">Open Folder</button>
+      </div>
+      <div class="sidebar-tabs">
+        <button class="sidebar-tab active" data-tab="songs">Songs</button>
+        <button class="sidebar-tab" data-tab="setlists">Setlists</button>
+      </div>
+      <div class="sidebar-list" id="sidebar-list"></div>
+      <div class="sidebar-footer">
+        <button class="btn btn-primary" id="add-btn" style="width:100%" disabled>+ Add Song</button>
+      </div>
+      <div class="status-bar" id="status-bar">No folder open</div>
+    </div>
+    <div id="editor">
+      <div id="welcome">
+        <h1>Gigalator Manager</h1>
+        <p>Open your local Gigalator project folder to start managing songs, lyrics, and backing tracks.</p>
+        <button class="btn btn-primary" id="open-folder-btn-main">Open Gigalator Folder</button>
+        <p style="font-size:12px;color:var(--text-dim);margin-top:8px">Requires Chrome or Edge</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ── State ──
+    var dirHandle = null;
+    var songsHandle = null;
+    var tracksHandle = null;
+    var data = null;
+    var activeTab = 'songs';
+    var selectedId = null;
+    var dirty = false;
+
+    // ── DOM ──
+    var sidebarList = document.getElementById('sidebar-list');
+    var editor = document.getElementById('editor');
+    var statusBar = document.getElementById('status-bar');
+    var addBtn = document.getElementById('add-btn');
+
+    // ── Open Folder ──
+    document.getElementById('open-folder-btn').addEventListener('click', openFolder);
+    document.getElementById('open-folder-btn-main').addEventListener('click', openFolder);
+
+    async function openFolder() {
+      try {
+        dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+
+        var songsDir = await dirHandle.getDirectoryHandle('songs');
+        songsHandle = await songsDir.getFileHandle('songs.json');
+
+        try {
+          tracksHandle = await dirHandle.getDirectoryHandle('tracks');
+        } catch (e) {
+          tracksHandle = await dirHandle.getDirectoryHandle('tracks', { create: true });
+        }
+
+        await loadData();
+        addBtn.disabled = false;
+        setStatus('Folder opened: ' + dirHandle.name);
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          setStatus('Failed to open folder: ' + e.message, 'error');
+        }
+      }
+    }
+
+    async function loadData() {
+      var file = await songsHandle.getFile();
+      var text = await file.text();
+      data = JSON.parse(text);
+      renderSidebar();
+      showWelcome();
+    }
+
+    async function saveData() {
+      var writable = await songsHandle.createWritable();
+      await writable.write(JSON.stringify(data, null, 2));
+      await writable.close();
+      dirty = false;
+      setStatus('Saved', 'saved');
+    }
+
+    // ── Tab switching ──
+    document.querySelectorAll('.sidebar-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        activeTab = tab.getAttribute('data-tab');
+        document.querySelectorAll('.sidebar-tab').forEach(function (t) {
+          t.classList.toggle('active', t === tab);
+        });
+        addBtn.textContent = activeTab === 'songs' ? '+ Add Song' : '+ Add Setlist';
+        selectedId = null;
+        renderSidebar();
+        showWelcome();
+      });
+    });
+
+    // ── Add button ──
+    addBtn.addEventListener('click', function () {
+      if (!data) return;
+      if (activeTab === 'songs') {
+        addNewSong();
+      } else {
+        addNewSetlist();
+      }
+    });
+
+    // ── Render sidebar ──
+    function renderSidebar() {
+      if (!data) { sidebarList.innerHTML = ''; return; }
+
+      var html = '';
+
+      if (activeTab === 'songs') {
+        var songIds = Object.keys(data.songs).sort(function (a, b) {
+          return data.songs[a].title.localeCompare(data.songs[b].title);
+        });
+
+        songIds.forEach(function (id) {
+          var song = data.songs[id];
+          var cls = id === selectedId ? ' active' : '';
+          html += '<div class="sidebar-item' + cls + '" data-id="' + id + '">'
+            + '<div>'
+            + '<div class="sidebar-item-title">' + esc(song.title) + '</div>'
+            + '<div class="sidebar-item-sub">' + esc(song.artist) + '</div>'
+            + '</div>'
+            + (song.track ? '<span class="sidebar-item-badge">Track</span>' : '')
+            + '</div>';
+        });
+      } else {
+        data.setlists.forEach(function (sl, i) {
+          var cls = selectedId === sl.id ? ' active' : '';
+          html += '<div class="sidebar-item' + cls + '" data-id="' + sl.id + '" data-index="' + i + '">'
+            + '<div>'
+            + '<div class="sidebar-item-title">' + esc(sl.name) + '</div>'
+            + '<div class="sidebar-item-sub">' + sl.songs.length + ' songs</div>'
+            + '</div>'
+            + '</div>';
+        });
+      }
+
+      sidebarList.innerHTML = html;
+
+      sidebarList.querySelectorAll('.sidebar-item').forEach(function (el) {
+        el.addEventListener('click', function () {
+          selectedId = el.getAttribute('data-id');
+          renderSidebar();
+          if (activeTab === 'songs') {
+            showSongEditor(selectedId);
+          } else {
+            showSetlistEditor(selectedId);
+          }
+        });
+      });
+    }
+
+    // ── Welcome ──
+    function showWelcome() {
+      if (!data) return;
+      var total = Object.keys(data.songs).length;
+      editor.innerHTML = '<div id="welcome">'
+        + '<h1>Gigalator Manager</h1>'
+        + '<p>' + total + ' songs, ' + data.setlists.length + ' setlists</p>'
+        + '<p style="color:var(--text-dim)">Select a song or setlist from the sidebar to edit, or click + to add new.</p>'
+        + '</div>';
+    }
+
+    // ── Song Editor ──
+    function showSongEditor(songId) {
+      var song = data.songs[songId];
+      if (!song) return;
+
+      var trackDisplay = song.track
+        ? '<span class="track-name">' + esc(song.track) + '</span>'
+          + '<button class="btn btn-sm btn-danger" id="remove-track-btn">Remove</button>'
+        : '<span class="track-name track-none">No backing track</span>';
+
+      editor.innerHTML = '<div class="editor-title">Edit Song</div>'
+        + '<div class="form-row">'
+        + '<div class="form-group">'
+        + '<label>Title</label>'
+        + '<input type="text" id="song-title" value="' + escAttr(song.title) + '">'
+        + '</div>'
+        + '<div class="form-group">'
+        + '<label>Artist</label>'
+        + '<input type="text" id="song-artist" value="' + escAttr(song.artist) + '">'
+        + '</div>'
+        + '</div>'
+        + '<div class="form-group">'
+        + '<label>Lyrics</label>'
+        + '<textarea id="song-lyrics">' + esc(song.lyrics) + '</textarea>'
+        + '</div>'
+        + '<div class="form-group">'
+        + '<label>Backing Track</label>'
+        + '<div class="track-info" id="track-info">' + trackDisplay + '</div>'
+        + '<div style="margin-top:8px">'
+        + '<button class="btn btn-sm" id="upload-track-btn">Upload MP3</button>'
+        + '</div>'
+        + '</div>'
+        + '<div class="form-group">'
+        + '<label>Font Size (iPad lyrics view)</label>'
+        + '<div class="font-size-row">'
+        + '<span>10px</span>'
+        + '<input type="range" id="song-fontsize" min="10" max="36" value="' + (song.fontSize || 18) + '">'
+        + '<span>36px</span>'
+        + '<span class="font-size-value" id="fontsize-val">' + (song.fontSize || 18) + 'px</span>'
+        + '</div>'
+        + '</div>'
+        + '<div class="actions-bar">'
+        + '<button class="btn btn-danger" id="delete-song-btn">Delete Song</button>'
+        + '<div class="spacer"></div>'
+        + '<button class="btn btn-primary" id="save-song-btn">Save Changes</button>'
+        + '</div>';
+
+      // Font size slider
+      var slider = document.getElementById('song-fontsize');
+      var fsVal = document.getElementById('fontsize-val');
+      slider.addEventListener('input', function () {
+        fsVal.textContent = slider.value + 'px';
+      });
+
+      // Upload track
+      document.getElementById('upload-track-btn').addEventListener('click', function () {
+        uploadTrack(songId);
+      });
+
+      // Remove track
+      var removeBtn = document.getElementById('remove-track-btn');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', function () {
+          song.track = null;
+          showSongEditor(songId);
+        });
+      }
+
+      // Save
+      document.getElementById('save-song-btn').addEventListener('click', function () {
+        saveSong(songId);
+      });
+
+      // Delete
+      document.getElementById('delete-song-btn').addEventListener('click', function () {
+        if (confirm('Delete "' + song.title + '"? This cannot be undone.')) {
+          deleteSong(songId);
+        }
+      });
+    }
+
+    async function saveSong(songId) {
+      var song = data.songs[songId];
+      var newTitle = document.getElementById('song-title').value.trim();
+      var newArtist = document.getElementById('song-artist').value.trim();
+      var newLyrics = document.getElementById('song-lyrics').value;
+      var newFontSize = parseInt(document.getElementById('song-fontsize').value, 10);
+
+      if (!newTitle) { alert('Title is required'); return; }
+
+      // Check if ID needs to change
+      var newId = slugify(newTitle);
+      if (newId !== songId && data.songs[newId]) {
+        newId = newId + '-' + Date.now();
+      }
+
+      song.title = newTitle;
+      song.artist = newArtist;
+      song.lyrics = newLyrics;
+      song.fontSize = newFontSize === 18 ? null : newFontSize;
+
+      if (newId !== songId) {
+        data.songs[newId] = song;
+        delete data.songs[songId];
+
+        // Update setlists
+        data.setlists.forEach(function (sl) {
+          var idx = sl.songs.indexOf(songId);
+          if (idx !== -1) sl.songs[idx] = newId;
+        });
+
+        selectedId = newId;
+      }
+
+      await saveData();
+      renderSidebar();
+    }
+
+    function deleteSong(songId) {
+      delete data.songs[songId];
+
+      // Remove from setlists
+      data.setlists.forEach(function (sl) {
+        sl.songs = sl.songs.filter(function (id) { return id !== songId; });
+      });
+
+      selectedId = null;
+      saveData();
+      renderSidebar();
+      showWelcome();
+    }
+
+    function addNewSong() {
+      var id = 'new-song-' + Date.now();
+      data.songs[id] = {
+        title: 'New Song',
+        artist: '',
+        lyrics: '',
+        track: null,
+        fontSize: null
+      };
+      selectedId = id;
+      renderSidebar();
+      showSongEditor(id);
+    }
+
+    // ── Track upload ──
+    async function uploadTrack(songId) {
+      try {
+        var pickerOpts = {
+          types: [{
+            description: 'Audio files',
+            accept: { 'audio/*': ['.mp3', '.m4a', '.wav', '.ogg'] }
+          }]
+        };
+        var fileHandles = await window.showOpenFilePicker(pickerOpts);
+        var file = await fileHandles[0].getFile();
+
+        var filename = file.name;
+
+        // Write to tracks directory
+        var trackFile = await tracksHandle.getFileHandle(filename, { create: true });
+        var writable = await trackFile.createWritable();
+        await writable.write(file);
+        await writable.close();
+
+        data.songs[songId].track = 'tracks/' + filename;
+        setStatus('Track uploaded: ' + filename, 'saved');
+        showSongEditor(songId);
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          setStatus('Upload failed: ' + e.message, 'error');
+        }
+      }
+    }
+
+    // ── Setlist Editor ──
+    function showSetlistEditor(setlistId) {
+      var sl = data.setlists.find(function (s) { return s.id === setlistId; });
+      if (!sl) return;
+
+      var songsHtml = '';
+      sl.songs.forEach(function (songId, i) {
+        var song = data.songs[songId];
+        var title = song ? song.title : songId + ' (missing)';
+        songsHtml += '<div class="setlist-song-item" data-index="' + i + '">'
+          + '<span class="song-name">' + esc(title) + '</span>'
+          + '<div class="move-btns">'
+          + '<button class="move-btn" data-dir="up" data-i="' + i + '" title="Move up">&#8593;</button>'
+          + '<button class="move-btn" data-dir="down" data-i="' + i + '" title="Move down">&#8595;</button>'
+          + '</div>'
+          + '<button class="remove-btn" data-i="' + i + '" title="Remove">&times;</button>'
+          + '</div>';
+      });
+
+      // Songs available to add
+      var availableSongs = Object.keys(data.songs).filter(function (id) {
+        return sl.songs.indexOf(id) === -1;
+      }).sort(function (a, b) {
+        return data.songs[a].title.localeCompare(data.songs[b].title);
+      });
+
+      var optionsHtml = '<option value="">-- Select a song --</option>';
+      availableSongs.forEach(function (id) {
+        optionsHtml += '<option value="' + id + '">' + esc(data.songs[id].title) + '</option>';
+      });
+
+      editor.innerHTML = '<div class="editor-title">Edit Setlist</div>'
+        + '<div class="form-group">'
+        + '<label>Setlist Name</label>'
+        + '<input type="text" id="setlist-name" value="' + escAttr(sl.name) + '">'
+        + '</div>'
+        + '<div class="form-group">'
+        + '<label>Songs (' + sl.songs.length + ')</label>'
+        + '<div class="setlist-songs" id="setlist-songs">'
+        + (songsHtml || '<div style="padding:16px;text-align:center;color:var(--text-dim)">No songs yet</div>')
+        + '</div>'
+        + '<div class="add-song-row">'
+        + '<select id="add-song-select">' + optionsHtml + '</select>'
+        + '<button class="btn btn-sm" id="add-song-to-setlist-btn">Add</button>'
+        + '</div>'
+        + '</div>'
+        + '<div class="actions-bar">'
+        + '<button class="btn btn-danger" id="delete-setlist-btn">Delete Setlist</button>'
+        + '<div class="spacer"></div>'
+        + '<button class="btn btn-primary" id="save-setlist-btn">Save Changes</button>'
+        + '</div>';
+
+      // Move buttons
+      document.querySelectorAll('.move-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var idx = parseInt(btn.getAttribute('data-i'), 10);
+          var dir = btn.getAttribute('data-dir');
+          if (dir === 'up' && idx > 0) {
+            var tmp = sl.songs[idx];
+            sl.songs[idx] = sl.songs[idx - 1];
+            sl.songs[idx - 1] = tmp;
+          } else if (dir === 'down' && idx < sl.songs.length - 1) {
+            var tmp2 = sl.songs[idx];
+            sl.songs[idx] = sl.songs[idx + 1];
+            sl.songs[idx + 1] = tmp2;
+          }
+          showSetlistEditor(setlistId);
+        });
+      });
+
+      // Remove buttons
+      document.querySelectorAll('.remove-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var idx = parseInt(btn.getAttribute('data-i'), 10);
+          sl.songs.splice(idx, 1);
+          showSetlistEditor(setlistId);
+        });
+      });
+
+      // Add song
+      document.getElementById('add-song-to-setlist-btn').addEventListener('click', function () {
+        var sel = document.getElementById('add-song-select');
+        if (sel.value) {
+          sl.songs.push(sel.value);
+          showSetlistEditor(setlistId);
+        }
+      });
+
+      // Save
+      document.getElementById('save-setlist-btn').addEventListener('click', function () {
+        var newName = document.getElementById('setlist-name').value.trim();
+        if (!newName) { alert('Name is required'); return; }
+
+        var newSlId = slugify(newName);
+        if (newSlId !== sl.id) {
+          // Check for duplicates
+          var existing = data.setlists.find(function (s) { return s.id === newSlId && s !== sl; });
+          if (existing) newSlId = newSlId + '-' + Date.now();
+          sl.id = newSlId;
+          selectedId = newSlId;
+        }
+
+        sl.name = newName;
+        saveData();
+        renderSidebar();
+      });
+
+      // Delete
+      document.getElementById('delete-setlist-btn').addEventListener('click', function () {
+        if (confirm('Delete setlist "' + sl.name + '"?')) {
+          data.setlists = data.setlists.filter(function (s) { return s.id !== setlistId; });
+          selectedId = null;
+          saveData();
+          renderSidebar();
+          showWelcome();
+        }
+      });
+    }
+
+    function addNewSetlist() {
+      var id = 'setlist-' + Date.now();
+      data.setlists.push({
+        id: id,
+        name: 'New Setlist',
+        songs: []
+      });
+      selectedId = id;
+      renderSidebar();
+      showSetlistEditor(id);
+    }
+
+    // ── Helpers ──
+    function esc(str) {
+      var d = document.createElement('div');
+      d.textContent = str || '';
+      return d.innerHTML;
+    }
+
+    function escAttr(str) {
+      return (str || '').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function slugify(str) {
+      return str.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .substring(0, 60);
+    }
+
+    function setStatus(msg, cls) {
+      statusBar.textContent = msg;
+      statusBar.className = 'status-bar';
+      if (cls) statusBar.classList.add(cls);
+      if (cls === 'saved') {
+        setTimeout(function () {
+          if (statusBar.textContent === msg) {
+            statusBar.textContent = dirHandle ? 'Folder: ' + dirHandle.name : 'Ready';
+            statusBar.className = 'status-bar';
+          }
+        }, 3000);
+      }
+    }
+  })();
+  </script>
+</body>
+</html>
