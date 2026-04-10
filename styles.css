@@ -1,0 +1,279 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #1a1a1a;
+  --bg-card: #252525;
+  --bg-card-hover: #303030;
+  --text: #e8e8e8;
+  --text-dim: #999;
+  --accent: #f0a030;
+  --accent-dim: #c07820;
+  --danger: #e05050;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ── Header ── */
+
+header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  padding-top: calc(12px + var(--safe-top));
+  background: #111;
+  border-bottom: 1px solid #333;
+  min-height: 56px;
+  flex-shrink: 0;
+}
+
+.header-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 24px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-btn:active {
+  background: rgba(240, 160, 48, 0.15);
+}
+
+.header-btn.hidden {
+  visibility: hidden;
+}
+
+#header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-spacer {
+  min-width: 44px;
+}
+
+/* ── Main content ── */
+
+main {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+  padding-bottom: calc(16px + var(--safe-bottom));
+}
+
+/* ── Song / Setlist list items ── */
+
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  margin-bottom: 8px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+  min-height: 60px;
+}
+
+.list-item:active {
+  background: var(--bg-card-hover);
+}
+
+.list-item-text {
+  flex: 1;
+}
+
+.list-item-title {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.list-item-subtitle {
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+.list-item-arrow {
+  color: var(--text-dim);
+  font-size: 20px;
+  margin-left: 12px;
+}
+
+.list-item .track-badge {
+  background: var(--accent-dim);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ── Setlist header with cache button ── */
+
+.setlist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.setlist-header h2 {
+  font-size: 16px;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.cache-btn {
+  background: var(--bg-card);
+  border: 1px solid #444;
+  color: var(--accent);
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.cache-btn:active {
+  background: var(--bg-card-hover);
+}
+
+.cache-btn.cached {
+  border-color: #4a4;
+  color: #4a4;
+}
+
+/* ── Lyrics view ── */
+
+.lyrics {
+  font-size: 22px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  padding-bottom: 100px;
+  font-weight: 300;
+}
+
+.lyrics-artist {
+  font-size: 16px;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+}
+
+/* ── Audio player bar ── */
+
+#player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  padding-bottom: calc(12px + var(--safe-bottom));
+  background: #111;
+  border-top: 1px solid #333;
+  flex-shrink: 0;
+}
+
+#player.hidden {
+  display: none;
+}
+
+#play-btn {
+  background: var(--accent);
+  border: none;
+  color: #111;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+#play-btn:active {
+  background: var(--accent-dim);
+}
+
+#progress-wrap {
+  flex: 1;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+#progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.25s linear;
+}
+
+#time-display {
+  font-size: 14px;
+  color: var(--text-dim);
+  min-width: 48px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Section labels ── */
+
+.section-label {
+  font-size: 14px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* ── Cache progress ── */
+
+.cache-progress {
+  font-size: 14px;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 8px;
+}

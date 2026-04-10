@@ -1,0 +1,46 @@
+{
+  "setlists": [
+    {
+      "id": "friday-rock",
+      "name": "Friday Rock Gig",
+      "songs": ["mustang-sally", "sweet-home", "proud-mary"]
+    },
+    {
+      "id": "sunday-jazz",
+      "name": "Sunday Jazz Brunch",
+      "songs": ["fly-me", "autumn-leaves"]
+    }
+  ],
+  "songs": {
+    "mustang-sally": {
+      "title": "Mustang Sally",
+      "artist": "Wilson Pickett",
+      "lyrics": "Mustang Sally\nGuess you better slow your mustang down\nMustang Sally now baby\nGuess you better slow your mustang down\n\nYou been running all over town now\nOh I guess I have to put your flat feet on the ground\n\n[Chorus]\nAll you wanna do is ride around Sally\nRide Sally ride\nAll you wanna do is ride around Sally\nRide Sally ride\nAll you wanna do is ride around Sally\nRide Sally ride\n\nOne of these early mornings\nOh you gonna be wiping your weeping eyes\n\n[Chorus]\n\nI bought you a brand new mustang\nIt was a nineteen sixty five\nNow you come around signifying woman\nYou don't wanna let me ride\n\n[Chorus]",
+      "track": null
+    },
+    "sweet-home": {
+      "title": "Sweet Home Alabama",
+      "artist": "Lynyrd Skynyrd",
+      "lyrics": "Big wheels keep on turning\nCarry me home to see my kin\nSinging songs about the southland\nI miss ole bamy once again and I think it's a sin\n\n[Chorus]\nSweet home Alabama\nWhere the skies are so blue\nSweet home Alabama\nLord I'm coming home to you\n\nIn Birmingham they love the Governor\nBoo boo boo\nNow we all did what we could do\nNow Watergate does not bother me\nDoes your conscience bother you tell the truth\n\n[Chorus]\n\nNow Muscle Shoals has got the Swampers\nAnd they've been known to pick a song or two\nLord they get me off so much\nThey pick me up when I'm feeling blue now how bout you\n\n[Chorus]",
+      "track": "tracks/sweet-home-alabama.mp3"
+    },
+    "proud-mary": {
+      "title": "Proud Mary",
+      "artist": "Creedence Clearwater Revival",
+      "lyrics": "Left a good job in the city\nWorking for the man every night and day\nAnd I never lost one minute of sleeping\nWorrying bout the way things might have been\n\n[Chorus]\nBig wheel keep on turning\nProud Mary keep on burning\nRolling rolling rolling on the river\n\nCleaned a lot of plates in Memphis\nPumped a lot of pain down in New Orleans\nBut I never saw the good side of the city\nTil I hitched a ride on a riverboat queen\n\n[Chorus]\n\nIf you come down to the river\nBet you gonna find some people who live\nYou don't have to worry cause you have no money\nPeople on the river are happy to give\n\n[Chorus]",
+      "track": "tracks/proud-mary.mp3"
+    },
+    "fly-me": {
+      "title": "Fly Me to the Moon",
+      "artist": "Frank Sinatra",
+      "lyrics": "Fly me to the moon\nLet me play among the stars\nLet me see what spring is like\nOn a Jupiter and Mars\n\nIn other words hold my hand\nIn other words baby kiss me\n\nFill my heart with song\nAnd let me sing forevermore\nYou are all I long for\nAll I worship and adore\n\nIn other words please be true\nIn other words I love you",
+      "track": null
+    },
+    "autumn-leaves": {
+      "title": "Autumn Leaves",
+      "artist": "Joseph Kosma",
+      "lyrics": "The falling leaves\nDrift by my window\nThe autumn leaves\nOf red and gold\n\nI see your lips\nThe summer kisses\nThe sunburned hands\nI used to hold\n\nSince you went away\nThe days grow long\nAnd soon I'll hear\nOld winter's song\n\nBut I miss you most of all\nMy darling\nWhen autumn leaves\nStart to fall",
+      "track": "tracks/autumn-leaves.mp3"
+    }
+  }
+}
