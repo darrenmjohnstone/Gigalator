@@ -60,8 +60,8 @@ self.addEventListener('fetch', function (event) {
     }
   }
 
-  // MP3 track requests — cache first, fallback to network (and cache on fetch)
-  if (url.pathname.includes('/tracks/') && url.pathname.endsWith('.mp3')) {
+  // Audio track requests — cache first, fallback to network (and cache on fetch)
+  if (url.pathname.includes('/tracks/') && (url.pathname.endsWith('.mp3') || url.pathname.endsWith('.m4a'))) {
     event.respondWith(
       caches.open(TRACK_CACHE).then(function (cache) {
         return cache.match(event.request).then(function (cached) {
