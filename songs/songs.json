@@ -188,6 +188,18 @@
         "youre-got-a-friend",
         "your-song"
       ]
+    },
+    {
+      "id": "set-1-acoustic",
+      "name": "Set 1 Acoustic",
+      "songs": [
+        "knocking-on-heavens-door",
+        "best-of-my-love",
+        "better-be-home-soon",
+        "true-blue",
+        "fall-at-your-feet",
+        "imagine"
+      ]
     }
   ],
   "songs": {
