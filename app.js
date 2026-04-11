@@ -271,8 +271,24 @@
       + '<div class="lyrics-page-dot active" id="page-dot-0"></div>'
       + '<div class="lyrics-page-dot" id="page-dot-1"></div>'
       + '<span class="lyrics-page-hint" id="page-hint">Swipe for more &#8250;</span>'
-      + '</div>'
       + '</div>';
+
+    // "Up Next" bar at the bottom — shows next song name + next button
+    if (hasNext) {
+      var nextIdx = currentSetlist.songs.indexOf(songId) + 1;
+      var nextSongData = data.songs[currentSetlist.songs[nextIdx]];
+      if (nextSongData) {
+        html += '<div class="up-next-bar" id="up-next-bar">'
+          + '<div class="up-next-info">'
+          + '<span class="up-next-label">Up next</span>'
+          + '<span class="up-next-title">' + esc(nextSongData.title) + '</span>'
+          + '</div>'
+          + '<button class="up-next-btn" id="up-next-btn">Next &#9654;</button>'
+          + '</div>';
+      }
+    }
+
+    html += '</div>';
 
     main.innerHTML = html;
 
@@ -300,6 +316,12 @@
         hint.innerHTML = 'Swipe for more &#8250;';
       }
     });
+
+    // Bind "Up Next" button
+    var upNextBtn = document.getElementById('up-next-btn');
+    if (upNextBtn) {
+      upNextBtn.addEventListener('click', playNextSong);
+    }
 
     // Audio — only change track if this song has one and it's different
     if (song.track) {
@@ -421,7 +443,10 @@
     var nextSong = data.songs[nextId];
     if (!nextSong) return;
 
-    // If the next song has a track, load and play it
+    // Always navigate to the next song's lyrics
+    showLyrics(nextId);
+
+    // If the next song has a track, auto-load and auto-play it
     if (nextSong.track) {
       audio.pause();
       audio.src = nextSong.track;
@@ -431,10 +456,8 @@
       progressBar.style.width = '0%';
       timeDisplay.textContent = '0:00';
       updateTrackLabel();
+      player.classList.remove('hidden');
     }
-
-    // Always navigate to the next song's lyrics
-    showLyrics(nextId);
   }
 
   function formatTime(secs) {
