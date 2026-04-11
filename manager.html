@@ -630,10 +630,16 @@
     function showWelcome() {
       if (!data) return;
       var total = Object.keys(data.songs).length;
+      var trackCount = Object.values(data.songs).filter(function (s) { return s.track; }).length;
       editor.innerHTML = '<div id="welcome">'
         + '<h1>Gigalator Manager</h1>'
-        + '<p>' + total + ' songs, ' + data.setlists.length + ' setlists</p>'
+        + '<p>' + total + ' songs, ' + trackCount + ' with backing tracks, ' + data.setlists.length + ' setlists</p>'
         + '<p style="color:var(--text-dim)">Select a song or setlist from the sidebar to edit, or click + to add new.</p>'
+        + '<div class="deploy-info" style="max-width:500px;margin-top:24px">'
+        + '<strong>Deploy to iPad app:</strong><br>'
+        + 'After making changes, double-click <code>deploy.command</code> in your Gigalator folder to push updates. '
+        + 'Then open the app on your iPad with WiFi to pick up the changes.'
+        + '</div>'
         + '</div>';
     }
 
