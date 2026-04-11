@@ -3,12 +3,19 @@
     {
       "id": "friday-rock",
       "name": "Friday Rock Gig",
-      "songs": ["mustang-sally", "sweet-home", "proud-mary"]
+      "songs": [
+        "mustang-sally",
+        "sweet-home",
+        "proud-mary"
+      ]
     },
     {
       "id": "sunday-jazz",
       "name": "Sunday Jazz Brunch",
-      "songs": ["fly-me", "autumn-leaves"]
+      "songs": [
+        "fly-me",
+        "autumn-leaves"
+      ]
     }
   ],
   "songs": {
@@ -46,6 +53,13 @@
       "lyrics": "The falling leaves\nDrift by my window\nThe autumn leaves\nOf red and gold\n\nI see your lips\nThe summer kisses\nThe sunburned hands\nI used to hold\n\nSince you went away\nThe days grow long\nAnd soon I'll hear\nOld winter's song\n\nBut I miss you most of all\nMy darling\nWhen autumn leaves\nStart to fall",
       "track": "tracks/autumn-leaves.mp3",
       "fontSize": null
+    },
+    "test": {
+      "title": "Test",
+      "artist": "test",
+      "lyrics": "Oh, I come from a land, from a faraway place\nWhere the caravan camels roam\nWhere it's flat and immense and the heat is intense\nIt's barbaric, but hey, it's home\nWhen the wind's from the east and the sun's from the west\nAnd the sand in the glass is right\nCome on down, stop on by, hop a carpet and fly\nTo another Arabian night\n\nArabian nights, like Arabian days\nMore often than not are hotter than hot\nIn a lot of good ways\nArabian nights 'neath Arabian moons\nA fool off his guard could fall and fall hard\nOut there on the dunes",
+      "track": "tracks/Will Smith - Arabian Nights (Lyrics).mp3",
+      "fontSize": 20
     }
   }
 }
