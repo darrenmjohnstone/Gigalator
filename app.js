@@ -111,7 +111,10 @@
       el.addEventListener('click', function () {
         const id = el.getAttribute('data-setlist');
         if (id === '__all__') {
-          showSongList({ id: '__all__', name: 'All Songs', songs: Object.keys(data.songs) });
+          var allSorted = Object.keys(data.songs).sort(function (a, b) {
+            return data.songs[a].title.localeCompare(data.songs[b].title);
+          });
+          showSongList({ id: '__all__', name: 'All Songs', songs: allSorted });
         } else {
           const setlist = data.setlists.find(function (s) { return s.id === id; });
           if (setlist) showSongList(setlist);
