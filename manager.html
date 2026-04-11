@@ -970,8 +970,17 @@
       }
 
       // Save
-      document.getElementById('save-song-btn').addEventListener('click', function () {
-        saveSong(songId);
+      document.getElementById('save-song-btn').addEventListener('click', async function () {
+        var btn = this;
+        await saveSong(songId);
+        btn.textContent = 'Saved!';
+        btn.style.background = '#2e7d32';
+        btn.style.borderColor = '#2e7d32';
+        setTimeout(function () {
+          btn.textContent = 'Save Changes';
+          btn.style.background = '';
+          btn.style.borderColor = '';
+        }, 1500);
       });
 
       // Delete
@@ -1211,6 +1220,7 @@
 
       // Save
       document.getElementById('save-setlist-btn').addEventListener('click', function () {
+        var btn = this;
         var newName = document.getElementById('setlist-name').value.trim();
         if (!newName) { alert('Name is required'); return; }
 
@@ -1226,6 +1236,15 @@
         sl.name = newName;
         saveData();
         renderSidebar();
+
+        btn.textContent = 'Saved!';
+        btn.style.background = '#2e7d32';
+        btn.style.borderColor = '#2e7d32';
+        setTimeout(function () {
+          btn.textContent = 'Save Changes';
+          btn.style.background = '';
+          btn.style.borderColor = '';
+        }, 1500);
       });
 
       // Delete

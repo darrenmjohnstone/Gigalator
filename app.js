@@ -104,6 +104,15 @@
       + '<button class="refresh-btn" id="refresh-btn">&#8635; Refresh Songs</button>'
       + '</div>';
 
+    // Sydney timestamp
+    var now = new Date();
+    var sydneyTime = now.toLocaleString('en-AU', {
+      timeZone: 'Australia/Sydney',
+      day: 'numeric', month: 'short', year: 'numeric',
+      hour: 'numeric', minute: '2-digit', hour12: true
+    });
+    html += '<div class="timestamp">Last loaded: ' + sydneyTime + '</div>';
+
     main.innerHTML = html;
     main.scrollTop = 0;
 

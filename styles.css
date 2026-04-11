@@ -395,3 +395,13 @@ main.lyrics-mode {
   border-color: #4a4;
   color: #4a4;
 }
+
+/* ── Timestamp ── */
+
+.timestamp {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 12px;
+  opacity: 0.6;
+}
