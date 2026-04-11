@@ -754,9 +754,9 @@
         + '<label>Font Size (iPad lyrics view)</label>'
         + '<div class="font-size-row">'
         + '<span>10px</span>'
-        + '<input type="range" id="song-fontsize" min="10" max="36" value="' + (song.fontSize || 18) + '">'
+        + '<input type="range" id="song-fontsize" min="10" max="36" value="' + (song.fontSize || 30) + '">'
         + '<span>36px</span>'
-        + '<span class="font-size-value" id="fontsize-val">' + (song.fontSize || 18) + 'px</span>'
+        + '<span class="font-size-value" id="fontsize-val">' + (song.fontSize || 30) + 'px</span>'
         + '</div>'
         + '</div>'
         + '<div class="form-group">'
@@ -855,7 +855,7 @@
       song.title = newTitle;
       song.artist = newArtist;
       song.lyrics = newLyrics;
-      song.fontSize = newFontSize === 18 ? null : newFontSize;
+      song.fontSize = newFontSize === 30 ? null : newFontSize;
 
       if (newId !== songId) {
         data.songs[newId] = song;
