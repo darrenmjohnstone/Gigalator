@@ -516,40 +516,68 @@
 
     .preview-container {
       margin-top: 8px;
+      position: relative;
+      /* Height set dynamically by JS based on scale */
+    }
+
+    .preview-label-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .preview-device-label {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .preview-device-select {
+      font-size: 12px;
+      padding: 2px 6px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .preview-scaler {
+      /* This div is the actual iPad resolution, scaled down with transform */
+      transform-origin: top left;
+      /* width/height/transform set by JS */
     }
 
     .preview-frame {
       background: #1a1a1a;
-      border-radius: 12px;
       border: 2px solid #444;
-      padding: 16px 20px;
-      aspect-ratio: 4 / 3;
+      border-radius: 0;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       position: relative;
+      /* Exact pixel dimensions set by JS to match iPad */
     }
 
     .preview-header {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding-bottom: 8px;
-      margin-bottom: 8px;
+      padding: 12px 16px;
       border-bottom: 1px solid #333;
       flex-shrink: 0;
+      background: #111;
+      min-height: 56px;
     }
 
     .preview-header-title {
       color: #e8e8e8;
-      font-size: 13px;
+      font-size: 20px;
       font-weight: 600;
     }
 
     .preview-artist {
-      font-size: 10px;
+      font-size: 16px;
       color: #999;
-      margin-bottom: 8px;
+      padding: 0 16px;
+      margin-top: 12px;
       flex-shrink: 0;
     }
 
@@ -557,25 +585,26 @@
       flex: 1;
       overflow: hidden;
       column-count: 2;
-      column-gap: 20px;
+      column-gap: 32px;
       column-rule: 1px solid #333;
       white-space: pre-wrap;
       color: #e8e8e8;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       font-weight: 300;
       line-height: 1.6;
-      font-size: 11px;
+      padding: 0 16px 16px;
+      /* font-size set by JS to actual iPad font size (no scaling!) */
     }
 
     .preview-overflow-warn {
       position: absolute;
-      bottom: 8px;
-      right: 12px;
+      bottom: 12px;
+      right: 16px;
       background: #d32f2f;
       color: #fff;
-      font-size: 11px;
+      font-size: 14px;
       font-weight: 600;
-      padding: 2px 8px;
+      padding: 4px 12px;
       border-radius: 4px;
       display: none;
     }
@@ -828,12 +857,22 @@
         + '</div>'
         + '<div class="form-group">'
         + '<label>iPad Preview</label>'
-        + '<div class="preview-container">'
-        + '<div class="preview-frame">'
+        + '<div class="preview-label-bar">'
+        + '<span class="preview-device-label">Device:</span>'
+        + '<select class="preview-device-select" id="preview-device">'
+        + '<option value="ipad-pro-11" selected>iPad Pro 11&quot; (landscape)</option>'
+        + '<option value="ipad-pro-13">iPad Pro 12.9&quot; (landscape)</option>'
+        + '<option value="ipad-9">iPad 9th gen (landscape)</option>'
+        + '</select>'
+        + '</div>'
+        + '<div class="preview-container" id="preview-container">'
+        + '<div class="preview-scaler" id="preview-scaler">'
+        + '<div class="preview-frame" id="preview-frame">'
         + '<div class="preview-header"><span class="preview-header-title">' + esc(song.title) + '</span></div>'
         + '<div class="preview-artist">' + esc(song.artist) + '</div>'
         + '<div class="preview-lyrics" id="preview-lyrics">' + esc(song.lyrics) + '</div>'
         + '<div class="preview-overflow-warn" id="preview-overflow">OVERFLOWS — reduce font size</div>'
+        + '</div>'
         + '</div>'
         + '</div>'
         + '</div>'
@@ -853,12 +892,42 @@
       var previewEl = document.getElementById('preview-lyrics');
       var overflowWarn = document.getElementById('preview-overflow');
       var lyricsTextarea = document.getElementById('song-lyrics');
+      var previewContainer = document.getElementById('preview-container');
+      var previewScaler = document.getElementById('preview-scaler');
+      var previewFrameEl = document.getElementById('preview-frame');
+      var deviceSelect = document.getElementById('preview-device');
+
+      // iPad logical resolutions in landscape (width x height)
+      var IPAD_SIZES = {
+        'ipad-pro-11':  { w: 1194, h: 834,  label: 'iPad Pro 11"' },
+        'ipad-pro-13':  { w: 1366, h: 1024, label: 'iPad Pro 12.9"' },
+        'ipad-9':       { w: 1080, h: 810,  label: 'iPad 9th gen' }
+      };
+
+      function sizePreview() {
+        var device = IPAD_SIZES[deviceSelect.value] || IPAD_SIZES['ipad-pro-11'];
+        var ipadW = device.w;
+        var ipadH = device.h;
+
+        // Set the preview frame to exact iPad pixel dimensions
+        previewFrameEl.style.width = ipadW + 'px';
+        previewFrameEl.style.height = ipadH + 'px';
+        previewScaler.style.width = ipadW + 'px';
+        previewScaler.style.height = ipadH + 'px';
+
+        // Scale down to fit in the available editor width
+        var availableWidth = previewContainer.parentElement.clientWidth;
+        var scale = Math.min(1, availableWidth / ipadW);
+        previewScaler.style.transform = 'scale(' + scale + ')';
+
+        // Set the container height to match the scaled preview
+        previewContainer.style.height = Math.ceil(ipadH * scale) + 'px';
+      }
 
       function updatePreview() {
         var fontSize = parseInt(slider.value, 10);
-        // Scale font size proportionally for the preview (preview is ~1/3 of real iPad)
-        var scaledSize = Math.max(6, Math.round(fontSize * 0.55));
-        previewEl.style.fontSize = scaledSize + 'px';
+        // Use the REAL font size — the preview is at actual iPad resolution, just scaled down visually
+        previewEl.style.fontSize = fontSize + 'px';
         previewEl.style.lineHeight = '1.6';
         previewEl.textContent = lyricsTextarea.value;
 
@@ -874,8 +943,17 @@
 
       lyricsTextarea.addEventListener('input', updatePreview);
 
-      // Initial preview render
+      deviceSelect.addEventListener('change', function () {
+        sizePreview();
+        updatePreview();
+      });
+
+      // Initial render
+      sizePreview();
       updatePreview();
+
+      // Re-scale on window resize
+      window.addEventListener('resize', sizePreview);
 
       // Upload track
       document.getElementById('upload-track-btn').addEventListener('click', function () {
