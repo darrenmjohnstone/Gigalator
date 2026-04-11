@@ -1,8 +1,8 @@
 // Gigalator Service Worker
-// Caches app shell + songs.json for offline use
+// Caches app shell for offline use at gigs
 // MP3 tracks are cached on demand or via "Cache Setlist" button
 
-const CACHE_NAME = 'gigalator-app-v1';
+const CACHE_NAME = 'gigalator-app-v2';
 const TRACK_CACHE = 'gigalator-tracks-v1';
 
 // App shell files to cache immediately
@@ -16,6 +16,9 @@ const APP_SHELL = [
   './icons/icon-192.png',
   './icons/icon-512.png'
 ];
+
+// Files that should never be cached (Mac-only tools)
+const NO_CACHE = ['manager.html', 'deploy.command'];
 
 // Install — cache app shell
 self.addEventListener('install', function (event) {
@@ -45,18 +48,24 @@ self.addEventListener('activate', function (event) {
   );
 });
 
-// Fetch — cache-first for app shell, cache-first for tracks (if cached)
+// Fetch strategy
 self.addEventListener('fetch', function (event) {
-  const url = new URL(event.request.url);
+  var url = new URL(event.request.url);
 
-  // MP3 track requests
+  // Never cache manager or deploy script
+  for (var i = 0; i < NO_CACHE.length; i++) {
+    if (url.pathname.endsWith(NO_CACHE[i])) {
+      event.respondWith(fetch(event.request));
+      return;
+    }
+  }
+
+  // MP3 track requests — cache first, fallback to network (and cache on fetch)
   if (url.pathname.includes('/tracks/') && url.pathname.endsWith('.mp3')) {
     event.respondWith(
       caches.open(TRACK_CACHE).then(function (cache) {
         return cache.match(event.request).then(function (cached) {
           if (cached) return cached;
-
-          // Not cached — fetch from network and cache for next time
           return fetch(event.request).then(function (response) {
             if (response.ok) {
               cache.put(event.request, response.clone());
@@ -69,19 +78,35 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  // App shell — cache first, fallback to network
-  event.respondWith(
-    caches.match(event.request).then(function (cached) {
-      if (cached) return cached;
-      return fetch(event.request).then(function (response) {
-        // Cache new app resources on the fly
-        if (response.ok && event.request.method === 'GET') {
+  // songs.json — network first so iPad picks up new songs when online
+  if (url.pathname.endsWith('/songs.json')) {
+    event.respondWith(
+      fetch(event.request).then(function (response) {
+        if (response.ok) {
           caches.open(CACHE_NAME).then(function (cache) {
             cache.put(event.request, response.clone());
           });
         }
         return response;
-      });
+      }).catch(function () {
+        return caches.match(event.request);
+      })
+    );
+    return;
+  }
+
+  // App shell — network first with cache fallback
+  // This ensures updates are picked up when online, but still works offline
+  event.respondWith(
+    fetch(event.request).then(function (response) {
+      if (response.ok && event.request.method === 'GET') {
+        caches.open(CACHE_NAME).then(function (cache) {
+          cache.put(event.request, response.clone());
+        });
+      }
+      return response;
+    }).catch(function () {
+      return caches.match(event.request);
     })
   );
 });
