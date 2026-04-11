@@ -64,9 +64,10 @@
     }
   }
 
-  function setHeader(title, showBack) {
+  function setHeader(title, showBack, showNext) {
     headerTitle.textContent = title;
     backBtn.classList.toggle('hidden', !showBack);
+    nextBtn.classList.toggle('hidden', !showNext);
   }
 
   // ── View: Setlists ──
@@ -242,7 +243,13 @@
     var song = data.songs[songId];
     if (!song) return;
 
-    setHeader(song.title, true);
+    // Show next button if there's a next song in the setlist
+    var hasNext = false;
+    if (currentSetlist && currentSetlist.songs) {
+      var idx = currentSetlist.songs.indexOf(songId);
+      hasNext = idx !== -1 && idx < currentSetlist.songs.length - 1;
+    }
+    setHeader(song.title, true, hasNext);
 
     currentFontSize = song.fontSize || DEFAULT_FONT_SIZE;
 
@@ -404,35 +411,30 @@
   function playNextSong() {
     if (!currentSetlist || !currentSetlist.songs) return;
     var songList = currentSetlist.songs;
-    // Find the current song in the setlist (use currentSong if in lyrics, otherwise playingSongId)
     var activeSong = currentSong || playingSongId;
     if (!activeSong) return;
 
     var idx = songList.indexOf(activeSong);
-    if (idx === -1) return;
+    if (idx === -1 || idx >= songList.length - 1) return; // already at end
 
-    // Find next song in the setlist that has a track
-    for (var i = idx + 1; i < songList.length; i++) {
-      var nextId = songList[i];
-      var nextSong = data.songs[nextId];
-      if (nextSong && nextSong.track) {
-        // Load and play the next track
-        audio.pause();
-        audio.src = nextSong.track;
-        playingSongId = nextId;
-        audio.play().catch(function () {});
-        playBtn.innerHTML = '&#9646;&#9646;';
-        progressBar.style.width = '0%';
-        timeDisplay.textContent = '0:00';
-        updateTrackLabel();
-        // If we're in lyrics view, navigate to the next song's lyrics
-        if (currentView === 'lyrics') {
-          showLyrics(nextId);
-        }
-        return;
-      }
+    var nextId = songList[idx + 1];
+    var nextSong = data.songs[nextId];
+    if (!nextSong) return;
+
+    // If the next song has a track, load and play it
+    if (nextSong.track) {
+      audio.pause();
+      audio.src = nextSong.track;
+      playingSongId = nextId;
+      audio.play().catch(function () {});
+      playBtn.innerHTML = '&#9646;&#9646;';
+      progressBar.style.width = '0%';
+      timeDisplay.textContent = '0:00';
+      updateTrackLabel();
     }
-    // No more songs with tracks — do nothing (we're at the end)
+
+    // Always navigate to the next song's lyrics
+    showLyrics(nextId);
   }
 
   function formatTime(secs) {

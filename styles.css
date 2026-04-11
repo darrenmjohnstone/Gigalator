@@ -374,25 +374,6 @@ main.lyrics-mode {
   transition: width 0.25s linear;
 }
 
-.next-btn {
-  background: none;
-  border: none;
-  color: var(--accent);
-  font-size: 22px;
-  padding: 8px;
-  cursor: pointer;
-  border-radius: 8px;
-  min-width: 44px;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.next-btn:active {
-  background: rgba(240, 160, 48, 0.15);
-}
 
 #time-display {
   font-size: 14px;
