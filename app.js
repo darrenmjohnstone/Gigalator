@@ -22,6 +22,7 @@
   const timeDisplay = document.getElementById('time-display');
   const trackLabel = document.getElementById('track-label');
   const audio = document.getElementById('audio');
+  const nextBtn = document.getElementById('next-btn');
 
   // ── Init ──
   async function init() {
@@ -35,6 +36,7 @@
 
     backBtn.addEventListener('click', goBack);
     playBtn.addEventListener('click', togglePlay);
+    nextBtn.addEventListener('click', playNextSong);
     progressWrap.addEventListener('click', seek);
     audio.addEventListener('timeupdate', updateProgress);
     audio.addEventListener('ended', onTrackEnd);
@@ -255,12 +257,20 @@
       + '<button class="font-size-btn" id="font-inc">&#43;</button>'
       + '</div>'
       + '</div>'
+      + '<div class="lyrics-scroll" id="lyrics-scroll">'
       + '<div class="lyrics" id="lyrics-text">' + esc(song.lyrics) + '</div>'
+      + '</div>'
+      + '<div class="lyrics-page-bar">'
+      + '<div class="lyrics-page-dot active" id="page-dot-0"></div>'
+      + '<div class="lyrics-page-dot" id="page-dot-1"></div>'
+      + '<span class="lyrics-page-hint" id="page-hint">Swipe for more &#8250;</span>'
+      + '</div>'
       + '</div>';
 
     main.innerHTML = html;
 
     var lyricsEl = document.getElementById('lyrics-text');
+    var scrollEl = document.getElementById('lyrics-scroll');
     lyricsEl.style.fontSize = currentFontSize + 'px';
 
     document.getElementById('font-dec').addEventListener('click', function () {
@@ -268,6 +278,20 @@
     });
     document.getElementById('font-inc').addEventListener('click', function () {
       adjustFontSize(1, lyricsEl);
+    });
+
+    // Page dots — update on scroll
+    scrollEl.addEventListener('scroll', function () {
+      var scrollPct = scrollEl.scrollLeft / (scrollEl.scrollWidth - scrollEl.clientWidth);
+      var onPage2 = scrollPct > 0.3;
+      document.getElementById('page-dot-0').classList.toggle('active', !onPage2);
+      document.getElementById('page-dot-1').classList.toggle('active', onPage2);
+      var hint = document.getElementById('page-hint');
+      if (onPage2) {
+        hint.innerHTML = '&#8249; Swipe back';
+      } else {
+        hint.innerHTML = 'Swipe for more &#8250;';
+      }
     });
 
     // Audio — only change track if this song has one and it's different
@@ -374,6 +398,41 @@
     if (currentView !== 'lyrics') {
       player.classList.add('hidden');
     }
+  }
+
+  // ── Next Song ──
+  function playNextSong() {
+    if (!currentSetlist || !currentSetlist.songs) return;
+    var songList = currentSetlist.songs;
+    // Find the current song in the setlist (use currentSong if in lyrics, otherwise playingSongId)
+    var activeSong = currentSong || playingSongId;
+    if (!activeSong) return;
+
+    var idx = songList.indexOf(activeSong);
+    if (idx === -1) return;
+
+    // Find next song in the setlist that has a track
+    for (var i = idx + 1; i < songList.length; i++) {
+      var nextId = songList[i];
+      var nextSong = data.songs[nextId];
+      if (nextSong && nextSong.track) {
+        // Load and play the next track
+        audio.pause();
+        audio.src = nextSong.track;
+        playingSongId = nextId;
+        audio.play().catch(function () {});
+        playBtn.innerHTML = '&#9646;&#9646;';
+        progressBar.style.width = '0%';
+        timeDisplay.textContent = '0:00';
+        updateTrackLabel();
+        // If we're in lyrics view, navigate to the next song's lyrics
+        if (currentView === 'lyrics') {
+          showLyrics(nextId);
+        }
+        return;
+      }
+    }
+    // No more songs with tracks — do nothing (we're at the end)
   }
 
   function formatTime(secs) {

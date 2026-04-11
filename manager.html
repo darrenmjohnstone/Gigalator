@@ -581,19 +581,59 @@
       flex-shrink: 0;
     }
 
-    .preview-lyrics {
+    .preview-lyrics-scroll {
       flex: 1;
       overflow: hidden;
-      column-count: 2;
+      display: flex;
+      position: relative;
+    }
+
+    .preview-lyrics {
+      min-width: 200%;
+      width: 200%;
+      height: 100%;
+      overflow: hidden;
+      column-count: 4;
       column-gap: 32px;
       column-rule: 1px solid #333;
+      column-fill: auto;
       white-space: pre-wrap;
       color: #e8e8e8;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       font-weight: 300;
       line-height: 1.6;
       padding: 0 16px 16px;
+      transition: transform 0.3s ease;
       /* font-size set by JS to actual iPad font size (no scaling!) */
+    }
+
+    .preview-page-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 8px 0 4px;
+      flex-shrink: 0;
+    }
+
+    .preview-page-btn {
+      background: #333;
+      border: 1px solid #555;
+      color: #e8e8e8;
+      font-size: 13px;
+      padding: 4px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .preview-page-btn:hover {
+      background: #444;
+    }
+
+    .preview-page-btn.active {
+      background: #f0a030;
+      border-color: #f0a030;
+      color: #111;
     }
 
     .preview-overflow-warn {
@@ -870,7 +910,13 @@
         + '<div class="preview-frame" id="preview-frame">'
         + '<div class="preview-header"><span class="preview-header-title">' + esc(song.title) + '</span></div>'
         + '<div class="preview-artist">' + esc(song.artist) + '</div>'
+        + '<div class="preview-lyrics-scroll" id="preview-lyrics-scroll">'
         + '<div class="preview-lyrics" id="preview-lyrics">' + esc(song.lyrics) + '</div>'
+        + '</div>'
+        + '<div class="preview-page-bar">'
+        + '<button class="preview-page-btn active" id="preview-page1">Page 1</button>'
+        + '<button class="preview-page-btn" id="preview-page2">Page 2</button>'
+        + '</div>'
         + '<div class="preview-overflow-warn" id="preview-overflow">OVERFLOWS — reduce font size</div>'
         + '</div>'
         + '</div>'
@@ -924,6 +970,10 @@
         previewContainer.style.height = Math.ceil(ipadH * scale) + 'px';
       }
 
+      var previewPage = 1;
+      var page1Btn = document.getElementById('preview-page1');
+      var page2Btn = document.getElementById('preview-page2');
+
       function updatePreview() {
         var fontSize = parseInt(slider.value, 10);
         // Use the REAL font size — the preview is at actual iPad resolution, just scaled down visually
@@ -931,10 +981,31 @@
         previewEl.style.lineHeight = '1.6';
         previewEl.textContent = lyricsTextarea.value;
 
-        // Check overflow
+        // Shift to show page 1 or page 2 (each page = 50% of the 200% width)
+        if (previewPage === 2) {
+          previewEl.style.transform = 'translateX(-50%)';
+        } else {
+          previewEl.style.transform = 'translateX(0)';
+        }
+
+        // Check overflow — content overflows if it exceeds the full 4-column area
         var isOverflowing = previewEl.scrollHeight > previewEl.clientHeight;
         overflowWarn.classList.toggle('visible', isOverflowing);
       }
+
+      page1Btn.addEventListener('click', function () {
+        previewPage = 1;
+        page1Btn.classList.add('active');
+        page2Btn.classList.remove('active');
+        updatePreview();
+      });
+
+      page2Btn.addEventListener('click', function () {
+        previewPage = 2;
+        page2Btn.classList.add('active');
+        page1Btn.classList.remove('active');
+        updatePreview();
+      });
 
       slider.addEventListener('input', function () {
         fsVal.textContent = slider.value + 'px';

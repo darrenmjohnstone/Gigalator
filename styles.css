@@ -241,23 +241,83 @@ main.lyrics-mode {
   text-align: center;
 }
 
+.lyrics-scroll {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  display: flex;
+}
+
+/* Hide scrollbar but keep scrolling */
+.lyrics-scroll::-webkit-scrollbar {
+  display: none;
+}
+.lyrics-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 .lyrics {
   font-size: 22px;
   line-height: 1.6;
   white-space: pre-wrap;
   font-weight: 300;
-  flex: 1;
+  min-width: 200%;
+  width: 200%;
+  height: 100%;
   overflow: hidden;
-  column-count: 2;
+  column-count: 4;
   column-gap: 32px;
   column-rule: 1px solid #333;
+  column-fill: auto;
+  scroll-snap-align: start;
 }
 
-/* Portrait fallback — single column, scrollable */
+/* Page indicator */
+.lyrics-page-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 8px 0 0;
+  flex-shrink: 0;
+}
+
+.lyrics-page-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #555;
+  transition: background 0.2s;
+}
+
+.lyrics-page-dot.active {
+  background: var(--accent);
+}
+
+.lyrics-page-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Portrait fallback — single column, scrollable, no paging */
 @media (orientation: portrait) {
-  .lyrics {
-    column-count: 1;
+  .lyrics-scroll {
+    scroll-snap-type: none;
     overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .lyrics {
+    min-width: 100%;
+    width: 100%;
+    column-count: 1;
+    overflow-y: visible;
+    height: auto;
+  }
+  .lyrics-page-bar {
+    display: none;
   }
 }
 
@@ -299,9 +359,9 @@ main.lyrics-mode {
 
 #progress-wrap {
   flex: 1;
-  height: 8px;
+  height: 6px;
   background: #333;
-  border-radius: 4px;
+  border-radius: 3px;
   overflow: hidden;
   cursor: pointer;
 }
@@ -310,8 +370,28 @@ main.lyrics-mode {
   height: 100%;
   width: 0%;
   background: var(--accent);
-  border-radius: 4px;
+  border-radius: 3px;
   transition: width 0.25s linear;
+}
+
+.next-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 22px;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.next-btn:active {
+  background: rgba(240, 160, 48, 0.15);
 }
 
 #time-display {
