@@ -322,6 +322,20 @@ main.lyrics-mode {
   font-variant-numeric: tabular-nums;
 }
 
+#track-label {
+  font-size: 12px;
+  color: var(--accent);
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+#track-label.hidden {
+  display: none;
+}
+
 /* ── Section labels ── */
 
 .section-label {
@@ -340,4 +354,44 @@ main.lyrics-mode {
   color: var(--text-dim);
   text-align: center;
   padding: 8px;
+}
+
+/* ── Refresh button ── */
+
+.refresh-bar {
+  margin-top: 24px;
+  text-align: center;
+}
+
+.refresh-btn {
+  background: var(--bg-card);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 32px;
+  border-radius: 12px;
+  cursor: pointer;
+  min-height: 52px;
+  min-width: 200px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.refresh-btn:active {
+  background: var(--accent);
+  color: #111;
+}
+
+.refresh-btn.refreshing {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.refresh-btn.success {
+  border-color: #4a4;
+  color: #4a4;
 }

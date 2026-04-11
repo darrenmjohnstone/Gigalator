@@ -9,6 +9,7 @@
   let currentView = 'setlists';
   let currentSetlist = null;
   let currentSong = null;
+  let playingSongId = null;  // which song's track is currently loaded/playing
 
   // ── DOM refs ──
   const main = document.getElementById('main');
@@ -19,6 +20,7 @@
   const progressWrap = document.getElementById('progress-wrap');
   const progressBar = document.getElementById('progress-bar');
   const timeDisplay = document.getElementById('time-display');
+  const trackLabel = document.getElementById('track-label');
   const audio = document.getElementById('audio');
 
   // ── Init ──
@@ -53,7 +55,6 @@
   // ── Navigation ──
   function goBack() {
     if (currentView === 'lyrics') {
-      stopAudio();
       main.classList.remove('lyrics-mode');
       showSongList(currentSetlist);
     } else if (currentView === 'songs') {
@@ -72,7 +73,7 @@
     currentSetlist = null;
     currentSong = null;
     setHeader('Gigalator', false);
-    player.classList.add('hidden');
+    showPlayerIfPlaying();
 
     let html = '<div class="section-label">Setlists</div>';
 
@@ -98,6 +99,11 @@
       + '<span class="list-item-arrow">&#8250;</span>'
       + '</div>';
 
+    // Refresh button
+    html += '<div class="refresh-bar">'
+      + '<button class="refresh-btn" id="refresh-btn">&#8635; Refresh Songs</button>'
+      + '</div>';
+
     main.innerHTML = html;
     main.scrollTop = 0;
 
@@ -112,6 +118,39 @@
         }
       });
     });
+
+    // Refresh button
+    document.getElementById('refresh-btn').addEventListener('click', refreshSongs);
+  }
+
+  // ── Refresh Songs ──
+  async function refreshSongs() {
+    var btn = document.getElementById('refresh-btn');
+    if (!btn) return;
+    btn.classList.add('refreshing');
+    btn.innerHTML = '&#8635; Refreshing...';
+
+    try {
+      // Bypass service worker cache with cache-busting query param
+      var resp = await fetch('songs/songs.json?_t=' + Date.now(), { cache: 'no-store' });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      data = await resp.json();
+
+      btn.classList.remove('refreshing');
+      btn.classList.add('success');
+      btn.innerHTML = '&#10003; Updated!';
+
+      // Re-render the setlists view with the new data
+      setTimeout(function () {
+        showSetlists();
+      }, 800);
+    } catch (e) {
+      btn.classList.remove('refreshing');
+      btn.innerHTML = '&#10007; Failed — tap to retry';
+      btn.style.borderColor = '#e05050';
+      btn.style.color = '#e05050';
+      console.warn('Refresh failed:', e);
+    }
   }
 
   // ── View: Song List ──
@@ -120,7 +159,7 @@
     currentSetlist = setlist;
     currentSong = null;
     setHeader(setlist.name, true);
-    player.classList.add('hidden');
+    showPlayerIfPlaying();
 
     // Check which tracks are cached
     const trackSongs = setlist.songs.filter(function (id) {
@@ -219,15 +258,23 @@
       adjustFontSize(1, lyricsEl);
     });
 
-    // Audio
+    // Audio — only change track if this song has one and it's different
     if (song.track) {
-      audio.src = song.track;
+      if (playingSongId !== songId) {
+        // Stop old track, load this one
+        audio.pause();
+        audio.src = song.track;
+        playingSongId = songId;
+        playBtn.innerHTML = '&#9654;';
+        progressBar.style.width = '0%';
+        timeDisplay.textContent = '0:00';
+        trackLabel.textContent = '';
+        trackLabel.classList.add('hidden');
+      }
       player.classList.remove('hidden');
-      playBtn.innerHTML = '&#9654;';
-      progressBar.style.width = '0%';
-      timeDisplay.textContent = '0:00';
     } else {
-      player.classList.add('hidden');
+      // This song has no track — keep showing player if something else is playing
+      showPlayerIfPlaying();
     }
   }
 
@@ -244,6 +291,8 @@
         // Autoplay blocked — user needs to tap again
       });
       playBtn.innerHTML = '&#9646;&#9646;';
+      // Show track label so you know what's playing when browsing
+      updateTrackLabel();
     } else {
       audio.pause();
       playBtn.innerHTML = '&#9654;';
@@ -253,10 +302,40 @@
   function stopAudio() {
     audio.pause();
     audio.src = '';
+    playingSongId = null;
     playBtn.innerHTML = '&#9654;';
     progressBar.style.width = '0%';
     timeDisplay.textContent = '0:00';
+    trackLabel.textContent = '';
+    trackLabel.classList.add('hidden');
     player.classList.add('hidden');
+  }
+
+  // Show player bar if audio is currently active (playing or paused with a loaded track)
+  function showPlayerIfPlaying() {
+    if (playingSongId && audio.src && !audio.ended) {
+      player.classList.remove('hidden');
+      updateTrackLabel();
+    } else {
+      player.classList.add('hidden');
+    }
+  }
+
+  // Show/hide the "Now playing: ..." label — visible when not on the playing song's lyrics
+  function updateTrackLabel() {
+    if (!playingSongId || !data.songs[playingSongId]) {
+      trackLabel.textContent = '';
+      trackLabel.classList.add('hidden');
+      return;
+    }
+    // Show label when browsing away from the playing song
+    if (currentView !== 'lyrics' || currentSong !== playingSongId) {
+      trackLabel.textContent = data.songs[playingSongId].title;
+      trackLabel.classList.remove('hidden');
+    } else {
+      trackLabel.textContent = '';
+      trackLabel.classList.add('hidden');
+    }
   }
 
   function seek(e) {
@@ -274,8 +353,15 @@
   }
 
   function onTrackEnd() {
+    playingSongId = null;
     playBtn.innerHTML = '&#9654;';
     progressBar.style.width = '100%';
+    trackLabel.textContent = '';
+    trackLabel.classList.add('hidden');
+    // Hide player if we've navigated away from the lyrics view
+    if (currentView !== 'lyrics') {
+      player.classList.add('hidden');
+    }
   }
 
   function formatTime(secs) {
