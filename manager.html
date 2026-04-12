@@ -1139,13 +1139,29 @@
         var fileHandles = await window.showOpenFilePicker(pickerOpts);
         var file = await fileHandles[0].getFile();
 
-        var filename = file.name;
+        // Kebab-case the filename for web compatibility
+        var ext = file.name.substring(file.name.lastIndexOf('.'));
+        var baseName = file.name.substring(0, file.name.lastIndexOf('.'));
+        var filename = baseName.toLowerCase().replace(/['''()]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + ext;
 
         // Write to tracks directory
         var trackFile = await tracksHandle.getFileHandle(filename, { create: true });
         var writable = await trackFile.createWritable();
         await writable.write(file);
         await writable.close();
+
+        // Preserve any unsaved edits before re-rendering
+        var titleInput = document.getElementById('song-title');
+        var artistInput = document.getElementById('song-artist');
+        var lyricsInput = document.getElementById('song-lyrics');
+        var fontSlider = document.getElementById('song-fontsize');
+        if (titleInput) data.songs[songId].title = titleInput.value.trim();
+        if (artistInput) data.songs[songId].artist = artistInput.value.trim();
+        if (lyricsInput) data.songs[songId].lyrics = lyricsInput.value;
+        if (fontSlider) {
+          var fs = parseInt(fontSlider.value, 10);
+          data.songs[songId].fontSize = fs === 30 ? null : fs;
+        }
 
         data.songs[songId].track = 'tracks/' + filename;
         setStatus('Track uploaded: ' + filename, 'saved');
