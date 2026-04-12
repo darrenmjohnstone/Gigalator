@@ -454,6 +454,36 @@ main.lyrics-mode {
 
 /* ── Section labels ── */
 
+/* ── Search bar ── */
+
+.search-bar {
+  padding: 8px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #444;
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-dim);
+}
+
+.search-input:focus {
+  border-color: var(--accent);
+}
+
 .section-label {
   font-size: 14px;
   color: var(--text-dim);

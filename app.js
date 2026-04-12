@@ -78,7 +78,11 @@
     setHeader('Gigalator', false);
     showPlayerIfPlaying();
 
-    let html = '<div class="section-label">Setlists</div>';
+    let html = '<div class="search-bar">'
+      + '<input type="text" class="search-input" id="home-search" placeholder="Search songs..." autocomplete="off" autocorrect="off" spellcheck="false">'
+      + '</div>';
+
+    html += '<div class="section-label">Setlists</div>';
 
     data.setlists.forEach(function (sl) {
       const count = sl.songs.length;
@@ -102,6 +106,9 @@
       + '<span class="list-item-arrow">&#8250;</span>'
       + '</div>';
 
+    // Search results container (hidden by default)
+    html += '<div id="search-results" class="hidden"></div>';
+
     // Refresh button
     html += '<div class="refresh-bar">'
       + '<button class="refresh-btn" id="refresh-btn">&#8635; Refresh Songs</button>'
@@ -118,6 +125,58 @@
 
     main.innerHTML = html;
     main.scrollTop = 0;
+
+    // Search functionality
+    var searchInput = document.getElementById('home-search');
+    var searchResults = document.getElementById('search-results');
+    var normalContent = main.querySelectorAll('.section-label, [data-setlist], .refresh-bar, .timestamp');
+
+    searchInput.addEventListener('input', function () {
+      var q = searchInput.value.trim().toLowerCase();
+      if (q.length < 2) {
+        searchResults.classList.add('hidden');
+        searchResults.innerHTML = '';
+        normalContent.forEach(function (el) { el.style.display = ''; });
+        return;
+      }
+
+      // Hide normal content, show search results
+      normalContent.forEach(function (el) { el.style.display = 'none'; });
+      searchResults.classList.remove('hidden');
+
+      var matches = [];
+      for (var sid in data.songs) {
+        var s = data.songs[sid];
+        if (s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q)) {
+          matches.push({ id: sid, title: s.title, artist: s.artist, hasTrack: !!s.track });
+        }
+      }
+      matches.sort(function (a, b) { return a.title.localeCompare(b.title); });
+
+      var rhtml = '<div class="section-label">' + matches.length + ' result' + (matches.length !== 1 ? 's' : '') + '</div>';
+      matches.forEach(function (m) {
+        rhtml += '<div class="list-item" data-search-song="' + m.id + '">'
+          + '<div class="list-item-text">'
+          + '<div class="list-item-title">' + esc(m.title) + '</div>'
+          + '<div class="list-item-subtitle">' + esc(m.artist) + '</div>'
+          + '</div>';
+        if (m.hasTrack) rhtml += '<span class="track-badge">Track</span>';
+        rhtml += '<span class="list-item-arrow">&#8250;</span></div>';
+      });
+      searchResults.innerHTML = rhtml;
+
+      searchResults.querySelectorAll('[data-search-song]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var id = el.getAttribute('data-search-song');
+          // Set a temporary setlist context so next/prev works from search
+          var allSorted = Object.keys(data.songs).sort(function (a, b) {
+            return data.songs[a].title.localeCompare(data.songs[b].title);
+          });
+          currentSetlist = { id: '__all__', name: 'All Songs', songs: allSorted };
+          showLyrics(id);
+        });
+      });
+    });
 
     main.querySelectorAll('[data-setlist]').forEach(function (el) {
       el.addEventListener('click', function () {
@@ -181,7 +240,9 @@
       return data.songs[id] && data.songs[id].track;
     });
 
-    let html = '';
+    let html = '<div class="search-bar">'
+      + '<input type="text" class="search-input" id="songlist-search" placeholder="Search in ' + esc(setlist.name) + '..." autocomplete="off" autocorrect="off" spellcheck="false">'
+      + '</div>';
 
     // Cache button if any songs have tracks
     if (trackSongs.length > 0) {
@@ -193,6 +254,7 @@
       html += '<div class="setlist-header"><h2>' + setlist.songs.length + ' songs</h2></div>';
     }
 
+    html += '<div id="songlist-items">';
     setlist.songs.forEach(function (songId) {
       const song = data.songs[songId];
       if (!song) return;
@@ -209,9 +271,23 @@
 
       html += '<span class="list-item-arrow">&#8250;</span></div>';
     });
+    html += '</div>';
 
     main.innerHTML = html;
     main.scrollTop = 0;
+
+    // Search filter for song list
+    var songlistSearch = document.getElementById('songlist-search');
+    songlistSearch.addEventListener('input', function () {
+      var q = songlistSearch.value.trim().toLowerCase();
+      main.querySelectorAll('#songlist-items [data-song]').forEach(function (el) {
+        var songId = el.getAttribute('data-song');
+        var song = data.songs[songId];
+        if (!song) return;
+        var match = q.length < 2 || song.title.toLowerCase().includes(q) || song.artist.toLowerCase().includes(q);
+        el.style.display = match ? '' : 'none';
+      });
+    });
 
     // Bind song clicks
     main.querySelectorAll('[data-song]').forEach(function (el) {
