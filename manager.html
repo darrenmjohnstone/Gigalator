@@ -796,6 +796,10 @@
     .deploy-info strong {
       color: #224;
     }
+
+    /* Electron mode — hide unnecessary browser-only elements */
+    .electron-mode #open-folder-btn,
+    .electron-mode #welcome { display: none !important; }
   </style>
 </head>
 <body>
@@ -835,6 +839,9 @@
   (function () {
     'use strict';
 
+    // ── Electron detection ──
+    var isElectron = !!(window.electronAPI);
+
     // ── State ──
     var dirHandle = null;
     var songsHandle = null;
@@ -844,6 +851,7 @@
     var activeTab = 'songs';
     var selectedId = null;
     var dirty = false;
+    var folderReady = false;
 
     // ── DOM ──
     var sidebarList = document.getElementById('sidebar-list');
@@ -857,27 +865,35 @@
 
     async function openFolder() {
       try {
-        dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        if (isElectron) {
+          // Electron mode: folder is auto-resolved by the main process
+          await window.electronAPI.ensureDir('tracks');
+          await window.electronAPI.ensureDir('sheets');
+          folderReady = true;
+        } else {
+          // Browser mode: use File System Access API
+          dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
 
-        var songsDir = await dirHandle.getDirectoryHandle('songs');
-        songsHandle = await songsDir.getFileHandle('songs.json');
+          var songsDir = await dirHandle.getDirectoryHandle('songs');
+          songsHandle = await songsDir.getFileHandle('songs.json');
 
-        try {
-          tracksHandle = await dirHandle.getDirectoryHandle('tracks');
-        } catch (e) {
-          tracksHandle = await dirHandle.getDirectoryHandle('tracks', { create: true });
-        }
+          try {
+            tracksHandle = await dirHandle.getDirectoryHandle('tracks');
+          } catch (e) {
+            tracksHandle = await dirHandle.getDirectoryHandle('tracks', { create: true });
+          }
 
-        try {
-          sheetsHandle = await dirHandle.getDirectoryHandle('sheets');
-        } catch (e) {
-          sheetsHandle = await dirHandle.getDirectoryHandle('sheets', { create: true });
+          try {
+            sheetsHandle = await dirHandle.getDirectoryHandle('sheets');
+          } catch (e) {
+            sheetsHandle = await dirHandle.getDirectoryHandle('sheets', { create: true });
+          }
         }
 
         await loadData();
         addBtn.disabled = false;
         deployBtn.disabled = false;
-        setStatus('Folder opened: ' + dirHandle.name);
+        setStatus(isElectron ? 'Gigalator folder loaded' : 'Folder opened: ' + dirHandle.name);
       } catch (e) {
         if (e.name !== 'AbortError') {
           setStatus('Failed to open folder: ' + e.message, 'error');
@@ -886,19 +902,34 @@
     }
 
     async function loadData() {
-      var file = await songsHandle.getFile();
-      var text = await file.text();
+      var text;
+      if (isElectron) {
+        text = await window.electronAPI.readTextFile('songs/songs.json');
+      } else {
+        var file = await songsHandle.getFile();
+        text = await file.text();
+      }
       data = JSON.parse(text);
       renderSidebar();
       showWelcome();
     }
 
     async function saveData() {
-      var writable = await songsHandle.createWritable();
-      await writable.write(JSON.stringify(data, null, 2));
-      await writable.close();
+      if (isElectron) {
+        await window.electronAPI.writeTextFile('songs/songs.json', JSON.stringify(data, null, 2));
+      } else {
+        var writable = await songsHandle.createWritable();
+        await writable.write(JSON.stringify(data, null, 2));
+        await writable.close();
+      }
       dirty = false;
       setStatus('Saved', 'saved');
+    }
+
+    // Auto-open in Electron mode
+    if (isElectron) {
+      document.body.classList.add('electron-mode');
+      openFolder();
     }
 
     // ── Tab switching ──
@@ -1106,9 +1137,9 @@
         + '<div class="preview-label-bar">'
         + '<span class="preview-device-label">Device:</span>'
         + '<select class="preview-device-select" id="preview-device">'
-        + '<option value="ipad-pro-11" selected>iPad Pro 11&quot; (landscape)</option>'
+        + '<option value="ipad-pro-11">iPad Pro 11&quot; (landscape)</option>'
         + '<option value="ipad-pro-13">iPad Pro 12.9&quot; (landscape)</option>'
-        + '<option value="ipad-9">iPad 9th gen (landscape)</option>'
+        + '<option value="ipad-9" selected>iPad 9th gen (landscape)</option>'
         + '</select>'
         + '</div>'
         + '<div class="preview-container" id="preview-container">'
@@ -1267,17 +1298,12 @@
       // Load existing sheet images from files
       function loadSheetImage(index) {
         if (!song.sheets || !song.sheets[index]) return;
-        var filename = song.sheets[index];
-        // Read from sheets directory
-        sheetsHandle.getFileHandle(filename.replace('sheets/', '')).then(function (fh) {
-          return fh.getFile();
-        }).then(function (file) {
-          var url = URL.createObjectURL(file);
+        var sheetPath = song.sheets[index];
+        readFileAsURL(sheetPath).then(function (url) {
           var img = document.getElementById('sheet-img-' + index);
           if (img) img.src = url;
         }).catch(function () {
-          // File not found — clear reference
-          console.warn('Sheet image not found:', filename);
+          console.warn('Sheet image not found:', sheetPath);
         });
       }
       for (var si = 0; si < 5; si++) loadSheetImage(si);
@@ -1301,7 +1327,7 @@
           if (song.sheets && song.sheets[idx]) {
             var filename = song.sheets[idx].replace('sheets/', '');
             try {
-              await sheetsHandle.removeEntry(filename);
+              await deleteFileCompat('sheets/' + filename);
             } catch (err) { /* file may not exist */ }
             song.sheets[idx] = null;
             // Clean up empty arrays
@@ -1315,15 +1341,11 @@
       // Upload PDF — auto-split into page images
       document.getElementById('upload-pdf-sheets-btn').addEventListener('click', async function () {
         try {
-          var pickerOpts = {
-            types: [{
-              description: 'PDF files',
-              accept: { 'application/pdf': ['.pdf'] }
-            }]
-          };
-          var fileHandles = await window.showOpenFilePicker(pickerOpts);
-          var file = await fileHandles[0].getFile();
-          var arrayBuffer = await file.arrayBuffer();
+          var picked = await pickFileCompat(
+            [{ name: 'PDF files', extensions: ['pdf'] }],
+            { 'application/pdf': ['.pdf'] }
+          );
+          var arrayBuffer = picked.arrayBuffer;
 
           setStatus('Splitting PDF pages...', 'processing');
 
@@ -1368,10 +1390,7 @@
 
             // Save to sheets folder
             var filename = songId + '-page-' + p + '.png';
-            var sheetFile = await sheetsHandle.getFileHandle(filename, { create: true });
-            var writable = await sheetFile.createWritable();
-            await writable.write(blob);
-            await writable.close();
+            await writeFileCompat('sheets/' + filename, blob);
 
             song.sheets[p - 1] = 'sheets/' + filename;
             setStatus('Rendered page ' + p + ' of ' + numPages + '...', 'processing');
@@ -1395,8 +1414,7 @@
 
         for (var ci = 0; ci < song.sheets.length; ci++) {
           if (song.sheets[ci]) {
-            var fn = song.sheets[ci].replace('sheets/', '');
-            try { await sheetsHandle.removeEntry(fn); } catch (err) { /* ok */ }
+            try { await deleteFileCompat(song.sheets[ci]); } catch (err) { /* ok */ }
           }
         }
         delete song.sheets;
@@ -1428,24 +1446,17 @@
 
     async function uploadSheetImage(songId, index) {
       try {
-        var pickerOpts = {
-          types: [{
-            description: 'Image files',
-            accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.webp'] }
-          }]
-        };
-        var fileHandles = await window.showOpenFilePicker(pickerOpts);
-        var file = await fileHandles[0].getFile();
+        var picked = await pickFileCompat(
+          [{ name: 'Image files', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
+          { 'image/*': ['.png', '.jpg', '.jpeg', '.webp'] }
+        );
 
         // Generate filename: songId-page-1.png etc.
-        var ext = file.name.substring(file.name.lastIndexOf('.'));
+        var ext = picked.name.substring(picked.name.lastIndexOf('.'));
         var filename = songId + '-page-' + (index + 1) + ext.toLowerCase();
 
         // Write to sheets directory
-        var sheetFile = await sheetsHandle.getFileHandle(filename, { create: true });
-        var writable = await sheetFile.createWritable();
-        await writable.write(file);
-        await writable.close();
+        await writeFileCompat('sheets/' + filename, picked.arrayBuffer);
 
         // Update song data
         var song = data.songs[songId];
@@ -1547,28 +1558,94 @@
       showSongEditor(id);
     }
 
+    // ── Helper: pick a file in either mode ──
+    async function pickFileCompat(filters, browserAccept) {
+      if (isElectron) {
+        var result = await window.electronAPI.pickFile(filters);
+        if (!result) throw Object.assign(new Error('Cancelled'), { name: 'AbortError' });
+        // result = { name, data (Buffer) }
+        return { name: result.name, arrayBuffer: result.data.buffer || result.data };
+      } else {
+        var pickerOpts = { types: [{ description: filters[0].name, accept: browserAccept }] };
+        var fileHandles = await window.showOpenFilePicker(pickerOpts);
+        var file = await fileHandles[0].getFile();
+        var ab = await file.arrayBuffer();
+        return { name: file.name, arrayBuffer: ab };
+      }
+    }
+
+    // ── Helper: write a binary file ──
+    async function writeFileCompat(relPath, dataOrBlob) {
+      if (isElectron) {
+        var ab;
+        if (dataOrBlob instanceof Blob) {
+          ab = await dataOrBlob.arrayBuffer();
+        } else if (dataOrBlob instanceof ArrayBuffer) {
+          ab = dataOrBlob;
+        } else {
+          ab = dataOrBlob;
+        }
+        await window.electronAPI.writeBinaryFile(relPath, ab);
+      } else {
+        // Determine which directory handle to use
+        var parts = relPath.split('/');
+        var dir = parts[0];
+        var fname = parts.slice(1).join('/');
+        var handle = dir === 'tracks' ? tracksHandle : dir === 'sheets' ? sheetsHandle : null;
+        if (!handle) throw new Error('Unknown directory: ' + dir);
+        var fileHandle = await handle.getFileHandle(fname, { create: true });
+        var writable = await fileHandle.createWritable();
+        await writable.write(dataOrBlob);
+        await writable.close();
+      }
+    }
+
+    // ── Helper: delete a file ──
+    async function deleteFileCompat(relPath) {
+      if (isElectron) {
+        await window.electronAPI.deleteFile(relPath);
+      } else {
+        var parts = relPath.split('/');
+        var dir = parts[0];
+        var fname = parts.slice(1).join('/');
+        var handle = dir === 'tracks' ? tracksHandle : dir === 'sheets' ? sheetsHandle : null;
+        if (handle) await handle.removeEntry(fname);
+      }
+    }
+
+    // ── Helper: read a file as object URL ──
+    async function readFileAsURL(relPath) {
+      if (isElectron) {
+        var buf = await window.electronAPI.readBinaryFile(relPath);
+        var blob = new Blob([buf]);
+        return URL.createObjectURL(blob);
+      } else {
+        var parts = relPath.split('/');
+        var dir = parts[0];
+        var fname = parts.slice(1).join('/');
+        var handle = dir === 'tracks' ? tracksHandle : dir === 'sheets' ? sheetsHandle : null;
+        if (!handle) throw new Error('Unknown directory: ' + dir);
+        var fh = await handle.getFileHandle(fname);
+        var file = await fh.getFile();
+        return URL.createObjectURL(file);
+      }
+    }
+
     // ── Track upload ──
     async function uploadTrack(songId) {
       try {
-        var pickerOpts = {
-          types: [{
-            description: 'Audio files',
-            accept: { 'audio/*': ['.mp3', '.m4a', '.wav', '.ogg'] }
-          }]
-        };
-        var fileHandles = await window.showOpenFilePicker(pickerOpts);
-        var file = await fileHandles[0].getFile();
+        var picked = await pickFileCompat(
+          [{ name: 'Audio files', extensions: ['mp3', 'm4a', 'wav', 'ogg'] }],
+          { 'audio/*': ['.mp3', '.m4a', '.wav', '.ogg'] }
+        );
 
         // Kebab-case the filename for web compatibility
-        var ext = file.name.substring(file.name.lastIndexOf('.'));
-        var baseName = file.name.substring(0, file.name.lastIndexOf('.'));
+        var ext = picked.name.substring(picked.name.lastIndexOf('.'));
+        var baseName = picked.name.substring(0, picked.name.lastIndexOf('.'));
         var filename = baseName.toLowerCase().replace(/['''()]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + ext;
 
         // Write to tracks directory
-        var trackFile = await tracksHandle.getFileHandle(filename, { create: true });
-        var writable = await trackFile.createWritable();
-        await writable.write(file);
-        await writable.close();
+        await writeFileCompat('tracks/' + filename, picked.arrayBuffer);
 
         // Preserve any unsaved edits before re-rendering
         var titleInput = document.getElementById('song-title');
@@ -1832,8 +1909,13 @@
 
       try {
         // Read current songs.json content
-        var file = await songsHandle.getFile();
-        var content = await file.text();
+        var content;
+        if (isElectron) {
+          content = await window.electronAPI.readTextFile('songs/songs.json');
+        } else {
+          var file = await songsHandle.getFile();
+          content = await file.text();
+        }
         var encoded = btoa(unescape(encodeURIComponent(content)));
 
         // Get current file SHA from GitHub

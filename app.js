@@ -331,19 +331,44 @@
 
     main.classList.add('lyrics-mode');
 
+    var hasSheets = song.sheets && song.sheets.some(function (s) { return !!s; });
+
     var html = '<div class="lyrics-wrap">'
       + '<div class="lyrics-top-bar">'
       + '<div class="lyrics-artist">' + esc(song.artist) + '</div>'
-      + '<div class="font-size-controls">'
+      + '<div class="lyrics-top-right">';
+
+    // Lyrics/Sheets toggle if song has sheet images
+    if (hasSheets) {
+      html += '<div class="view-toggle" id="view-toggle">'
+        + '<button class="view-toggle-btn active" id="toggle-lyrics">Lyrics</button>'
+        + '<button class="view-toggle-btn" id="toggle-sheets">Sheets</button>'
+        + '</div>';
+    }
+
+    html += '<div class="font-size-controls">'
       + '<button class="font-size-btn" id="font-dec">&#8722;</button>'
       + '<span class="font-size-label" id="font-label">' + currentFontSize + 'px</span>'
       + '<button class="font-size-btn" id="font-inc">&#43;</button>'
       + '</div>'
       + '</div>'
+      + '</div>'
       + '<div class="lyrics-scroll" id="lyrics-scroll">'
       + '<div class="lyrics" id="lyrics-text">' + esc(song.lyrics) + '</div>'
-      + '</div>'
-      + '<div class="lyrics-page-bar">'
+      + '</div>';
+
+    // Sheets view (hidden by default)
+    if (hasSheets) {
+      html += '<div class="sheets-scroll hidden" id="sheets-scroll">';
+      song.sheets.forEach(function (sheetPath, si) {
+        if (sheetPath) {
+          html += '<img class="sheet-page-img" src="' + sheetPath + '" alt="Page ' + (si + 1) + '">';
+        }
+      });
+      html += '</div>';
+    }
+
+    html += '<div class="lyrics-page-bar">'
       + '<div class="lyrics-page-dot active" id="page-dot-0"></div>'
       + '<div class="lyrics-page-dot" id="page-dot-1"></div>'
       + '<span class="lyrics-page-hint" id="page-hint">Swipe for more &#8250;</span>'
@@ -392,6 +417,27 @@
         hint.innerHTML = 'Swipe for more &#8250;';
       }
     });
+
+    // Lyrics/Sheets toggle
+    var toggleLyricsBtn = document.getElementById('toggle-lyrics');
+    var toggleSheetsBtn = document.getElementById('toggle-sheets');
+    if (toggleLyricsBtn && toggleSheetsBtn) {
+      var sheetsScrollEl = document.getElementById('sheets-scroll');
+      toggleLyricsBtn.addEventListener('click', function () {
+        scrollEl.classList.remove('hidden');
+        sheetsScrollEl.classList.add('hidden');
+        toggleLyricsBtn.classList.add('active');
+        toggleSheetsBtn.classList.remove('active');
+        document.querySelector('.lyrics-page-bar').classList.remove('hidden');
+      });
+      toggleSheetsBtn.addEventListener('click', function () {
+        scrollEl.classList.add('hidden');
+        sheetsScrollEl.classList.remove('hidden');
+        toggleSheetsBtn.classList.add('active');
+        toggleLyricsBtn.classList.remove('active');
+        document.querySelector('.lyrics-page-bar').classList.add('hidden');
+      });
+    }
 
     // Bind "Up Next" button
     var upNextBtn = document.getElementById('up-next-btn');

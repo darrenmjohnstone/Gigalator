@@ -1,0 +1,13 @@
+{
+  "name": "gigalator-manager",
+  "version": "1.0.0",
+  "description": "Gigalator Manager — Desktop app for managing songs, lyrics, and backing tracks",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}

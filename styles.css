@@ -298,6 +298,61 @@ main.lyrics-mode {
   color: var(--text-dim);
 }
 
+/* Lyrics/Sheets toggle */
+.lyrics-top-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.view-toggle {
+  display: flex;
+  background: var(--bg-card);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #444;
+}
+
+.view-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.view-toggle-btn.active {
+  background: var(--accent);
+  color: #111;
+}
+
+/* Sheets scroll view */
+.sheets-scroll {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  gap: 16px;
+  padding: 8px 0;
+  align-items: flex-start;
+}
+
+.sheets-scroll::-webkit-scrollbar { display: none; }
+.sheets-scroll { scrollbar-width: none; }
+
+.sheet-page-img {
+  height: 100%;
+  width: auto;
+  max-height: calc(100vh - 160px);
+  border-radius: 4px;
+  border: 1px solid #333;
+  flex-shrink: 0;
+}
+
 /* ── Up Next bar ── */
 
 .up-next-bar {
