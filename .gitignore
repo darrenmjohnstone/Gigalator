@@ -4,3 +4,5 @@ Music to import/
 Music to pick from/
 Songbooks/
 Add/
+.env
+api/node_modules/

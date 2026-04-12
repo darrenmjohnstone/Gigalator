@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gigalator Manager</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -555,6 +556,89 @@
       justify-content: flex-end;
     }
 
+    /* ── Sheet Images ── */
+
+    .sheets-section { margin-top: 4px; }
+
+    .sheets-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .sheet-slot {
+      position: relative;
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      min-width: 200px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      overflow: hidden;
+      background: #fafafa;
+    }
+
+    .sheet-slot:hover { border-color: var(--accent); }
+
+    .sheet-slot.has-image {
+      border-style: solid;
+      cursor: default;
+    }
+
+    .sheet-slot img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .sheet-placeholder {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 13px;
+      padding: 16px;
+    }
+
+    .sheet-placeholder span { font-size: 28px; display: block; margin-bottom: 4px; }
+
+    .sheet-remove {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: var(--danger);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .sheet-slot:hover .sheet-remove { opacity: 1; }
+
+    .sheet-size-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .sheet-size-row input[type="range"] {
+      flex: 1;
+      max-width: 200px;
+    }
+
     /* ── Live iPad Preview ── */
 
     .preview-container {
@@ -755,6 +839,7 @@
     var dirHandle = null;
     var songsHandle = null;
     var tracksHandle = null;
+    var sheetsHandle = null;
     var data = null;
     var activeTab = 'songs';
     var selectedId = null;
@@ -781,6 +866,12 @@
           tracksHandle = await dirHandle.getDirectoryHandle('tracks');
         } catch (e) {
           tracksHandle = await dirHandle.getDirectoryHandle('tracks', { create: true });
+        }
+
+        try {
+          sheetsHandle = await dirHandle.getDirectoryHandle('sheets');
+        } catch (e) {
+          sheetsHandle = await dirHandle.getDirectoryHandle('sheets', { create: true });
         }
 
         await loadData();
@@ -974,6 +1065,33 @@
         + '<button class="btn btn-sm" id="upload-track-btn">Upload MP3</button>'
         + '</div>'
         + '</div>'
+        + '<div class="form-group sheets-section">'
+        + '<label>Sheet Images <span style="font-weight:normal;color:var(--text-dim)">(up to 5 pages)</span></label>'
+        + '<div style="margin-bottom:8px;display:flex;gap:8px">'
+        + '<button class="btn btn-sm" id="upload-pdf-sheets-btn">Upload PDF (auto-split pages)</button>'
+        + '<button class="btn btn-sm" id="clear-all-sheets-btn" style="background:var(--danger-light);color:var(--danger)">Clear All</button>'
+        + '</div>'
+        + '<div class="sheets-grid" id="sheets-grid">'
+        + (function () {
+          var slotsHtml = '';
+          for (var si = 0; si < 5; si++) {
+            var hasSheet = song.sheets && song.sheets[si];
+            slotsHtml += '<div class="sheet-slot' + (hasSheet ? ' has-image' : '') + '" id="sheet-slot-' + si + '" data-index="' + si + '">'
+              + (hasSheet
+                ? '<img src="" id="sheet-img-' + si + '"><button class="sheet-remove" data-index="' + si + '">&times;</button>'
+                : '<div class="sheet-placeholder"><span>+</span>Page ' + (si + 1) + '</div>')
+              + '</div>';
+          }
+          return slotsHtml;
+        })()
+        + '</div>'
+        + '<div class="sheet-size-row">'
+        + '<span>Small</span>'
+        + '<input type="range" id="sheet-size-slider" min="200" max="800" value="' + (song.sheetSize || 400) + '">'
+        + '<span>Large</span>'
+        + '<span id="sheet-size-val" style="min-width:40px">' + (song.sheetSize || 400) + 'px</span>'
+        + '</div>'
+        + '</div>'
         + '<div class="form-group">'
         + '<label>Font Size (iPad lyrics view)</label>'
         + '<div class="font-size-row">'
@@ -1128,6 +1246,164 @@
         });
       }
 
+      // ── Sheet images ──
+      var sheetSizeSlider = document.getElementById('sheet-size-slider');
+      var sheetSizeVal = document.getElementById('sheet-size-val');
+
+      function applySheetSize() {
+        var size = parseInt(sheetSizeSlider.value, 10);
+        sheetSizeVal.textContent = size + 'px';
+        document.querySelectorAll('.sheet-slot').forEach(function (slot) {
+          slot.style.width = size + 'px';
+        });
+      }
+      applySheetSize();
+
+      sheetSizeSlider.addEventListener('input', function () {
+        applySheetSize();
+        song.sheetSize = parseInt(sheetSizeSlider.value, 10);
+      });
+
+      // Load existing sheet images from files
+      function loadSheetImage(index) {
+        if (!song.sheets || !song.sheets[index]) return;
+        var filename = song.sheets[index];
+        // Read from sheets directory
+        sheetsHandle.getFileHandle(filename.replace('sheets/', '')).then(function (fh) {
+          return fh.getFile();
+        }).then(function (file) {
+          var url = URL.createObjectURL(file);
+          var img = document.getElementById('sheet-img-' + index);
+          if (img) img.src = url;
+        }).catch(function () {
+          // File not found — clear reference
+          console.warn('Sheet image not found:', filename);
+        });
+      }
+      for (var si = 0; si < 5; si++) loadSheetImage(si);
+
+      // Click to upload sheet image
+      document.querySelectorAll('.sheet-slot').forEach(function (slot) {
+        slot.addEventListener('click', function (e) {
+          if (e.target.classList.contains('sheet-remove')) return;
+          var idx = parseInt(slot.dataset.index, 10);
+          // Don't re-upload if already has image — user must remove first
+          if (song.sheets && song.sheets[idx]) return;
+          uploadSheetImage(songId, idx);
+        });
+      });
+
+      // Remove sheet image buttons
+      document.querySelectorAll('.sheet-remove').forEach(function (btn) {
+        btn.addEventListener('click', async function (e) {
+          e.stopPropagation();
+          var idx = parseInt(btn.dataset.index, 10);
+          if (song.sheets && song.sheets[idx]) {
+            var filename = song.sheets[idx].replace('sheets/', '');
+            try {
+              await sheetsHandle.removeEntry(filename);
+            } catch (err) { /* file may not exist */ }
+            song.sheets[idx] = null;
+            // Clean up empty arrays
+            if (song.sheets.every(function (s) { return !s; })) delete song.sheets;
+            await saveData();
+            showSongEditor(songId);
+          }
+        });
+      });
+
+      // Upload PDF — auto-split into page images
+      document.getElementById('upload-pdf-sheets-btn').addEventListener('click', async function () {
+        try {
+          var pickerOpts = {
+            types: [{
+              description: 'PDF files',
+              accept: { 'application/pdf': ['.pdf'] }
+            }]
+          };
+          var fileHandles = await window.showOpenFilePicker(pickerOpts);
+          var file = await fileHandles[0].getFile();
+          var arrayBuffer = await file.arrayBuffer();
+
+          setStatus('Splitting PDF pages...', 'processing');
+
+          // Set up PDF.js worker
+          var pdfjsLib = window['pdfjs-dist/build/pdf'] || window.pdfjsLib;
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+          var pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          var numPages = Math.min(pdfDoc.numPages, 5);
+
+          // Preserve unsaved edits
+          var titleInput = document.getElementById('song-title');
+          var artistInput = document.getElementById('song-artist');
+          var lyricsInput = document.getElementById('song-lyrics');
+          var fontSlider = document.getElementById('song-fontsize');
+          if (titleInput) song.title = titleInput.value.trim();
+          if (artistInput) song.artist = artistInput.value.trim();
+          if (lyricsInput) song.lyrics = lyricsInput.value;
+          if (fontSlider) {
+            var fs = parseInt(fontSlider.value, 10);
+            song.fontSize = fs === 30 ? null : fs;
+          }
+
+          if (!song.sheets) song.sheets = [];
+
+          for (var p = 1; p <= numPages; p++) {
+            var page = await pdfDoc.getPage(p);
+            var scale = 2; // High-res render
+            var viewport = page.getViewport({ scale: scale });
+
+            var canvas = document.createElement('canvas');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            var ctx = canvas.getContext('2d');
+
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+            // Convert canvas to PNG blob
+            var blob = await new Promise(function (resolve) {
+              canvas.toBlob(resolve, 'image/png');
+            });
+
+            // Save to sheets folder
+            var filename = songId + '-page-' + p + '.png';
+            var sheetFile = await sheetsHandle.getFileHandle(filename, { create: true });
+            var writable = await sheetFile.createWritable();
+            await writable.write(blob);
+            await writable.close();
+
+            song.sheets[p - 1] = 'sheets/' + filename;
+            setStatus('Rendered page ' + p + ' of ' + numPages + '...', 'processing');
+          }
+
+          await saveData();
+          setStatus('PDF split into ' + numPages + ' page(s)', 'saved');
+          showSongEditor(songId);
+        } catch (e) {
+          if (e.name !== 'AbortError') {
+            setStatus('PDF split failed: ' + e.message, 'error');
+            console.error('PDF split error:', e);
+          }
+        }
+      });
+
+      // Clear all sheet images
+      document.getElementById('clear-all-sheets-btn').addEventListener('click', async function () {
+        if (!song.sheets || !song.sheets.some(function (s) { return !!s; })) return;
+        if (!confirm('Remove all sheet images for this song?')) return;
+
+        for (var ci = 0; ci < song.sheets.length; ci++) {
+          if (song.sheets[ci]) {
+            var fn = song.sheets[ci].replace('sheets/', '');
+            try { await sheetsHandle.removeEntry(fn); } catch (err) { /* ok */ }
+          }
+        }
+        delete song.sheets;
+        await saveData();
+        showSongEditor(songId);
+      });
+
       // Save
       document.getElementById('save-song-btn').addEventListener('click', async function () {
         var btn = this;
@@ -1150,6 +1426,55 @@
       });
     }
 
+    async function uploadSheetImage(songId, index) {
+      try {
+        var pickerOpts = {
+          types: [{
+            description: 'Image files',
+            accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.webp'] }
+          }]
+        };
+        var fileHandles = await window.showOpenFilePicker(pickerOpts);
+        var file = await fileHandles[0].getFile();
+
+        // Generate filename: songId-page-1.png etc.
+        var ext = file.name.substring(file.name.lastIndexOf('.'));
+        var filename = songId + '-page-' + (index + 1) + ext.toLowerCase();
+
+        // Write to sheets directory
+        var sheetFile = await sheetsHandle.getFileHandle(filename, { create: true });
+        var writable = await sheetFile.createWritable();
+        await writable.write(file);
+        await writable.close();
+
+        // Update song data
+        var song = data.songs[songId];
+        if (!song.sheets) song.sheets = [];
+        song.sheets[index] = 'sheets/' + filename;
+
+        // Preserve unsaved edits
+        var titleInput = document.getElementById('song-title');
+        var artistInput = document.getElementById('song-artist');
+        var lyricsInput = document.getElementById('song-lyrics');
+        var fontSlider = document.getElementById('song-fontsize');
+        if (titleInput) song.title = titleInput.value.trim();
+        if (artistInput) song.artist = artistInput.value.trim();
+        if (lyricsInput) song.lyrics = lyricsInput.value;
+        if (fontSlider) {
+          var fs = parseInt(fontSlider.value, 10);
+          song.fontSize = fs === 30 ? null : fs;
+        }
+
+        await saveData();
+        setStatus('Sheet image uploaded: ' + filename, 'saved');
+        showSongEditor(songId);
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          setStatus('Sheet upload failed: ' + e.message, 'error');
+        }
+      }
+    }
+
     async function saveSong(songId) {
       var song = data.songs[songId];
       var newTitle = document.getElementById('song-title').value.trim();
@@ -1169,6 +1494,13 @@
       song.artist = newArtist;
       song.lyrics = newLyrics;
       song.fontSize = newFontSize === 30 ? null : newFontSize;
+
+      // Save sheet size preference
+      var sheetSizeEl = document.getElementById('sheet-size-slider');
+      if (sheetSizeEl) {
+        var ss = parseInt(sheetSizeEl.value, 10);
+        song.sheetSize = ss === 400 ? null : ss;
+      }
 
       if (newId !== songId) {
         data.songs[newId] = song;

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gigalator — Chord Extractor</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #1a1a1a;
+      color: #e8e8e8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #f0a030;
+    }
+
+    .subtitle {
+      color: #999;
+      margin-bottom: 32px;
+      font-size: 15px;
+    }
+
+    .upload-area {
+      width: 100%;
+      max-width: 600px;
+      border: 2px dashed #444;
+      border-radius: 16px;
+      padding: 48px 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 24px;
+    }
+
+    .upload-area:hover, .upload-area.dragover {
+      border-color: #f0a030;
+      background: rgba(240, 160, 48, 0.05);
+    }
+
+    .upload-area p {
+      font-size: 16px;
+      color: #999;
+      margin-top: 8px;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .upload-area .filename {
+      color: #f0a030;
+      font-weight: 600;
+      font-size: 16px;
+      margin-top: 12px;
+    }
+
+    input[type="file"] { display: none; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 32px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-primary {
+      background: #f0a030;
+      color: #111;
+    }
+
+    .btn-primary:hover { background: #e09020; }
+
+    .btn-primary:disabled {
+      background: #555;
+      color: #999;
+      cursor: not-allowed;
+    }
+
+    .btn-copy {
+      background: #333;
+      color: #e8e8e8;
+      border: 1px solid #555;
+      padding: 8px 20px;
+      font-size: 14px;
+    }
+
+    .btn-copy:hover { background: #444; }
+
+    .status {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #999;
+      min-height: 20px;
+    }
+
+    .status.error { color: #e05050; }
+    .status.processing { color: #f0a030; }
+
+    .result-area {
+      width: 100%;
+      max-width: 800px;
+      margin-top: 32px;
+      display: none;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .result-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .result-text {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 24px;
+      font-family: "SF Mono", "Menlo", "Monaco", "Consolas", monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre;
+      overflow-x: auto;
+      color: #e8e8e8;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid #f0a030;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <h1>Chord Extractor</h1>
+  <p class="subtitle">Drop a chord sheet PDF — get clean lyrics with aligned chords</p>
+
+  <div class="upload-area" id="drop-zone">
+    <div class="upload-icon">&#127928;</div>
+    <p>Drop PDF here or click to browse</p>
+    <div class="filename" id="filename"></div>
+  </div>
+
+  <input type="file" id="file-input" accept=".pdf">
+
+  <button class="btn btn-primary" id="extract-btn" disabled>Extract Chords &amp; Lyrics</button>
+
+  <div class="status" id="status"></div>
+
+  <div class="result-area" id="result-area">
+    <div class="result-header">
+      <h2>Extracted Chord Sheet</h2>
+      <div class="result-actions">
+        <button class="btn btn-copy" id="copy-btn">Copy to Clipboard</button>
+        <button class="btn btn-copy" id="add-to-gigalator-btn">Add to Gigalator</button>
+      </div>
+    </div>
+    <div class="result-text" id="result-text"></div>
+  </div>
+
+  <script>
+    var dropZone = document.getElementById('drop-zone');
+    var fileInput = document.getElementById('file-input');
+    var extractBtn = document.getElementById('extract-btn');
+    var statusEl = document.getElementById('status');
+    var resultArea = document.getElementById('result-area');
+    var resultText = document.getElementById('result-text');
+    var filenameEl = document.getElementById('filename');
+    var selectedFile = null;
+
+    // Drag and drop
+    dropZone.addEventListener('click', function () { fileInput.click(); });
+
+    dropZone.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', function () {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0 && e.dataTransfer.files[0].type === 'application/pdf') {
+        selectFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    fileInput.addEventListener('change', function () {
+      if (fileInput.files.length > 0) selectFile(fileInput.files[0]);
+    });
+
+    function selectFile(file) {
+      selectedFile = file;
+      filenameEl.textContent = file.name;
+      extractBtn.disabled = false;
+      resultArea.style.display = 'none';
+      statusEl.textContent = '';
+      statusEl.className = 'status';
+    }
+
+    // Extract
+    extractBtn.addEventListener('click', async function () {
+      if (!selectedFile) return;
+
+      extractBtn.disabled = true;
+      statusEl.innerHTML = '<span class="spinner"></span> Extracting chords and lyrics...';
+      statusEl.className = 'status processing';
+      resultArea.style.display = 'none';
+
+      var formData = new FormData();
+      formData.append('pdf', selectedFile);
+
+      try {
+        var resp = await fetch('/api/extract', { method: 'POST', body: formData });
+        var data = await resp.json();
+
+        if (data.success) {
+          resultText.textContent = data.text;
+          resultArea.style.display = 'block';
+          statusEl.textContent = 'Done! ' + data.pages + ' page(s) processed.';
+          statusEl.className = 'status';
+        } else {
+          statusEl.textContent = 'Error: ' + data.error;
+          statusEl.className = 'status error';
+        }
+      } catch (err) {
+        statusEl.textContent = 'Error: ' + err.message;
+        statusEl.className = 'status error';
+      }
+
+      extractBtn.disabled = false;
+    });
+
+    // Copy
+    document.getElementById('copy-btn').addEventListener('click', function () {
+      navigator.clipboard.writeText(resultText.textContent).then(function () {
+        var btn = document.getElementById('copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(function () { btn.textContent = 'Copy to Clipboard'; }, 1500);
+      });
+    });
+
+    // Add to Gigalator — copies to clipboard with instructions
+    document.getElementById('add-to-gigalator-btn').addEventListener('click', function () {
+      navigator.clipboard.writeText(resultText.textContent).then(function () {
+        var btn = document.getElementById('add-to-gigalator-btn');
+        btn.textContent = 'Copied! Paste in Manager';
+        setTimeout(function () { btn.textContent = 'Add to Gigalator'; }, 2000);
+      });
+    });
+  </script>
+</body>
+</html>
