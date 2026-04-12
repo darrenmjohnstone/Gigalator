@@ -155,6 +155,30 @@
     .sidebar-item:hover { background: var(--bg); }
     .sidebar-item.active { background: var(--accent-light); }
 
+    .sidebar-reorder {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex-shrink: 0;
+      margin-left: 4px;
+    }
+
+    .sidebar-move-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      color: var(--text-dim);
+      font-size: 10px;
+      padding: 0 4px;
+      cursor: pointer;
+      line-height: 14px;
+    }
+
+    .sidebar-move-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text);
+    }
+
     .sidebar-item-title {
       font-size: 14px;
       font-weight: 500;
@@ -818,6 +842,10 @@
             + '<div class="sidebar-item-title">' + esc(sl.name) + '</div>'
             + '<div class="sidebar-item-sub">' + sl.songs.length + ' songs</div>'
             + '</div>'
+            + '<div class="sidebar-reorder">'
+            + '<button class="sidebar-move-btn" data-sl-dir="up" data-sl-i="' + i + '" title="Move up">&#8593;</button>'
+            + '<button class="sidebar-move-btn" data-sl-dir="down" data-sl-i="' + i + '" title="Move down">&#8595;</button>'
+            + '</div>'
             + '</div>';
         });
       }
@@ -825,7 +853,9 @@
       sidebarList.innerHTML = html;
 
       sidebarList.querySelectorAll('.sidebar-item').forEach(function (el) {
-        el.addEventListener('click', function () {
+        el.addEventListener('click', function (e) {
+          // Don't trigger navigation if clicking a reorder button
+          if (e.target.classList.contains('sidebar-move-btn')) return;
           selectedId = el.getAttribute('data-id');
           renderSidebar();
           if (activeTab === 'songs') {
@@ -833,6 +863,25 @@
           } else {
             showSetlistEditor(selectedId);
           }
+        });
+      });
+
+      // Setlist reorder buttons
+      sidebarList.querySelectorAll('.sidebar-move-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var idx = parseInt(btn.getAttribute('data-sl-i'), 10);
+          var dir = btn.getAttribute('data-sl-dir');
+          if (dir === 'up' && idx > 0) {
+            var tmp = data.setlists[idx];
+            data.setlists[idx] = data.setlists[idx - 1];
+            data.setlists[idx - 1] = tmp;
+          } else if (dir === 'down' && idx < data.setlists.length - 1) {
+            var tmp2 = data.setlists[idx];
+            data.setlists[idx] = data.setlists[idx + 1];
+            data.setlists[idx + 1] = tmp2;
+          }
+          renderSidebar();
         });
       });
     }
@@ -1237,6 +1286,7 @@
         + '</div>'
         + '<div class="actions-bar">'
         + '<button class="btn btn-danger" id="delete-setlist-btn">Delete Setlist</button>'
+        + '<button class="btn" id="duplicate-setlist-btn">Duplicate as New Setlist</button>'
         + '<div class="spacer"></div>'
         + '<button class="btn btn-primary" id="save-setlist-btn">Save Changes</button>'
         + '</div>';
@@ -1332,6 +1382,21 @@
           btn.style.background = '';
           btn.style.borderColor = '';
         }, 1500);
+      });
+
+      // Duplicate as new setlist
+      document.getElementById('duplicate-setlist-btn').addEventListener('click', function () {
+        var newId = 'setlist-' + Date.now();
+        var newSl = {
+          id: newId,
+          name: sl.name + ' (copy)',
+          songs: sl.songs.slice()  // copy the array
+        };
+        data.setlists.push(newSl);
+        selectedId = newId;
+        renderSidebar();
+        showSetlistEditor(newId);
+        setStatus('Duplicated "' + sl.name + '" — edit and rename the copy', 'saved');
       });
 
       // Delete

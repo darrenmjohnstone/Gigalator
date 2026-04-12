@@ -140,15 +140,11 @@ main.lyrics-mode {
   margin-left: 12px;
 }
 
-.list-item .track-badge {
-  background: var(--accent-dim);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 10px;
+.list-item .track-icon {
+  font-size: 20px;
   margin-left: 8px;
-  text-transform: uppercase;
+  flex-shrink: 0;
+  opacity: 0.7;
   letter-spacing: 0.5px;
 }
 

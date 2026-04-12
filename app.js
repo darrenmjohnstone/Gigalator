@@ -160,7 +160,7 @@
           + '<div class="list-item-title">' + esc(m.title) + '</div>'
           + '<div class="list-item-subtitle">' + esc(m.artist) + '</div>'
           + '</div>';
-        if (m.hasTrack) rhtml += '<span class="track-badge">Track</span>';
+        if (m.hasTrack) rhtml += '<span class="track-icon">&#128264;</span>';
         rhtml += '<span class="list-item-arrow">&#8250;</span></div>';
       });
       searchResults.innerHTML = rhtml;
@@ -266,7 +266,7 @@
         + '</div>';
 
       if (song.track) {
-        html += '<span class="track-badge">Track</span>';
+        html += '<span class="track-icon">&#128264;</span>';
       }
 
       html += '<span class="list-item-arrow">&#8250;</span></div>';
