@@ -333,12 +333,13 @@ main.lyrics-mode {
 .sheets-scroll {
   flex: 1;
   overflow-x: auto;
-  overflow-y: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   display: flex;
   gap: 16px;
   padding: 8px 0;
-  align-items: flex-start;
+  align-items: stretch;
+  min-height: 0; /* flex child needs this to shrink properly */
 }
 
 .sheets-scroll::-webkit-scrollbar { display: none; }
@@ -347,7 +348,7 @@ main.lyrics-mode {
 .sheet-page-img {
   height: 100%;
   width: auto;
-  max-height: calc(100vh - 160px);
+  object-fit: contain;
   border-radius: 4px;
   border: 1px solid #333;
   flex-shrink: 0;
