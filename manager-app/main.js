@@ -134,6 +134,8 @@ function runGit(args) {
 }
 
 ipcMain.handle('git:deploy', async () => {
+  const MAX_RETRIES = 3;
+
   // Stage all changes (songs, tracks, sheets, etc.)
   await runGit(['add', '-A']);
 
@@ -150,15 +152,33 @@ ipcMain.handle('git:deploy', async () => {
   });
   await runGit(['commit', '-m', `Update songs — ${date}`]);
 
-  // Pull rebase to handle any remote changes, then push
-  try {
-    await runGit(['pull', '--rebase']);
-  } catch (e) {
-    // If rebase fails, try to continue
-    console.warn('Pull rebase warning:', e.message);
+  // Push with retries (handles remote conflicts, network hiccups)
+  let lastError = null;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      // Pull rebase first to handle any remote changes
+      try {
+        await runGit(['pull', '--rebase']);
+      } catch (e) {
+        // If rebase conflicts, abort and retry fresh
+        try { await runGit(['rebase', '--abort']); } catch (_) {}
+        if (attempt < MAX_RETRIES) {
+          console.warn(`Pull rebase failed (attempt ${attempt}), retrying...`);
+          await new Promise(r => setTimeout(r, 2000));
+          continue;
+        }
+      }
+
+      await runGit(['push']);
+      return { success: true, message: 'Deployed to iPad app' };
+    } catch (e) {
+      lastError = e;
+      console.warn(`Push failed (attempt ${attempt}/${MAX_RETRIES}):`, e.message);
+      if (attempt < MAX_RETRIES) {
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
   }
 
-  await runGit(['push']);
-
-  return { success: true, message: 'Deployed to iPad app' };
+  throw lastError || new Error('Deploy failed after ' + MAX_RETRIES + ' attempts');
 });

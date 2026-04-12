@@ -374,20 +374,32 @@
       + '<span class="lyrics-page-hint" id="page-hint">Swipe for more &#8250;</span>'
       + '</div>';
 
-    // "Up Next" bar at the bottom — shows next song name + next button
+    // Bottom navigation bar — Back / Setlists / Next
+    html += '<div class="bottom-nav">'
+      + '<button class="bottom-nav-btn" id="bottom-back-btn">'
+      + '<span class="bottom-nav-icon">&#8249;</span>'
+      + '<span class="bottom-nav-label">Back</span>'
+      + '</button>'
+      + '<button class="bottom-nav-btn" id="bottom-setlists-btn">'
+      + '<span class="bottom-nav-icon">&#9776;</span>'
+      + '<span class="bottom-nav-label">Setlists</span>'
+      + '</button>';
+
     if (hasNext) {
       var nextIdx = currentSetlist.songs.indexOf(songId) + 1;
       var nextSongData = data.songs[currentSetlist.songs[nextIdx]];
-      if (nextSongData) {
-        html += '<div class="up-next-bar" id="up-next-bar">'
-          + '<div class="up-next-info">'
-          + '<span class="up-next-label">Up next</span>'
-          + '<span class="up-next-title">' + esc(nextSongData.title) + '</span>'
-          + '</div>'
-          + '<button class="up-next-btn" id="up-next-btn">Next &#9654;</button>'
-          + '</div>';
-      }
+      html += '<button class="bottom-nav-btn bottom-nav-next" id="bottom-next-btn">'
+        + '<span class="bottom-nav-label">Next</span>'
+        + '<span class="bottom-nav-icon">&#8250;</span>'
+        + '</button>';
+    } else {
+      html += '<button class="bottom-nav-btn bottom-nav-next disabled" disabled>'
+        + '<span class="bottom-nav-label">Next</span>'
+        + '<span class="bottom-nav-icon">&#8250;</span>'
+        + '</button>';
     }
+
+    html += '</div>';
 
     html += '</div>';
 
@@ -439,10 +451,18 @@
       });
     }
 
-    // Bind "Up Next" button
-    var upNextBtn = document.getElementById('up-next-btn');
-    if (upNextBtn) {
-      upNextBtn.addEventListener('click', playNextSong);
+    // Bottom nav buttons
+    document.getElementById('bottom-back-btn').addEventListener('click', function () {
+      main.classList.remove('lyrics-mode');
+      showSongList(currentSetlist);
+    });
+    document.getElementById('bottom-setlists-btn').addEventListener('click', function () {
+      main.classList.remove('lyrics-mode');
+      showSetlists();
+    });
+    var bottomNextBtn = document.getElementById('bottom-next-btn');
+    if (bottomNextBtn) {
+      bottomNextBtn.addEventListener('click', playNextSong);
     }
 
     // Audio — only change track if this song has one and it's different
