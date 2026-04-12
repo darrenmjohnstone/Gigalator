@@ -136,6 +136,25 @@
       border-bottom-color: var(--accent);
     }
 
+    .sidebar-search {
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-search-input {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      background: var(--bg);
+    }
+
+    .sidebar-search-input:focus {
+      border-color: var(--accent);
+    }
+
     .sidebar-list {
       flex: 1;
       overflow-y: auto;
@@ -706,6 +725,9 @@
         <button class="sidebar-tab active" data-tab="songs">Songs</button>
         <button class="sidebar-tab" data-tab="setlists">Setlists</button>
       </div>
+      <div class="sidebar-search">
+        <input type="text" class="sidebar-search-input" id="sidebar-search" placeholder="Search..." autocomplete="off">
+      </div>
       <div class="sidebar-list" id="sidebar-list"></div>
       <div class="sidebar-footer">
         <button class="btn btn-primary" id="add-btn" style="width:100%" disabled>+ Add Song</button>
@@ -789,6 +811,8 @@
     }
 
     // ── Tab switching ──
+    var sidebarSearchInput = document.getElementById('sidebar-search');
+
     document.querySelectorAll('.sidebar-tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
         activeTab = tab.getAttribute('data-tab');
@@ -797,8 +821,23 @@
         });
         addBtn.textContent = activeTab === 'songs' ? '+ Add Song' : '+ Add Setlist';
         selectedId = null;
+        sidebarSearchInput.value = '';
         renderSidebar();
         showWelcome();
+      });
+    });
+
+    // ── Sidebar search ──
+    sidebarSearchInput.addEventListener('input', function () {
+      var q = sidebarSearchInput.value.trim().toLowerCase();
+      sidebarList.querySelectorAll('.sidebar-item').forEach(function (el) {
+        if (q.length < 2) {
+          el.style.display = '';
+          return;
+        }
+        var title = el.querySelector('.sidebar-item-title').textContent.toLowerCase();
+        var sub = el.querySelector('.sidebar-item-sub').textContent.toLowerCase();
+        el.style.display = (title.includes(q) || sub.includes(q)) ? '' : 'none';
       });
     });
 
