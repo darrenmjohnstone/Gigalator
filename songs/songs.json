@@ -266,7 +266,8 @@
         "o-holy-night",
         "rudolf",
         "santa-claus-is-coming-to-town",
-        "so-this-is-christmas"
+        "so-this-is-christmas",
+        "angels-on-high"
       ]
     }
   ],
@@ -1923,10 +1924,10 @@
       "track": "tracks/perfect-ed-sheeran.mp3",
       "fontSize": null
     },
-    "angels-higher-key": {
-      "title": "Angels (Higher Key)",
-      "artist": "Robbie Williams",
-      "lyrics": "[Verse 1]\nI sit and wait\nDoes an angel contemplate my fate\nAnd do they know\nThe places where we go\nWhen we're grey and old\n\n'Cause I've been told\nThat salvation lets their wings unfold\nSo when I'm lying in my bed\nThoughts running through my head\nAnd I feel that love is dead\nI'm loving angels instead\n\n[Chorus]\nAnd through it all she offers me protection\nA lot of love and affection\nWhether I'm right or wrong\nAnd down the waterfall\nWherever it may take me\nI know that life won't break me\nWhen I come to call she won't forsake me\nI'm loving angels instead\n\n[Verse 2]\nWhen I'm feeling weak\nAnd my pain walks down a one way street\nI look above\nAnd I know I'll always be blessed with love\n\nAnd as the feeling grows\nShe breathes flesh to my bones\nAnd when love is dead\nI'm loving angels instead\n\n[Chorus]\nAnd through it all she offers me protection\nA lot of love and affection\nWhether I'm right or wrong\nAnd down the waterfall\nWherever it may take me\nI know that life won't break me\nWhen I come to call she won't forsake me\nI'm loving angels instead",
+    "angels-on-high": {
+      "title": "Angels on High",
+      "artist": "Christmas traditional",
+      "lyrics": "1. Angels we have heard on high,\nSweetly singing o'er the plains,\nAnd the mountains in reply\nEchoing their joyous strains.\nRefrain:\nGloria in excelsis Deo.\nGloria in excelsis Deo.\n2. Shepherds, why this jubilee?\nWhy your joyous strains prolong?\nWhat the gladsome tidings be\nWhich inspire your heavn'ly song? [Refrain]\n3. Come to Bethlehem and see\nHim whose birth the angels sing.\nCome, adore on bended knee\nChrist the Lord, the newborn King. [Refrain]\n4. See him in a manger laid,\nWhom the choirs of angels praise.\nMary, Joseph, lend your aid\nWhile our hearts in love we raise. [Refrain]\n",
       "track": "tracks/angels-higher.m4a",
       "fontSize": 27
     }
