@@ -1897,6 +1897,32 @@
     deployBtn.addEventListener('click', deployToGitHub);
 
     async function deployToGitHub() {
+      if (isElectron) {
+        // Electron mode: git add, commit, push — handles everything (songs, tracks, sheets)
+        deployBtn.disabled = true;
+        deployBtn.className = 'btn-deploy deploying';
+        deployBtn.textContent = 'Deploying...';
+
+        try {
+          var result = await window.electronAPI.gitDeploy();
+          deployBtn.className = 'btn-deploy success';
+          deployBtn.textContent = 'Deployed!';
+          setStatus(result.message, 'saved');
+          setTimeout(function () {
+            deployBtn.className = 'btn-deploy';
+            deployBtn.textContent = 'Deploy to iPad App';
+            deployBtn.disabled = false;
+          }, 3000);
+        } catch (e) {
+          deployBtn.className = 'btn-deploy failed';
+          deployBtn.textContent = 'Deploy failed — try again';
+          setStatus('Deploy failed: ' + e.message, 'error');
+          deployBtn.disabled = false;
+        }
+        return;
+      }
+
+      // Browser mode: GitHub API (songs.json only)
       var token = localStorage.getItem('gigalator-gh-token');
       if (!token) {
         showTokenModal();
@@ -1908,14 +1934,8 @@
       deployBtn.textContent = 'Deploying...';
 
       try {
-        // Read current songs.json content
-        var content;
-        if (isElectron) {
-          content = await window.electronAPI.readTextFile('songs/songs.json');
-        } else {
-          var file = await songsHandle.getFile();
-          content = await file.text();
-        }
+        var file = await songsHandle.getFile();
+        var content = await file.text();
         var encoded = btoa(unescape(encodeURIComponent(content)));
 
         // Get current file SHA from GitHub

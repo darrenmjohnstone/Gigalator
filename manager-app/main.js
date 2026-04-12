@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { execFile } = require('child_process');
 
 // The Gigalator project root is one level up from this app
 const GIGALATOR_ROOT = path.resolve(__dirname, '..');
@@ -117,4 +118,47 @@ ipcMain.handle('dialog:pickFile', async (event, filters) => {
     name: name,
     data: buffer, // Buffer is serialized via structured clone
   };
+});
+
+// ── Git Deploy ──
+function runGit(args) {
+  return new Promise((resolve, reject) => {
+    execFile('git', args, { cwd: GIGALATOR_ROOT, maxBuffer: 10 * 1024 * 1024 }, (err, stdout, stderr) => {
+      if (err) {
+        reject(new Error(stderr || err.message));
+      } else {
+        resolve(stdout.trim());
+      }
+    });
+  });
+}
+
+ipcMain.handle('git:deploy', async () => {
+  // Stage all changes (songs, tracks, sheets, etc.)
+  await runGit(['add', '-A']);
+
+  // Check if there are changes to commit
+  const status = await runGit(['status', '--porcelain']);
+  if (!status) {
+    return { success: true, message: 'Nothing to deploy — already up to date' };
+  }
+
+  // Commit
+  const date = new Date().toLocaleDateString('en-AU', {
+    day: 'numeric', month: 'short', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+  await runGit(['commit', '-m', `Update songs — ${date}`]);
+
+  // Pull rebase to handle any remote changes, then push
+  try {
+    await runGit(['pull', '--rebase']);
+  } catch (e) {
+    // If rebase fails, try to continue
+    console.warn('Pull rebase warning:', e.message);
+  }
+
+  await runGit(['push']);
+
+  return { success: true, message: 'Deployed to iPad app' };
 });

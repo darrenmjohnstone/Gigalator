@@ -13,4 +13,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // File picker (uses Electron's native dialog)
   pickFile: (filters) => ipcRenderer.invoke('dialog:pickFile', filters),
+
+  // Git deploy (commit + push everything)
+  gitDeploy: () => ipcRenderer.invoke('git:deploy'),
 });
