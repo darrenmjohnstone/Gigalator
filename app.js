@@ -25,6 +25,7 @@
   const nextBtn = document.getElementById('next-btn');
   const searchBar = document.getElementById('search-bar');
   const searchInput = document.getElementById('search-input');
+  const searchResultsEl = document.getElementById('search-results-fixed');
 
   // ── Init ──
   async function init() {
@@ -66,6 +67,8 @@
 
   function hideSearch() {
     searchBar.classList.add('hidden');
+    searchResultsEl.classList.add('hidden');
+    searchResultsEl.innerHTML = '';
     searchInput.value = '';
   }
 
@@ -84,28 +87,33 @@
   function onSearchInput() {
     var q = searchInput.value.trim().toLowerCase();
 
-    if (currentView === 'setlists') {
-      var searchResults = document.getElementById('search-results');
-      var normalContent = main.querySelectorAll('.section-label, [data-setlist], .refresh-bar, .timestamp');
-
+    if (currentView === 'setlists' || currentView === 'songs') {
       if (q.length < 2) {
-        searchResults.classList.add('hidden');
-        searchResults.innerHTML = '';
-        normalContent.forEach(function (el) { el.style.display = ''; });
+        searchResultsEl.classList.add('hidden');
+        searchResultsEl.innerHTML = '';
         return;
       }
 
-      normalContent.forEach(function (el) { el.style.display = 'none'; });
-      searchResults.classList.remove('hidden');
-
       var matches = [];
-      for (var sid in data.songs) {
-        var s = data.songs[sid];
-        var score = wordStartMatch(s.title, q);
-        if (score > 0) {
-          matches.push({ id: sid, title: s.title, artist: s.artist, hasTrack: !!s.track, score: score });
+      if (currentView === 'setlists') {
+        for (var sid in data.songs) {
+          var s = data.songs[sid];
+          var score = wordStartMatch(s.title, q);
+          if (score > 0) {
+            matches.push({ id: sid, title: s.title, artist: s.artist, hasTrack: !!s.track, score: score });
+          }
         }
+      } else {
+        currentSetlist.songs.forEach(function (sid) {
+          var s = data.songs[sid];
+          if (!s) return;
+          var score = wordStartMatch(s.title, q);
+          if (score > 0) {
+            matches.push({ id: sid, title: s.title, artist: s.artist, hasTrack: !!s.track, score: score });
+          }
+        });
       }
+
       // Best match at bottom (nearest play bar): lower score first, then Z-A within same score
       matches.sort(function (a, b) {
         if (a.score !== b.score) return a.score - b.score;
@@ -122,12 +130,13 @@
         if (m.hasTrack) rhtml += '<span class="track-icon">&#128264;</span>';
         rhtml += '<span class="list-item-arrow">&#8250;</span></div>';
       });
-      searchResults.innerHTML = rhtml;
+      searchResultsEl.innerHTML = rhtml;
+      searchResultsEl.classList.remove('hidden');
 
-      // Scroll to bottom so best match is visible near the search bar
-      main.scrollTop = main.scrollHeight;
+      // Scroll results to bottom so best match is nearest the search bar
+      searchResultsEl.scrollTop = searchResultsEl.scrollHeight;
 
-      searchResults.querySelectorAll('[data-search-song]').forEach(function (el) {
+      searchResultsEl.querySelectorAll('[data-search-song]').forEach(function (el) {
         el.addEventListener('click', function () {
           var id = el.getAttribute('data-search-song');
           var allSorted = Object.keys(data.songs).sort(function (a, b) {
@@ -138,14 +147,6 @@
         });
       });
 
-    } else if (currentView === 'songs') {
-      main.querySelectorAll('#songlist-items [data-song]').forEach(function (el) {
-        var songId = el.getAttribute('data-song');
-        var song = data.songs[songId];
-        if (!song) return;
-        var match = q.length < 2 || wordStartMatch(song.title, q) > 0;
-        el.style.display = match ? '' : 'none';
-      });
     }
   }
 
@@ -196,9 +197,6 @@
       + '</div>'
       + '<span class="list-item-arrow">&#8250;</span>'
       + '</div>';
-
-    // Search results container (hidden by default)
-    html += '<div id="search-results" class="hidden"></div>';
 
     // Refresh button
     html += '<div class="refresh-bar">'
