@@ -100,7 +100,7 @@
       var matches = [];
       for (var sid in data.songs) {
         var s = data.songs[sid];
-        if (wordStartMatch(s.title, q) || wordStartMatch(s.artist, q)) {
+        if (wordStartMatch(s.title, q)) {
           matches.push({ id: sid, title: s.title, artist: s.artist, hasTrack: !!s.track });
         }
       }
@@ -138,7 +138,7 @@
         var songId = el.getAttribute('data-song');
         var song = data.songs[songId];
         if (!song) return;
-        var match = q.length < 2 || wordStartMatch(song.title, q) || wordStartMatch(song.artist, q);
+        var match = q.length < 2 || wordStartMatch(song.title, q);
         el.style.display = match ? '' : 'none';
       });
     }
