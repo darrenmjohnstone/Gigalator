@@ -514,14 +514,17 @@ main.lyrics-mode {
 
 /* ── Section labels ── */
 
-/* ── Search bar ── */
+/* ── Search bar (fixed above player) ── */
 
-.search-bar {
+.search-bar-fixed {
   padding: 8px 16px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--bg);
+  background: #111;
+  border-top: 1px solid #333;
+  flex-shrink: 0;
+}
+
+.search-bar-fixed.hidden {
+  display: none;
 }
 
 .search-input {
