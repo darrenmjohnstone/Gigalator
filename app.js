@@ -70,14 +70,15 @@
   }
 
   // Match query against start of any word in text
+  // Returns 0 = no match, 1 = word match, 2 = title starts with query
   function wordStartMatch(text, q) {
     var lower = text.toLowerCase();
-    if (lower.indexOf(q) === 0) return true;
+    if (lower.indexOf(q) === 0) return 2;
     var words = lower.split(/[\s\-\/\(\)]+/);
     for (var i = 0; i < words.length; i++) {
-      if (words[i].indexOf(q) === 0) return true;
+      if (words[i].indexOf(q) === 0) return 1;
     }
-    return false;
+    return 0;
   }
 
   function onSearchInput() {
@@ -100,12 +101,16 @@
       var matches = [];
       for (var sid in data.songs) {
         var s = data.songs[sid];
-        if (wordStartMatch(s.title, q)) {
-          matches.push({ id: sid, title: s.title, artist: s.artist, hasTrack: !!s.track });
+        var score = wordStartMatch(s.title, q);
+        if (score > 0) {
+          matches.push({ id: sid, title: s.title, artist: s.artist, hasTrack: !!s.track, score: score });
         }
       }
-      // Sort Z-A so the best match is at the bottom, nearest the search bar
-      matches.sort(function (a, b) { return b.title.localeCompare(a.title); });
+      // Best match at bottom (nearest play bar): lower score first, then Z-A within same score
+      matches.sort(function (a, b) {
+        if (a.score !== b.score) return a.score - b.score;
+        return b.title.localeCompare(a.title);
+      });
 
       var rhtml = '<div class="section-label">' + matches.length + ' result' + (matches.length !== 1 ? 's' : '') + '</div>';
       matches.forEach(function (m) {
@@ -138,7 +143,7 @@
         var songId = el.getAttribute('data-song');
         var song = data.songs[songId];
         if (!song) return;
-        var match = q.length < 2 || wordStartMatch(song.title, q);
+        var match = q.length < 2 || wordStartMatch(song.title, q) > 0;
         el.style.display = match ? '' : 'none';
       });
     }
