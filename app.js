@@ -69,6 +69,17 @@
     searchInput.value = '';
   }
 
+  // Match query against start of any word in text
+  function wordStartMatch(text, q) {
+    var lower = text.toLowerCase();
+    if (lower.indexOf(q) === 0) return true;
+    var words = lower.split(/[\s\-\/\(\)]+/);
+    for (var i = 0; i < words.length; i++) {
+      if (words[i].indexOf(q) === 0) return true;
+    }
+    return false;
+  }
+
   function onSearchInput() {
     var q = searchInput.value.trim().toLowerCase();
 
@@ -89,11 +100,12 @@
       var matches = [];
       for (var sid in data.songs) {
         var s = data.songs[sid];
-        if (s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q)) {
+        if (wordStartMatch(s.title, q) || wordStartMatch(s.artist, q)) {
           matches.push({ id: sid, title: s.title, artist: s.artist, hasTrack: !!s.track });
         }
       }
-      matches.sort(function (a, b) { return a.title.localeCompare(b.title); });
+      // Sort Z-A so the best match is at the bottom, nearest the search bar
+      matches.sort(function (a, b) { return b.title.localeCompare(a.title); });
 
       var rhtml = '<div class="section-label">' + matches.length + ' result' + (matches.length !== 1 ? 's' : '') + '</div>';
       matches.forEach(function (m) {
@@ -106,6 +118,9 @@
         rhtml += '<span class="list-item-arrow">&#8250;</span></div>';
       });
       searchResults.innerHTML = rhtml;
+
+      // Scroll to bottom so best match is visible near the search bar
+      main.scrollTop = main.scrollHeight;
 
       searchResults.querySelectorAll('[data-search-song]').forEach(function (el) {
         el.addEventListener('click', function () {
@@ -123,7 +138,7 @@
         var songId = el.getAttribute('data-song');
         var song = data.songs[songId];
         if (!song) return;
-        var match = q.length < 2 || song.title.toLowerCase().includes(q) || song.artist.toLowerCase().includes(q);
+        var match = q.length < 2 || wordStartMatch(song.title, q) || wordStartMatch(song.artist, q);
         el.style.display = match ? '' : 'none';
       });
     }
