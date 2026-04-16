@@ -494,7 +494,7 @@ main.lyrics-mode {
   font-size: 14px;
   color: var(--text-dim);
   min-width: 48px;
-  text-align: right;
+  text-align: left;
   font-variant-numeric: tabular-nums;
 }
 

@@ -25,12 +25,12 @@
       <input type="search" class="search-input" id="search-input" placeholder="Search songs..." autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search">
     </div>
     <div id="player" class="hidden">
-      <button id="play-btn" aria-label="Play">&#9654;</button>
+      <span id="time-display">0:00</span>
+      <span id="track-label" class="hidden"></span>
       <div id="progress-wrap">
         <div id="progress-bar"></div>
       </div>
-      <span id="time-display">0:00</span>
-      <span id="track-label" class="hidden"></span>
+      <button id="play-btn" aria-label="Play">&#9654;</button>
     </div>
   </div>
   <audio id="audio" preload="auto"></audio>
