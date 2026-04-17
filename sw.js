@@ -2,7 +2,7 @@
 // Caches app shell for offline use at gigs
 // MP3 tracks are cached on demand or via "Cache Setlist" button
 
-const CACHE_NAME = 'gigalator-app-v26';
+const CACHE_NAME = 'gigalator-app-v27';
 const TRACK_CACHE = 'gigalator-tracks-v1';
 
 // App shell files to cache immediately

@@ -275,6 +275,51 @@
       line-height: 1.6;
     }
 
+    .lyrics-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      background: var(--bg-card, #f6f6f6);
+    }
+
+    .lyrics-toolbar + textarea {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    .fmt-btn {
+      background: var(--bg-white, #fff);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text);
+      line-height: 1;
+      min-width: 32px;
+    }
+
+    .fmt-btn:hover {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .fmt-btn:active {
+      transform: translateY(1px);
+    }
+
+    .fmt-hint {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: "SF Mono", "Menlo", monospace;
+    }
+
     .form-row {
       display: flex;
       gap: 16px;
@@ -1087,6 +1132,13 @@
         + '</div>'
         + '<div class="form-group">'
         + '<label>Lyrics</label>'
+        + '<div class="lyrics-toolbar">'
+        + '<button type="button" class="fmt-btn" data-fmt="bold" title="Bold (⌘B)"><b>B</b></button>'
+        + '<button type="button" class="fmt-btn" data-fmt="italic" title="Italic (⌘I)"><i>I</i></button>'
+        + '<button type="button" class="fmt-btn" data-fmt="underline" title="Underline (⌘U)"><u>U</u></button>'
+        + '<button type="button" class="fmt-btn" data-fmt="highlight" title="Highlight"><span style="background:#ffe380;padding:0 4px;border-radius:2px">H</span></button>'
+        + '<span class="fmt-hint">Markdown: **bold** · *italic* · __underline__ · ==highlight==</span>'
+        + '</div>'
         + '<textarea id="song-lyrics">' + esc(song.lyrics) + '</textarea>'
         + '</div>'
         + '<div class="form-group">'
@@ -1175,6 +1227,65 @@
       var previewEl = document.getElementById('preview-lyrics');
       var overflowWarn = document.getElementById('preview-overflow');
       var lyricsTextarea = document.getElementById('song-lyrics');
+
+      // ── Lyrics formatting toolbar ──
+      // Wraps selection in markdown-style markers so chord alignment stays intact.
+      var FMT_WRAPPERS = {
+        bold:      { open: '**', close: '**' },
+        italic:    { open: '*',  close: '*'  },
+        underline: { open: '__', close: '__' },
+        highlight: { open: '==', close: '==' }
+      };
+
+      function wrapSelection(fmt) {
+        var w = FMT_WRAPPERS[fmt];
+        if (!w) return;
+        var ta = lyricsTextarea;
+        var start = ta.selectionStart;
+        var end = ta.selectionEnd;
+        var before = ta.value.slice(0, start);
+        var selected = ta.value.slice(start, end);
+        var after = ta.value.slice(end);
+
+        // Toggle: if the selection is already wrapped, unwrap it.
+        if (selected.startsWith(w.open) && selected.endsWith(w.close)
+            && selected.length >= w.open.length + w.close.length) {
+          var unwrapped = selected.slice(w.open.length, selected.length - w.close.length);
+          ta.value = before + unwrapped + after;
+          ta.selectionStart = start;
+          ta.selectionEnd = start + unwrapped.length;
+        } else {
+          ta.value = before + w.open + selected + w.close + after;
+          if (selected.length === 0) {
+            // No selection — place cursor between the markers ready to type
+            ta.selectionStart = ta.selectionEnd = start + w.open.length;
+          } else {
+            ta.selectionStart = start + w.open.length;
+            ta.selectionEnd = start + w.open.length + selected.length;
+          }
+        }
+        ta.focus();
+        // Fire input event so preview updates and dirty state is tracked
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+
+      document.querySelectorAll('.fmt-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          wrapSelection(btn.dataset.fmt);
+        });
+      });
+
+      // Keyboard shortcuts: ⌘B / ⌘I / ⌘U while in the lyrics textarea
+      lyricsTextarea.addEventListener('keydown', function (e) {
+        if (!(e.metaKey || e.ctrlKey)) return;
+        var key = e.key.toLowerCase();
+        var map = { b: 'bold', i: 'italic', u: 'underline' };
+        if (map[key]) {
+          e.preventDefault();
+          wrapSelection(map[key]);
+        }
+      });
+
       var previewContainer = document.getElementById('preview-container');
       var previewScaler = document.getElementById('preview-scaler');
       var previewFrameEl = document.getElementById('preview-frame');

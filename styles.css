@@ -287,6 +287,28 @@ main.lyrics-mode {
   scroll-snap-align: start;
 }
 
+/* Inline lyric formatting — set via Markdown in the Manager */
+.lyrics strong {
+  font-weight: 700;
+  color: #fff;
+}
+.lyrics em {
+  font-style: italic;
+  color: var(--accent);
+}
+.lyrics u {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--accent);
+}
+.lyrics mark {
+  background: rgba(255, 227, 128, 0.28);
+  color: inherit;
+  padding: 0 3px;
+  border-radius: 3px;
+}
+
 /* Page indicator */
 .lyrics-page-bar {
   display: flex;

@@ -469,7 +469,7 @@
       + '</div>'
       + '</div>'
       + '<div class="lyrics-scroll" id="lyrics-scroll">'
-      + '<div class="lyrics" id="lyrics-text">' + esc(song.lyrics) + '</div>'
+      + '<div class="lyrics" id="lyrics-text">' + renderLyrics(song.lyrics) + '</div>'
       + '</div>';
 
     // Sheets view (hidden by default)
@@ -836,6 +836,22 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  // Render lyrics with inline markdown-lite formatting.
+  // Escapes HTML first (safe), then turns markers into tags.
+  // Order matters: ** before *, __ before _.
+  function renderLyrics(str) {
+    var html = esc(str || '');
+    // ==highlight==
+    html = html.replace(/==([^=\n]+?)==/g, '<mark>$1</mark>');
+    // **bold**
+    html = html.replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>');
+    // __underline__  (double underscore — must come before single/italic patterns would)
+    html = html.replace(/__([^_\n]+?)__/g, '<u>$1</u>');
+    // *italic*  (single asterisk, not surrounded by **; safe because ** was already consumed)
+    html = html.replace(/\*([^*\n]+?)\*/g, '<em>$1</em>');
+    return html;
   }
 
   // ── Start ──
