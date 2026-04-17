@@ -731,7 +731,7 @@
     .preview-header {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       padding: 12px 16px;
       border-bottom: 1px solid #333;
       flex-shrink: 0;
@@ -743,13 +743,146 @@
       color: #e8e8e8;
       font-size: 20px;
       font-weight: 600;
+      flex: 1;
+      text-align: center;
+    }
+
+    .preview-header-btn {
+      color: #f0a030;
+      font-size: 24px;
+      min-width: 44px;
+      text-align: center;
+    }
+
+    .preview-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      padding: 16px;
+      background: #1a1a1a;
+    }
+
+    .preview-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      margin-bottom: 12px;
     }
 
     .preview-artist {
       font-size: 16px;
       color: #999;
-      padding: 0 16px;
-      margin-top: 12px;
+    }
+
+    .preview-font-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preview-font-btn {
+      background: #252525;
+      border: 1px solid #444;
+      color: #f0a030;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      font-size: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview-font-label {
+      font-size: 13px;
+      color: #999;
+      min-width: 36px;
+      text-align: center;
+    }
+
+    /* Bottom nav — matches the iPad .bottom-nav */
+    .preview-bottom-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0 0;
+      flex-shrink: 0;
+    }
+
+    .preview-bnav-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #252525;
+      border: 1px solid #444;
+      color: #f0a030;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 12px;
+      min-height: 48px;
+      flex: 1;
+    }
+
+    .preview-bnav-next {
+      background: #f0a030;
+      color: #111;
+      border-color: #f0a030;
+    }
+
+    .preview-bnav-icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    /* Player bar — matches the iPad #player */
+    .preview-player {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #111;
+      border-top: 1px solid #333;
+      flex-shrink: 0;
+    }
+
+    .preview-player-time {
+      font-size: 14px;
+      color: #999;
+      min-width: 48px;
+      text-align: left;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .preview-player-progress {
+      flex: 1;
+      height: 6px;
+      background: #333;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .preview-player-progress-bar {
+      height: 100%;
+      width: 35%;
+      background: #f0a030;
+      border-radius: 3px;
+    }
+
+    .preview-player-play {
+      background: #f0a030;
+      color: #111;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-size: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
     }
 
@@ -774,7 +907,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       font-weight: 300;
       line-height: 1.6;
-      padding: 0 16px 16px;
       transition: transform 0.3s ease;
       /* font-size set by JS to actual iPad font size (no scaling!) */
     }
@@ -1241,14 +1373,37 @@
         + '<div class="preview-container" id="preview-container">'
         + '<div class="preview-scaler" id="preview-scaler">'
         + '<div class="preview-frame" id="preview-frame">'
-        + '<div class="preview-header"><span class="preview-header-title">' + esc(song.title) + '</span></div>'
+        + '<div class="preview-header">'
+        + '<span class="preview-header-btn">&#8592;</span>'
+        + '<span class="preview-header-title">' + esc(song.title) + '</span>'
+        + '<span class="preview-header-btn">&#x23ED;&#xFE0E;</span>'
+        + '</div>'
+        + '<div class="preview-body">'
+        + '<div class="preview-top-bar">'
         + '<div class="preview-artist">' + esc(song.artist) + '</div>'
+        + '<div class="preview-font-controls">'
+        + '<span class="preview-font-btn">&#8722;</span>'
+        + '<span class="preview-font-label" id="preview-font-label">30px</span>'
+        + '<span class="preview-font-btn">&#43;</span>'
+        + '</div>'
+        + '</div>'
         + '<div class="preview-lyrics-scroll" id="preview-lyrics-scroll">'
         + '<div class="preview-lyrics" id="preview-lyrics">' + esc(song.lyrics) + '</div>'
         + '</div>'
         + '<div class="preview-page-bar">'
         + '<button class="preview-page-btn active" id="preview-page1">Page 1</button>'
         + '<button class="preview-page-btn" id="preview-page2">Page 2</button>'
+        + '</div>'
+        + '<div class="preview-bottom-nav">'
+        + '<div class="preview-bnav-btn"><span class="preview-bnav-icon">&#8249;</span>Back</div>'
+        + '<div class="preview-bnav-btn"><span class="preview-bnav-icon">&#9776;</span>Setlists</div>'
+        + '<div class="preview-bnav-btn preview-bnav-next">Next <span class="preview-bnav-icon">&#8250;</span></div>'
+        + '</div>'
+        + '</div>'
+        + '<div class="preview-player">'
+        + '<span class="preview-player-time">0:00</span>'
+        + '<div class="preview-player-progress"><div class="preview-player-progress-bar"></div></div>'
+        + '<div class="preview-player-play">&#9654;</div>'
         + '</div>'
         + '<div class="preview-overflow-warn" id="preview-overflow">OVERFLOWS — reduce font size</div>'
         + '</div>'
@@ -1393,6 +1548,9 @@
         // Use the REAL font size — the preview is at actual iPad resolution, just scaled down visually
         previewEl.style.fontSize = fontSize + 'px';
         previewEl.style.lineHeight = '1.6';
+        // Keep the font label in the preview chrome in sync
+        var previewFontLabel = document.getElementById('preview-font-label');
+        if (previewFontLabel) previewFontLabel.textContent = fontSize + 'px';
         // Render markdown-lite formatting (**bold**, *italic*, __underline__, ==highlight==)
         // so the Manager preview matches the iPad exactly.
         previewEl.innerHTML = renderLyricsPreview(lyricsTextarea.value);
