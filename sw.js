@@ -2,7 +2,7 @@
 // Caches app shell for offline use at gigs
 // MP3 tracks are cached on demand or via "Cache Setlist" button
 
-const CACHE_NAME = 'gigalator-app-v21';
+const CACHE_NAME = 'gigalator-app-v22';
 const TRACK_CACHE = 'gigalator-tracks-v1';
 
 // App shell files to cache immediately
@@ -48,6 +48,69 @@ self.addEventListener('activate', function (event) {
   );
 });
 
+// Handle audio track requests with proper Range support for iOS Safari.
+// iOS <audio> sends Range: bytes=X-Y requests. If we serve a cached 200
+// response directly, iOS may fail playback or seeking. Instead, we slice
+// the cached full response and return a proper 206 Partial Content.
+async function handleTrackRequest(request) {
+  try {
+    const cache = await caches.open(TRACK_CACHE);
+    // Strip Range from request for cache lookup (we always store full 200)
+    const cacheKey = new Request(request.url);
+    let cached = await cache.match(cacheKey);
+
+    if (!cached) {
+      // Not in cache — fetch from network. Use a non-Range request so we
+      // cache the full file for later.
+      try {
+        const fullResp = await fetch(request.url);
+        if (fullResp.ok) {
+          await cache.put(cacheKey, fullResp.clone());
+          cached = fullResp;
+        } else {
+          // Fall back to returning whatever the network gave us
+          return fullResp;
+        }
+      } catch (e) {
+        // Offline and not cached — nothing we can do
+        return new Response('', { status: 504, statusText: 'Not cached and offline' });
+      }
+    }
+
+    // If the request had no Range header, return the full cached response
+    const rangeHeader = request.headers.get('range');
+    if (!rangeHeader) return cached;
+
+    // Parse Range: "bytes=start-end"
+    const match = /^bytes=(\d*)-(\d*)$/.exec(rangeHeader);
+    if (!match) return cached;
+
+    const fullBuffer = await cached.clone().arrayBuffer();
+    const totalSize = fullBuffer.byteLength;
+    const start = match[1] ? parseInt(match[1], 10) : 0;
+    const end = match[2] ? parseInt(match[2], 10) : totalSize - 1;
+
+    if (start >= totalSize) {
+      return new Response('', { status: 416, statusText: 'Range Not Satisfiable' });
+    }
+
+    const slice = fullBuffer.slice(start, end + 1);
+    return new Response(slice, {
+      status: 206,
+      statusText: 'Partial Content',
+      headers: {
+        'Content-Type': cached.headers.get('Content-Type') || 'audio/mpeg',
+        'Content-Length': String(slice.byteLength),
+        'Content-Range': 'bytes ' + start + '-' + end + '/' + totalSize,
+        'Accept-Ranges': 'bytes'
+      }
+    });
+  } catch (e) {
+    // Last resort — go straight to network
+    return fetch(request);
+  }
+}
+
 // Fetch strategy
 self.addEventListener('fetch', function (event) {
   var url = new URL(event.request.url);
@@ -60,21 +123,9 @@ self.addEventListener('fetch', function (event) {
     }
   }
 
-  // Audio track requests — cache first, fallback to network (and cache on fetch)
+  // Audio track requests — handle Range requests properly for iOS Safari
   if (url.pathname.includes('/tracks/') && (url.pathname.endsWith('.mp3') || url.pathname.endsWith('.m4a'))) {
-    event.respondWith(
-      caches.open(TRACK_CACHE).then(function (cache) {
-        return cache.match(event.request).then(function (cached) {
-          if (cached) return cached;
-          return fetch(event.request).then(function (response) {
-            if (response.ok) {
-              cache.put(event.request, response.clone());
-            }
-            return response;
-          });
-        });
-      })
-    );
+    event.respondWith(handleTrackRequest(event.request));
     return;
   }
 

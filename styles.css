@@ -183,6 +183,11 @@ main.lyrics-mode {
   color: #4a4;
 }
 
+.cache-btn.cache-partial {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
 /* ── Lyrics view ── */
 
 .lyrics-wrap {

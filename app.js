@@ -70,11 +70,26 @@
   }
 
   function hideSearch() {
+    // Explicit blur first so iOS releases the input before hiding the parent
+    try { searchInput.blur(); } catch (e) {}
     searchBar.classList.add('hidden');
     searchResultsEl.classList.add('hidden');
     searchResultsEl.innerHTML = '';
     searchInput.value = '';
   }
+
+  // iOS PWA sometimes drops the keyboard when the search bar reappears.
+  // A touchend handler that re-focuses forces the keyboard to come back.
+  document.addEventListener('DOMContentLoaded', function () {
+    var si = document.getElementById('search-input');
+    if (!si) return;
+    si.addEventListener('touchend', function () {
+      // Defer focus so iOS sees it as a user-gesture focus
+      setTimeout(function () {
+        if (document.activeElement !== si) si.focus();
+      }, 0);
+    });
+  });
 
   // Match query against start of any word in text
   // Returns 0 = no match, 1 = word match, 2 = title starts with query
@@ -679,30 +694,50 @@
     if (trackSongs.length === 0) return;
 
     btn.disabled = true;
+    btn.classList.remove('cached');
     let cached = 0;
+    let failed = 0;
+    const failures = [];
 
     try {
       const cache = await caches.open('gigalator-tracks-v1');
 
       for (const song of trackSongs) {
         try {
+          // Always re-fetch to verify — don't trust existing cache entries
+          // (they might be partial or corrupt from a previous failed run)
           const existing = await cache.match(song.track);
           if (!existing) {
             await cache.add(song.track);
           }
+          // Verify it actually landed in cache
+          const verify = await cache.match(song.track);
+          if (!verify) throw new Error('Cache put did not persist');
           cached++;
-          btn.textContent = 'Caching ' + cached + '/' + trackSongs.length;
         } catch (e) {
           console.warn('Failed to cache:', song.track, e);
-          cached++;
-          btn.textContent = 'Caching ' + cached + '/' + trackSongs.length;
+          failed++;
+          failures.push(song.title + ' (' + (e.message || 'unknown') + ')');
         }
+        btn.textContent = 'Caching ' + (cached + failed) + '/' + trackSongs.length;
       }
 
-      btn.textContent = 'Cached';
-      btn.classList.add('cached');
+      if (failed === 0) {
+        btn.textContent = 'Cached';
+        btn.classList.add('cached');
+      } else {
+        btn.textContent = failed + ' failed — tap to retry';
+        btn.classList.add('cache-partial');
+        console.warn('Cache failures:', failures);
+        // Show the user what failed so they know before the gig
+        alert(failed + ' track' + (failed !== 1 ? 's' : '') + ' failed to cache:\n\n'
+          + failures.slice(0, 10).join('\n')
+          + (failures.length > 10 ? '\n...and ' + (failures.length - 10) + ' more' : '')
+          + '\n\nStorage may be full, or the device was offline. Tap the button again to retry.');
+      }
     } catch (e) {
       btn.textContent = 'Cache failed';
+      console.error('Cache setup failed:', e);
     }
 
     btn.disabled = false;
