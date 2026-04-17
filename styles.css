@@ -303,10 +303,11 @@ main.lyrics-mode {
   text-decoration-color: var(--accent);
 }
 .lyrics mark {
-  background: rgba(255, 227, 128, 0.28);
-  color: inherit;
-  padding: 0 3px;
+  background: #ffd84a;
+  color: #111;
+  padding: 0 4px;
   border-radius: 3px;
+  font-weight: 500;
 }
 
 /* Page indicator */

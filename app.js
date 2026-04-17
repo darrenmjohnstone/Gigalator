@@ -840,17 +840,19 @@
 
   // Render lyrics with inline markdown-lite formatting.
   // Escapes HTML first (safe), then turns markers into tags.
-  // Order matters: ** before *, __ before _.
+  // Order matters: ** before *, ==highlight== before anything, __underline__ before single _.
+  // All patterns allow the wrapped content to span newlines so multi-line
+  // bold/highlight blocks render correctly.
   function renderLyrics(str) {
     var html = esc(str || '');
     // ==highlight==
-    html = html.replace(/==([^=\n]+?)==/g, '<mark>$1</mark>');
+    html = html.replace(/==([\s\S]+?)==/g, '<mark>$1</mark>');
     // **bold**
-    html = html.replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>');
-    // __underline__  (double underscore — must come before single/italic patterns would)
-    html = html.replace(/__([^_\n]+?)__/g, '<u>$1</u>');
-    // *italic*  (single asterisk, not surrounded by **; safe because ** was already consumed)
-    html = html.replace(/\*([^*\n]+?)\*/g, '<em>$1</em>');
+    html = html.replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>');
+    // __underline__
+    html = html.replace(/__([\s\S]+?)__/g, '<u>$1</u>');
+    // *italic*
+    html = html.replace(/\*([\s\S]+?)\*/g, '<em>$1</em>');
     return html;
   }
 
