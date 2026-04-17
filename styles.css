@@ -119,6 +119,15 @@ main.lyrics-mode {
   background: var(--bg-card-hover);
 }
 
+.list-item.just-viewed {
+  animation: just-viewed-flash 1.5s ease-out;
+}
+
+@keyframes just-viewed-flash {
+  0%   { background: rgba(240, 160, 48, 0.35); }
+  100% { background: var(--bg-card); }
+}
+
 .list-item-text {
   flex: 1;
 }

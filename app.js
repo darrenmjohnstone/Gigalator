@@ -193,7 +193,8 @@
   function goBack() {
     if (currentView === 'lyrics') {
       main.classList.remove('lyrics-mode');
-      showSongList(currentSetlist);
+      // Pass the song we were viewing so the list scrolls back to it
+      showSongList(currentSetlist, currentSong);
     } else if (currentView === 'songs') {
       showSetlists();
     }
@@ -307,7 +308,7 @@
   }
 
   // ── View: Song List ──
-  function showSongList(setlist) {
+  function showSongList(setlist, scrollToSongId) {
     currentView = 'songs';
     currentSetlist = setlist;
     currentSong = null;
@@ -352,6 +353,20 @@
 
     main.innerHTML = html;
     main.scrollTop = 0;
+
+    // If a specific song was requested (coming back from lyrics),
+    // scroll it into view and give it a brief highlight
+    if (scrollToSongId) {
+      var target = main.querySelector('[data-song="' + scrollToSongId + '"]');
+      if (target) {
+        // block: 'center' keeps the song roughly in the middle of the view
+        target.scrollIntoView({ block: 'center' });
+        target.classList.add('just-viewed');
+        setTimeout(function () {
+          if (target) target.classList.remove('just-viewed');
+        }, 1500);
+      }
+    }
 
     // Show search bar for this song list
     showSearch('Search in ' + setlist.name + '...');
@@ -522,7 +537,8 @@
     // Bottom nav buttons
     document.getElementById('bottom-back-btn').addEventListener('click', function () {
       main.classList.remove('lyrics-mode');
-      showSongList(currentSetlist);
+      // Pass the current song so the list scrolls back to it
+      showSongList(currentSetlist, currentSong);
     });
     document.getElementById('bottom-setlists-btn').addEventListener('click', function () {
       main.classList.remove('lyrics-mode');
