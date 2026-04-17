@@ -142,24 +142,15 @@
         return;
       }
 
+      // Always search the whole library — setlist context is just used
+      // to pick the default setlist if you open a result from search.
       var matches = [];
-      if (currentView === 'setlists') {
-        for (var sid in data.songs) {
-          var s = data.songs[sid];
-          var score = wordStartMatch(s.title, q);
-          if (score > 0) {
-            matches.push({ id: sid, title: s.title, artist: s.artist, hasTrack: !!s.track, score: score });
-          }
+      for (var sid in data.songs) {
+        var s = data.songs[sid];
+        var score = wordStartMatch(s.title, q);
+        if (score > 0) {
+          matches.push({ id: sid, title: s.title, artist: s.artist, hasTrack: !!s.track, score: score });
         }
-      } else {
-        currentSetlist.songs.forEach(function (sid) {
-          var s = data.songs[sid];
-          if (!s) return;
-          var score = wordStartMatch(s.title, q);
-          if (score > 0) {
-            matches.push({ id: sid, title: s.title, artist: s.artist, hasTrack: !!s.track, score: score });
-          }
-        });
       }
 
       // Best match at bottom (nearest play bar): lower score first, then Z-A within same score
