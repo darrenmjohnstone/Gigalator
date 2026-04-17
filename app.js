@@ -56,6 +56,10 @@
         console.warn('SW registration failed:', err);
       });
     }
+    // Request persistent storage so iOS won't evict cached tracks
+    if (navigator.storage && navigator.storage.persist) {
+      navigator.storage.persist();
+    }
   }
 
   // ── Search ──
