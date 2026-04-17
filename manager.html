@@ -733,6 +733,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 12px 16px;
+      padding-top: calc(12px + var(--preview-safe-top, 0px));
       border-bottom: 1px solid #333;
       flex-shrink: 0;
       background: #111;
@@ -845,6 +846,7 @@
       align-items: center;
       gap: 12px;
       padding: 12px 16px;
+      padding-bottom: calc(12px + var(--preview-safe-bottom, 0px));
       background: #111;
       border-top: 1px solid #333;
       flex-shrink: 0;
@@ -1491,11 +1493,22 @@
       var deviceSelect = document.getElementById('preview-device');
       var orientationSelect = document.getElementById('preview-orientation');
 
-      // iPad logical resolutions in landscape (width x height)
+      // iPad logical resolutions (landscape) + safe-area insets per orientation.
+      // Safe-area values match what env(safe-area-inset-*) returns for each
+      // device in PWA standalone mode with the black-translucent status bar.
       var IPAD_SIZES = {
-        'ipad-pro-11':  { w: 1194, h: 834,  label: 'iPad Pro 11"' },
-        'ipad-pro-13':  { w: 1366, h: 1024, label: 'iPad Pro 12.9"' },
-        'ipad-9':       { w: 1080, h: 810,  label: 'iPad 9th gen' }
+        'ipad-pro-11':  {
+          w: 1194, h: 834, label: 'iPad Pro 11"',
+          safe: { portrait: { top: 24, bottom: 34 }, landscape: { top: 20, bottom: 21 } }
+        },
+        'ipad-pro-13':  {
+          w: 1366, h: 1024, label: 'iPad Pro 12.9"',
+          safe: { portrait: { top: 24, bottom: 34 }, landscape: { top: 20, bottom: 21 } }
+        },
+        'ipad-9':       {
+          w: 1080, h: 810, label: 'iPad 9th gen',
+          safe: { portrait: { top: 20, bottom: 0 },  landscape: { top: 20, bottom: 0 } }
+        }
       };
 
       function sizePreview() {
@@ -1514,6 +1527,13 @@
         previewFrameEl.style.height = ipadH + 'px';
         previewScaler.style.width = ipadW + 'px';
         previewScaler.style.height = ipadH + 'px';
+
+        // Apply safe-area insets — these simulate what env(safe-area-inset-*)
+        // returns on the real device, so the lyrics area shrinks by the same
+        // amount the status bar / home indicator steals on the iPad.
+        var safe = device.safe[portrait ? 'portrait' : 'landscape'];
+        previewFrameEl.style.setProperty('--preview-safe-top', safe.top + 'px');
+        previewFrameEl.style.setProperty('--preview-safe-bottom', safe.bottom + 'px');
 
         // Scale down to fit in the available editor width
         var availableWidth = previewContainer.parentElement.clientWidth;
