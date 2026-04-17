@@ -57,8 +57,37 @@
       });
     }
     // Request persistent storage so iOS won't evict cached tracks
+    // and raises the origin quota ceiling.
     if (navigator.storage && navigator.storage.persist) {
-      navigator.storage.persist();
+      navigator.storage.persisted().then(function (already) {
+        if (!already) {
+          navigator.storage.persist().then(function (granted) {
+            console.log('Persistent storage granted:', granted);
+          });
+        } else {
+          console.log('Persistent storage already granted');
+        }
+      });
+    }
+  }
+
+  // Query the browser's storage quota — useful for diagnosing cache limits
+  async function getStorageInfo() {
+    if (!navigator.storage || !navigator.storage.estimate) return null;
+    try {
+      const est = await navigator.storage.estimate();
+      const persisted = navigator.storage.persisted
+        ? await navigator.storage.persisted()
+        : false;
+      return {
+        usage: est.usage || 0,
+        quota: est.quota || 0,
+        persisted: persisted,
+        usageMB: Math.round((est.usage || 0) / 1024 / 1024),
+        quotaMB: Math.round((est.quota || 0) / 1024 / 1024)
+      };
+    } catch (e) {
+      return null;
     }
   }
 
@@ -695,45 +724,63 @@
 
     btn.disabled = true;
     btn.classList.remove('cached');
+    btn.classList.remove('cache-partial');
     let cached = 0;
     let failed = 0;
+    let quotaHit = false;
     const failures = [];
+
+    const before = await getStorageInfo();
+    if (before) console.log('Storage before caching:', before);
 
     try {
       const cache = await caches.open('gigalator-tracks-v1');
 
       for (const song of trackSongs) {
         try {
-          // Always re-fetch to verify — don't trust existing cache entries
-          // (they might be partial or corrupt from a previous failed run)
           const existing = await cache.match(song.track);
           if (!existing) {
             await cache.add(song.track);
           }
-          // Verify it actually landed in cache
           const verify = await cache.match(song.track);
           if (!verify) throw new Error('Cache put did not persist');
           cached++;
         } catch (e) {
           console.warn('Failed to cache:', song.track, e);
           failed++;
-          failures.push(song.title + ' (' + (e.message || 'unknown') + ')');
+          failures.push(song.title);
+          // iOS/Safari throws QuotaExceededError when origin quota is hit
+          if (e && (e.name === 'QuotaExceededError' || /quota/i.test(e.message || ''))) {
+            quotaHit = true;
+          }
         }
         btn.textContent = 'Caching ' + (cached + failed) + '/' + trackSongs.length;
       }
 
+      const after = await getStorageInfo();
+      if (after) console.log('Storage after caching:', after);
+
       if (failed === 0) {
-        btn.textContent = 'Cached';
+        btn.textContent = 'Cached' + (after ? ' (' + after.usageMB + 'MB)' : '');
         btn.classList.add('cached');
       } else {
         btn.textContent = failed + ' failed — tap to retry';
         btn.classList.add('cache-partial');
-        console.warn('Cache failures:', failures);
-        // Show the user what failed so they know before the gig
-        alert(failed + ' track' + (failed !== 1 ? 's' : '') + ' failed to cache:\n\n'
-          + failures.slice(0, 10).join('\n')
-          + (failures.length > 10 ? '\n...and ' + (failures.length - 10) + ' more' : '')
-          + '\n\nStorage may be full, or the device was offline. Tap the button again to retry.');
+
+        let msg = failed + ' of ' + trackSongs.length + ' tracks failed to cache.\n\n';
+        if (after) {
+          msg += 'Storage: ' + after.usageMB + ' MB used of ' + after.quotaMB + ' MB available'
+               + (after.persisted ? ' (persistent)' : ' (NOT persistent — iOS may be limiting us)')
+               + '.\n\n';
+        }
+        if (quotaHit) {
+          msg += 'iOS cache quota hit. Your device has lots of free space but Safari caps '
+               + 'the per-app cache. This usually lifts once persistent storage is granted '
+               + '— try closing and reopening the app, then tap Cache Tracks again.\n\n';
+        }
+        msg += 'Failed tracks:\n' + failures.slice(0, 8).join('\n')
+             + (failures.length > 8 ? '\n...and ' + (failures.length - 8) + ' more' : '');
+        alert(msg);
       }
     } catch (e) {
       btn.textContent = 'Cache failed';
