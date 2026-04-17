@@ -395,6 +395,35 @@
   var MIN_FONT_SIZE = 10;
   var MAX_FONT_SIZE = 36;
 
+  // ── Per-song preferences (iPad-local, survives restarts) ──
+  // Stored in localStorage as a { songId: { fontSize: N } } map.
+  // These override values in songs.json but don't sync back to the Manager.
+  var PREFS_KEY = 'gigalator-song-prefs';
+
+  function loadPrefs() {
+    try {
+      return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}');
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function savePref(songId, key, value) {
+    var prefs = loadPrefs();
+    prefs[songId] = prefs[songId] || {};
+    prefs[songId][key] = value;
+    try {
+      localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+    } catch (e) {
+      console.warn('Could not save preference:', e);
+    }
+  }
+
+  function getPref(songId, key) {
+    var prefs = loadPrefs();
+    return prefs[songId] ? prefs[songId][key] : undefined;
+  }
+
   function showLyrics(songId) {
     currentView = 'lyrics';
     currentSong = songId;
@@ -409,7 +438,10 @@
     }
     setHeader(song.title, true, hasNext);
 
-    currentFontSize = song.fontSize || DEFAULT_FONT_SIZE;
+    // Priority: iPad-local override (from pinching/adjusting on the iPad)
+    //         → songs.json fontSize → default 30px
+    var localSize = getPref(songId, 'fontSize');
+    currentFontSize = localSize || song.fontSize || DEFAULT_FONT_SIZE;
 
     main.classList.add('lyrics-mode');
     hideSearch();
@@ -573,6 +605,8 @@
     currentFontSize = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, currentFontSize + delta));
     lyricsEl.style.fontSize = currentFontSize + 'px';
     document.getElementById('font-label').textContent = currentFontSize + 'px';
+    // Persist the new size for this song — survives refresh, app updates, etc.
+    if (currentSong) savePref(currentSong, 'fontSize', currentFontSize);
   }
 
   // ── Audio Controls ──
