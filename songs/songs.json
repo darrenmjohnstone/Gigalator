@@ -388,6 +388,70 @@
         "youre-got-a-friend",
         "youre-the-voice"
       ]
+    },
+    {
+      "id": "set-1",
+      "name": "Set 1",
+      "songs": [
+        "knocking-on-heavens-door",
+        "best-of-my-love",
+        "better-be-home-soon",
+        "fall-at-your-feet",
+        "true-blue",
+        "yesterday",
+        "hallelujah",
+        "imagine",
+        "passenger",
+        "space-oddity",
+        "sweet-child-o-mine",
+        "sweet-child-of-mine",
+        "dreams",
+        "kiss-from-a-rose",
+        "youre-got-a-friend",
+        "hey-there-delilah",
+        "fire-and-rain",
+        "have-you-ever-seen-the-rain-creedence-clearwater-revival",
+        "over-the-rainbow",
+        "moondance",
+        "perfect"
+      ]
+    },
+    {
+      "id": "set-2",
+      "name": "Set 2",
+      "songs": [
+        "let-it-be",
+        "love-is-all-around",
+        "lyin-eyes",
+        "american-pie",
+        "april-sun-in-cuba",
+        "bad-moon-rising",
+        "country-roads",
+        "the-gambler",
+        "take-it-easy",
+        "brown-eyed-girl",
+        "proud-mary",
+        "thinking-out-loud",
+        "sweet-home"
+      ]
+    },
+    {
+      "id": "set-3",
+      "name": "Set 3",
+      "songs": [
+        "horses",
+        "hotel-california",
+        "stay-with-me",
+        "shotgun",
+        "fresh-eyes",
+        "viva-la-vida",
+        "dont-dream-its-over",
+        "angels",
+        "message-to-my-girl",
+        "sweet-caroline",
+        "to-her-door",
+        "midnight-hour"
+      ]
     }
   ],
   "songs": {
