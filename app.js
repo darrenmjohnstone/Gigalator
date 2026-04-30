@@ -391,7 +391,7 @@
 
   // ── View: Lyrics ──
   var currentFontSize = 18;
-  var DEFAULT_FONT_SIZE = 30;
+  var DEFAULT_FONT_SIZE = 20;
   var MIN_FONT_SIZE = 10;
   var MAX_FONT_SIZE = 36;
 
