@@ -20,6 +20,7 @@
   const progressWrap = document.getElementById('progress-wrap');
   const progressBar = document.getElementById('progress-bar');
   const timeDisplay = document.getElementById('time-display');
+  const timeRemaining = document.getElementById('time-remaining');
   const trackLabel = document.getElementById('track-label');
   const audio = document.getElementById('audio');
   const nextBtn = document.getElementById('next-btn');
@@ -503,14 +504,17 @@
     if (hasNext) {
       var nextIdx = currentSetlist.songs.indexOf(songId) + 1;
       var nextSongData = data.songs[currentSetlist.songs[nextIdx]];
+      var nextTitle = nextSongData ? nextSongData.title : '';
       html += '<button class="bottom-nav-btn bottom-nav-next" id="bottom-next-btn">'
-        + '<span class="bottom-nav-label">Next</span>'
+        + '<span class="bottom-nav-next-stack">'
+        + '<span class="bottom-nav-next-up">Up next</span>'
+        + '<span class="bottom-nav-next-title">' + esc(nextTitle) + '</span>'
+        + '</span>'
         + '<span class="bottom-nav-icon">&#8250;</span>'
         + '</button>';
     } else {
       html += '<button class="bottom-nav-btn bottom-nav-next disabled" disabled>'
-        + '<span class="bottom-nav-label">Next</span>'
-        + '<span class="bottom-nav-icon">&#8250;</span>'
+        + '<span class="bottom-nav-label">End of setlist</span>'
         + '</button>';
     }
 
@@ -581,23 +585,21 @@
       bottomNextBtn.addEventListener('click', playNextSong);
     }
 
-    // Audio — only change track if this song has one and it's different
-    if (song.track) {
-      if (playingSongId !== songId) {
-        // Stop old track, load this one
-        audio.pause();
-        audio.src = song.track;
-        playingSongId = songId;
-        playBtn.innerHTML = '&#9654;';
-        progressBar.style.width = '0%';
-        timeDisplay.textContent = '0:00';
-        trackLabel.textContent = '';
-        trackLabel.classList.add('hidden');
-      }
+    // Audio: do NOT touch what's already loaded/playing.
+    // Whatever song is playing keeps playing until the user explicitly hits
+    // play on a different song's lyrics view.
+    if (playingSongId && audio.src) {
+      // Something is loaded — keep player bar visible, update label so
+      // the user can see what's actually playing if it's not this song.
+      player.classList.remove('hidden');
+      updateTrackLabel();
+    } else if (song.track) {
+      // Nothing loaded yet — show the player bar in a "ready to play
+      // this song" state, but don't start playback.
       player.classList.remove('hidden');
     } else {
-      // This song has no track — keep showing player if something else is playing
-      showPlayerIfPlaying();
+      // No loaded audio AND no track for this song
+      player.classList.add('hidden');
     }
   }
 
@@ -611,6 +613,26 @@
 
   // ── Audio Controls ──
   function togglePlay() {
+    var viewedSong = currentSong ? data.songs[currentSong] : null;
+
+    // If the user is on a song's lyrics view AND that song has a track AND
+    // it's NOT the loaded one, switch to it and play. This is "I'm choosing
+    // another song to play."
+    if (viewedSong && viewedSong.track && currentSong !== playingSongId) {
+      audio.pause();
+      audio.src = viewedSong.track;
+      playingSongId = currentSong;
+      progressBar.style.width = '0%';
+      timeDisplay.textContent = '0:00';
+      timeRemaining.textContent = '-0:00';
+      audio.play().catch(function () {});
+      playBtn.innerHTML = '&#9646;&#9646;';
+      updateTrackLabel();
+      player.classList.remove('hidden');
+      return;
+    }
+
+    // Otherwise toggle whatever's loaded
     if (audio.paused) {
       audio.play().catch(function () {
         // Autoplay blocked — user needs to tap again
@@ -631,6 +653,7 @@
     playBtn.innerHTML = '&#9654;';
     progressBar.style.width = '0%';
     timeDisplay.textContent = '0:00';
+    timeRemaining.textContent = '-0:00';
     trackLabel.textContent = '';
     trackLabel.classList.add('hidden');
     player.classList.add('hidden');
@@ -675,6 +698,8 @@
     const pct = (audio.currentTime / audio.duration) * 100;
     progressBar.style.width = pct + '%';
     timeDisplay.textContent = formatTime(audio.currentTime);
+    var remaining = Math.max(0, audio.duration - audio.currentTime);
+    timeRemaining.textContent = '-' + formatTime(remaining);
   }
 
   function onTrackEnd() {
@@ -690,6 +715,9 @@
   }
 
   // ── Next Song ──
+  // Navigates to the next song's lyrics WITHOUT touching the audio.
+  // Whatever is currently playing keeps playing. The user must explicitly
+  // tap Play (or Play on the new lyrics screen) to start a new track.
   function playNextSong() {
     if (!currentSetlist || !currentSetlist.songs) return;
     var songList = currentSetlist.songs;
@@ -703,21 +731,8 @@
     var nextSong = data.songs[nextId];
     if (!nextSong) return;
 
-    // Always navigate to the next song's lyrics
+    // Just switch the lyrics view — leave audio alone.
     showLyrics(nextId);
-
-    // If the next song has a track, auto-load and auto-play it
-    if (nextSong.track) {
-      audio.pause();
-      audio.src = nextSong.track;
-      playingSongId = nextId;
-      audio.play().catch(function () {});
-      playBtn.innerHTML = '&#9646;&#9646;';
-      progressBar.style.width = '0%';
-      timeDisplay.textContent = '0:00';
-      updateTrackLabel();
-      player.classList.remove('hidden');
-    }
   }
 
   function formatTime(secs) {
