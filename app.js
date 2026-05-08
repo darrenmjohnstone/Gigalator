@@ -44,6 +44,9 @@
     progressWrap.addEventListener('click', seek);
     audio.addEventListener('timeupdate', updateProgress);
     audio.addEventListener('ended', onTrackEnd);
+    audio.addEventListener('error', function (e) {
+      console.warn('Audio error:', audio.error && audio.error.code, audio.error && audio.error.message, 'for', audio.src);
+    });
     searchInput.addEventListener('input', onSearchInput);
 
     showSetlists();
@@ -620,12 +623,18 @@
     // another song to play."
     if (viewedSong && viewedSong.track && currentSong !== playingSongId) {
       audio.pause();
-      audio.src = viewedSong.track;
+      // Cache-bust to force the audio element to drop any prior failed load
+      // for this URL and re-fetch through the SW (which now self-heals
+      // zero-byte entries).
+      audio.src = viewedSong.track + '?t=' + Date.now();
+      audio.load();
       playingSongId = currentSong;
       progressBar.style.width = '0%';
       timeDisplay.textContent = '0:00';
       timeRemaining.textContent = '-0:00';
-      audio.play().catch(function () {});
+      audio.play().catch(function (err) {
+        console.warn('Play failed:', err);
+      });
       playBtn.innerHTML = '&#9646;&#9646;';
       updateTrackLabel();
       player.classList.remove('hidden');

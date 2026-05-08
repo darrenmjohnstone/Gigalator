@@ -2,7 +2,7 @@
 // Caches app shell for offline use at gigs
 // MP3 tracks are cached on demand or via "Cache Setlist" button
 
-const CACHE_NAME = 'gigalator-app-v33';
+const CACHE_NAME = 'gigalator-app-v34';
 const TRACK_CACHE = 'gigalator-tracks-v1';
 
 // App shell files to cache immediately
@@ -32,6 +32,39 @@ self.addEventListener('install', function (event) {
 });
 
 // Activate — clean up old caches
+// On activation, do two passes:
+//   1. Delete old app-shell caches that aren't the current CACHE_NAME.
+//   2. Scan the persistent TRACK_CACHE and delete any zero-byte entries
+//      left over from a previous bad encode/upload. Without this purge,
+//      stale 0-byte entries are sticky and the audio element silently
+//      fails to play those tracks.
+async function purgeZeroByteTrackEntries() {
+  try {
+    const cache = await caches.open(TRACK_CACHE);
+    const requests = await cache.keys();
+    let purged = 0;
+    for (const req of requests) {
+      try {
+        const resp = await cache.match(req);
+        if (!resp) continue;
+        const buf = await resp.clone().arrayBuffer();
+        if (buf.byteLength === 0) {
+          await cache.delete(req);
+          purged++;
+          console.log('[SW] Purged zero-byte cached track:', req.url);
+        }
+      } catch (e) {
+        // If we can't read it, treat as broken and delete
+        await cache.delete(req);
+        purged++;
+      }
+    }
+    if (purged > 0) console.log('[SW] Total zero-byte tracks purged:', purged);
+  } catch (e) {
+    console.warn('[SW] Track cache purge failed:', e);
+  }
+}
+
 self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
@@ -42,7 +75,9 @@ self.addEventListener('activate', function (event) {
           return caches.delete(key);
         })
       );
-    }).then(function () {
+    })
+    .then(purgeZeroByteTrackEntries)
+    .then(function () {
       return self.clients.claim();
     })
   );
@@ -55,8 +90,14 @@ self.addEventListener('activate', function (event) {
 async function handleTrackRequest(request) {
   try {
     const cache = await caches.open(TRACK_CACHE);
-    // Strip Range from request for cache lookup (we always store full 200)
-    const cacheKey = new Request(request.url);
+    // Strip Range AND any cache-busting query params (e.g. ?t=12345) for
+    // cache lookup. The app appends timestamps to force the audio element
+    // out of stuck states, but we still want the SW to recognise the same
+    // underlying track and reuse cached bytes.
+    const u = new URL(request.url);
+    u.search = '';
+    const canonicalUrl = u.toString();
+    const cacheKey = new Request(canonicalUrl);
     let cached = await cache.match(cacheKey);
 
     // Treat a zero-byte cached entry as missing. We accidentally deployed
@@ -78,10 +119,11 @@ async function handleTrackRequest(request) {
     }
 
     if (!cached) {
-      // Not in cache — fetch from network. Use a non-Range request so we
-      // cache the full file for later.
+      // Not in cache — fetch from network. Use the canonical URL (no
+      // query string) so any cache layer between us and origin treats
+      // requests for the same track as the same resource.
       try {
-        const fullResp = await fetch(request.url);
+        const fullResp = await fetch(canonicalUrl);
         if (fullResp.ok) {
           // Verify the network response isn't 0 bytes either before caching
           const respClone = fullResp.clone();
