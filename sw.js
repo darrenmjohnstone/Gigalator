@@ -2,7 +2,7 @@
 // Caches app shell for offline use at gigs
 // MP3 tracks are cached on demand or via "Cache Setlist" button
 
-const CACHE_NAME = 'gigalator-app-v32';
+const CACHE_NAME = 'gigalator-app-v33';
 const TRACK_CACHE = 'gigalator-tracks-v1';
 
 // App shell files to cache immediately
@@ -59,13 +59,36 @@ async function handleTrackRequest(request) {
     const cacheKey = new Request(request.url);
     let cached = await cache.match(cacheKey);
 
+    // Treat a zero-byte cached entry as missing. We accidentally deployed
+    // some 0-byte MP3s in a bad bulk re-encode; the SW had cached them and
+    // would happily keep serving 0 bytes forever. By validating size we
+    // self-heal: a bad entry gets evicted and re-fetched fresh.
+    if (cached) {
+      try {
+        const peek = await cached.clone().arrayBuffer();
+        if (peek.byteLength === 0) {
+          await cache.delete(cacheKey);
+          cached = null;
+        }
+      } catch (_) {
+        // If we can't peek, assume invalid and refetch
+        await cache.delete(cacheKey);
+        cached = null;
+      }
+    }
+
     if (!cached) {
       // Not in cache — fetch from network. Use a non-Range request so we
       // cache the full file for later.
       try {
         const fullResp = await fetch(request.url);
         if (fullResp.ok) {
-          await cache.put(cacheKey, fullResp.clone());
+          // Verify the network response isn't 0 bytes either before caching
+          const respClone = fullResp.clone();
+          const buf = await respClone.clone().arrayBuffer();
+          if (buf.byteLength > 0) {
+            await cache.put(cacheKey, respClone);
+          }
           cached = fullResp;
         } else {
           // Fall back to returning whatever the network gave us
