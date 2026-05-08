@@ -589,6 +589,9 @@
 
     // Measures content and decides how many pages we need. Called after
     // initial render and after every font-size change.
+    //
+    // Behaviour: always >= 2 pages so swipe always works (matches the old
+    // hard-coded 4-column behaviour). Long songs / big fonts get more pages.
     function reflowLyricsPages() {
       // Portrait: single-column vertical scroll. No paging, no reflow.
       if (window.matchMedia('(orientation: portrait)').matches) {
@@ -609,38 +612,51 @@
         return;
       }
 
-      // Each rendered column is half a page-width minus the column gap (32px / 2)
       var columnWidth = Math.floor(availableWidth / 2 - 16);
 
-      // Measure linear content height in a hidden CLONE — measuring on the
-      // live element gives clipped values because of overflow:hidden +
-      // height:100%. The clone is height:auto, overflow:visible, single
-      // column, at the rendered column width. Its offsetHeight is the
-      // exact natural height the lyrics need.
-      var clone = lyricsEl.cloneNode(true);
-      clone.removeAttribute('id');
-      clone.style.position = 'absolute';
-      clone.style.left = '-9999px';
-      clone.style.top = '0';
-      clone.style.visibility = 'hidden';
-      clone.style.pointerEvents = 'none';
-      clone.style.width = columnWidth + 'px';
-      clone.style.minWidth = columnWidth + 'px';
-      clone.style.maxWidth = columnWidth + 'px';
-      clone.style.height = 'auto';
-      clone.style.minHeight = '0';
-      clone.style.maxHeight = 'none';
-      clone.style.overflow = 'visible';
-      clone.style.columnCount = '1';
-      clone.style.columnRule = 'none';
-      // fontSize was set inline on the original — cloneNode preserves it
-      document.body.appendChild(clone);
-      var contentHeight = clone.offsetHeight;
-      document.body.removeChild(clone);
+      // Measure linear content height by temporarily reshaping the LIVE
+      // .lyrics element to single-column / height:auto / overflow:visible.
+      // The clone approach proved unreliable on iOS Safari. The whole
+      // mutate-measure-restore happens in one synchronous JS turn, so
+      // the browser doesn't paint the intermediate state.
+      var orig = {
+        columnCount: lyricsEl.style.columnCount,
+        columnRule: lyricsEl.style.columnRule,
+        width: lyricsEl.style.width,
+        minWidth: lyricsEl.style.minWidth,
+        maxWidth: lyricsEl.style.maxWidth,
+        height: lyricsEl.style.height,
+        minHeight: lyricsEl.style.minHeight,
+        maxHeight: lyricsEl.style.maxHeight,
+        overflow: lyricsEl.style.overflow
+      };
 
-      // How many columns do we need? Round up to even so each "page" has 2 columns.
-      var columnsNeeded = Math.max(2, Math.ceil(contentHeight / columnHeight));
-      var totalColumns = Math.ceil(columnsNeeded / 2) * 2;
+      lyricsEl.style.columnCount = '1';
+      lyricsEl.style.columnRule = 'none';
+      lyricsEl.style.width = columnWidth + 'px';
+      lyricsEl.style.minWidth = columnWidth + 'px';
+      lyricsEl.style.maxWidth = columnWidth + 'px';
+      lyricsEl.style.height = 'auto';
+      lyricsEl.style.minHeight = '0';
+      lyricsEl.style.maxHeight = 'none';
+      lyricsEl.style.overflow = 'visible';
+
+      // Force layout + read
+      var contentHeight = lyricsEl.offsetHeight;
+
+      // Restore mutated style props back to whatever they were (mostly
+      // empty strings so the .lyrics CSS class wins again).
+      lyricsEl.style.columnRule = orig.columnRule;
+      lyricsEl.style.maxWidth = orig.maxWidth;
+      lyricsEl.style.height = orig.height;
+      lyricsEl.style.minHeight = orig.minHeight;
+      lyricsEl.style.maxHeight = orig.maxHeight;
+      lyricsEl.style.overflow = orig.overflow;
+
+      // How many columns do we need? Round up to even so each page has 2 cols.
+      // Floor at 4 columns / 2 pages so swipe always works for short songs too.
+      var columnsNeeded = Math.ceil(contentHeight / columnHeight);
+      var totalColumns = Math.max(4, Math.ceil(columnsNeeded / 2) * 2);
       pageCount = totalColumns / 2;
 
       // Apply final layout — N pages of 2 columns each.
