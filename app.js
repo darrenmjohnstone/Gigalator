@@ -538,9 +538,16 @@
       adjustFontSize(1, lyricsEl);
     });
 
-    // Page dots — update on scroll
+    // Page dots + page snap on scroll-end.
+    // Why JS not CSS: CSS scroll-snap with multi-column content only allows
+    // one snap target (the .lyrics element itself), so it can't snap to
+    // the half-way page break. We debounce the scroll event and animate
+    // to the nearer page boundary once the user stops scrolling.
+    var snapTimer = null;
     scrollEl.addEventListener('scroll', function () {
-      var scrollPct = scrollEl.scrollLeft / (scrollEl.scrollWidth - scrollEl.clientWidth);
+      var maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
+      if (maxScroll <= 0) return;
+      var scrollPct = scrollEl.scrollLeft / maxScroll;
       var onPage2 = scrollPct > 0.3;
       document.getElementById('page-dot-0').classList.toggle('active', !onPage2);
       document.getElementById('page-dot-1').classList.toggle('active', onPage2);
@@ -550,6 +557,20 @@
       } else {
         hint.innerHTML = 'Swipe for more &#8250;';
       }
+
+      // Skip snap entirely in portrait — that view is a single column.
+      if (window.matchMedia('(orientation: portrait)').matches) return;
+
+      // Debounced snap: 140ms after the last scroll event, animate to
+      // the nearest page boundary (0 or maxScroll). 140ms gives iOS
+      // momentum-scroll time to come to rest before we step in.
+      clearTimeout(snapTimer);
+      snapTimer = setTimeout(function () {
+        var targetLeft = scrollPct > 0.5 ? maxScroll : 0;
+        if (Math.abs(scrollEl.scrollLeft - targetLeft) > 4) {
+          scrollEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
+        }
+      }, 140);
     });
 
     // Lyrics/Sheets toggle

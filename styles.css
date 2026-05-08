@@ -258,8 +258,9 @@ main.lyrics-mode {
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
   display: flex;
+  /* Page snap is handled in JS (see app.js) — CSS scroll-snap with multi-
+     column content only gives one snap target which fights touch input. */
 }
 
 /* Hide scrollbar but keep scrolling */
@@ -284,7 +285,6 @@ main.lyrics-mode {
   column-gap: 32px;
   column-rule: 1px solid #333;
   column-fill: auto;
-  scroll-snap-align: start;
 }
 
 /* Inline lyric formatting — set via Markdown in the Manager */
@@ -483,6 +483,10 @@ main.lyrics-mode {
 /* Portrait fallback — single column, scrollable, no paging */
 @media (orientation: portrait) {
   .lyrics-scroll {
+    /* display: block so the child can grow taller than the container.
+       With display: flex, align-items: stretch forces the lyrics child
+       to exactly the container's height and overflow-y can't scroll. */
+    display: block;
     scroll-snap-type: none;
     overflow-y: auto;
     overflow-x: hidden;
