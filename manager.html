@@ -1247,20 +1247,26 @@
 
       // Setlist reorder buttons
       sidebarList.querySelectorAll('.sidebar-move-btn').forEach(function (btn) {
-        btn.addEventListener('click', function (e) {
+        btn.addEventListener('click', async function (e) {
           e.stopPropagation();
           var idx = parseInt(btn.getAttribute('data-sl-i'), 10);
           var dir = btn.getAttribute('data-sl-dir');
+          var moved = false;
           if (dir === 'up' && idx > 0) {
             var tmp = data.setlists[idx];
             data.setlists[idx] = data.setlists[idx - 1];
             data.setlists[idx - 1] = tmp;
+            moved = true;
           } else if (dir === 'down' && idx < data.setlists.length - 1) {
             var tmp2 = data.setlists[idx];
             data.setlists[idx] = data.setlists[idx + 1];
             data.setlists[idx + 1] = tmp2;
+            moved = true;
           }
           renderSidebar();
+          // CRITICAL: persist to songs.json so the Deploy button has
+          // something to push. Without this, reorders were UI-only.
+          if (moved) await saveData();
         });
       });
     }
