@@ -49,6 +49,15 @@
     });
     searchInput.addEventListener('input', onSearchInput);
 
+    // When the iPad app comes back to the foreground (user switched apps,
+    // unlocked the iPad, etc), check for fresh songs.json. Catches Manager
+    // deploys that happened while the app was backgrounded.
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden && currentView === 'setlists') {
+        backgroundRefreshSongs();
+      }
+    });
+
     showSetlists();
     registerSW();
   }
@@ -279,35 +288,68 @@
 
     // Refresh button
     document.getElementById('refresh-btn').addEventListener('click', refreshSongs);
+
+    // Auto-refresh in the background — picks up Manager deploys silently.
+    // Renders with current data first (instant), then quietly updates if
+    // the network has something newer.
+    backgroundRefreshSongs();
   }
 
   // ── Refresh Songs ──
+  // Shared helper: fetch the latest songs.json, bypassing all caches.
+  // Returns the parsed JSON or null on failure (offline / network error).
+  async function fetchLatestSongs() {
+    try {
+      var resp = await fetch('songs/songs.json?_t=' + Date.now(), { cache: 'no-store' });
+      if (!resp.ok) return null;
+      return await resp.json();
+    } catch (e) {
+      return null;
+    }
+  }
+
   async function refreshSongs() {
     var btn = document.getElementById('refresh-btn');
     if (!btn) return;
     btn.classList.add('refreshing');
     btn.innerHTML = '&#8635; Refreshing...';
 
-    try {
-      // Bypass service worker cache with cache-busting query param
-      var resp = await fetch('songs/songs.json?_t=' + Date.now(), { cache: 'no-store' });
-      if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      data = await resp.json();
-
+    var fresh = await fetchLatestSongs();
+    if (fresh) {
+      data = fresh;
       btn.classList.remove('refreshing');
       btn.classList.add('success');
       btn.innerHTML = '&#10003; Updated!';
-
-      // Re-render the setlists view with the new data
-      setTimeout(function () {
-        showSetlists();
-      }, 800);
-    } catch (e) {
+      setTimeout(function () { showSetlists(); }, 800);
+    } else {
       btn.classList.remove('refreshing');
       btn.innerHTML = '&#10007; Failed — tap to retry';
       btn.style.borderColor = '#e05050';
       btn.style.color = '#e05050';
-      console.warn('Refresh failed:', e);
+    }
+  }
+
+  // Background auto-refresh: silently fetch latest songs.json and, if it
+  // differs from what we have in memory, update + re-render. Called from
+  // showSetlists() and on visibilitychange so the iPad picks up Manager
+  // deploys without the user tapping anything.
+  var bgRefreshInFlight = false;
+  async function backgroundRefreshSongs() {
+    if (bgRefreshInFlight) return;
+    bgRefreshInFlight = true;
+    try {
+      var fresh = await fetchLatestSongs();
+      if (!fresh) return; // offline or fetch failed — keep current data
+      // Cheap deep-equals — songs.json is small (<1MB). If they match,
+      // no UI churn.
+      if (JSON.stringify(fresh) === JSON.stringify(data)) return;
+      data = fresh;
+      // Only refresh the view if the user is still looking at the
+      // setlists screen. If they've navigated into a song, leave them
+      // alone (we'll catch up next time they come back).
+      if (currentView === 'setlists') showSetlists();
+    } finally {
+      bgRefreshInFlight = false;
     }
   }
 
