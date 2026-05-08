@@ -628,9 +628,16 @@
         height: lyricsEl.style.height,
         minHeight: lyricsEl.style.minHeight,
         maxHeight: lyricsEl.style.maxHeight,
-        overflow: lyricsEl.style.overflow
+        overflow: lyricsEl.style.overflow,
+        alignSelf: lyricsEl.style.alignSelf
       };
 
+      // CRITICAL: align-self: flex-start opts the lyrics out of the flex
+      // container's default `align-items: stretch`. Without this the
+      // element is forced to container height regardless of `height: auto`,
+      // so offsetHeight always returns ~container height and page count
+      // never grows when the font gets bigger.
+      lyricsEl.style.alignSelf = 'flex-start';
       lyricsEl.style.columnCount = '1';
       lyricsEl.style.columnRule = 'none';
       lyricsEl.style.width = columnWidth + 'px';
@@ -646,6 +653,7 @@
 
       // Restore mutated style props back to whatever they were (mostly
       // empty strings so the .lyrics CSS class wins again).
+      lyricsEl.style.alignSelf = orig.alignSelf;
       lyricsEl.style.columnRule = orig.columnRule;
       lyricsEl.style.maxWidth = orig.maxWidth;
       lyricsEl.style.height = orig.height;
