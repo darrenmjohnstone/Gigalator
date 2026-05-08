@@ -259,8 +259,22 @@ main.lyrics-mode {
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   display: flex;
-  /* Page snap is handled in JS (see app.js) — CSS scroll-snap with multi-
-     column content only gives one snap target which fights touch input. */
+  position: relative; /* containing block for absolute snap anchors */
+  /* Native CSS scroll-snap — see .lyrics-snap-anchor below. */
+  scroll-snap-type: x mandatory;
+}
+
+/* Invisible anchor elements that act as scroll-snap targets. Created
+   dynamically by reflowLyricsPages() at each page boundary in pixel
+   coordinates that match the multi-column geometry. */
+.lyrics-snap-anchor {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  pointer-events: none;
+  visibility: hidden;
+  scroll-snap-align: start;
 }
 
 /* Hide scrollbar but keep scrolling */
