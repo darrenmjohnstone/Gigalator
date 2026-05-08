@@ -541,23 +541,22 @@
 
     // Page dots + page snap on scroll-end.
     // Page count is dynamic — reflowLyricsPages() measures the content and
-    // sets column-count + width to fit. Each "page" is one viewport-wide
-    // slice of the multi-column layout.
-    var pageCount = 2; // Updated by reflow
+    // sets column-count + width to fit. Each "page" shows 2 columns of the
+    // multi-column layout.
+    //
+    // Important: page boundaries are NOT at multiples of clientWidth!
+    // With 6 columns spread across 300% width and 32px gaps, each
+    // "2-columns-plus-2-gaps" block is ~1034px on a 1024px viewport,
+    // so columns drift relative to viewport boundaries. We compute the
+    // exact pageDistance using the column geometry instead.
+    var COLUMN_GAP = 32; // matches CSS column-gap on .lyrics
+    var pageCount = 2;   // Updated by reflow
+    var pageDistance = 0; // Updated by reflow — actual scroll px between page starts
     var snapTimer = null;
 
-    function pageBoundaries() {
-      // Returns array of scrollLeft values, one per page boundary.
-      var pageWidth = scrollEl.clientWidth;
-      var stops = [];
-      for (var i = 0; i < pageCount; i++) stops.push(i * pageWidth);
-      return stops;
-    }
-
     function updateDotsAndHint() {
-      var pageWidth = scrollEl.clientWidth;
-      if (pageWidth <= 0) return;
-      var currentPage = Math.round(scrollEl.scrollLeft / pageWidth);
+      if (pageDistance <= 0) return;
+      var currentPage = Math.round(scrollEl.scrollLeft / pageDistance);
       currentPage = Math.max(0, Math.min(pageCount - 1, currentPage));
       var dots = document.querySelectorAll('#page-dots .lyrics-page-dot');
       dots.forEach(function (dot, i) {
@@ -672,6 +671,11 @@
       lyricsEl.style.width = (pageCount * 100) + '%';
       lyricsEl.style.minWidth = (pageCount * 100) + '%';
 
+      // Recompute the actual page distance based on the new geometry.
+      // scrollWidth = pageCount * pageDistance - one final gap (no trailing
+      // gap after last column). So pageDistance = (scrollWidth + gap) / pageCount.
+      pageDistance = (scrollEl.scrollWidth + COLUMN_GAP) / pageCount;
+
       rebuildDots();
       updateDotsAndHint();
     }
@@ -684,17 +688,16 @@
 
       // Skip snap entirely in portrait — that view is a single column.
       if (window.matchMedia('(orientation: portrait)').matches) return;
+      if (pageCount < 2 || pageDistance <= 0) return;
 
       // Debounced snap: 140ms after the last scroll event, animate to
-      // the nearest page boundary. 140ms gives iOS momentum-scroll time
-      // to come to rest before we step in.
-      var pageWidth = scrollEl.clientWidth;
-      if (pageWidth <= 0 || pageCount < 2) return;
+      // the nearest page boundary using pageDistance (column geometry).
       clearTimeout(snapTimer);
       snapTimer = setTimeout(function () {
-        var nearest = Math.round(scrollEl.scrollLeft / pageWidth);
+        var maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
+        var nearest = Math.round(scrollEl.scrollLeft / pageDistance);
         nearest = Math.max(0, Math.min(pageCount - 1, nearest));
-        var targetLeft = nearest * pageWidth;
+        var targetLeft = Math.min(nearest * pageDistance, maxScroll);
         if (Math.abs(scrollEl.scrollLeft - targetLeft) > 4) {
           scrollEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
         }
