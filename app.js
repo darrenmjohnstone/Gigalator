@@ -552,7 +552,6 @@
     var COLUMN_GAP = 32; // matches CSS column-gap on .lyrics
     var pageCount = 2;   // Updated by reflow
     var pageDistance = 0; // Updated by reflow — actual scroll px between page starts
-    var snapTimer = null;
 
     function updateDotsAndHint() {
       if (pageDistance <= 0) return;
@@ -686,60 +685,57 @@
     // Update dots while scrolling (purely visual)
     scrollEl.addEventListener('scroll', updateDotsAndHint);
 
-    // Touch-based snap. Records where the swipe started, and on lift
-    // commits to a target page based on direction + distance moved. This
-    // is more deterministic than the scroll-debounce approach on iOS.
+    // Page snap driven by touch + scrollend.
+    // Three-pronged because iOS Safari can be unreliable about which event
+    // fires when after a flick:
+    //   1. touchend with a long delay — works for slow drags
+    //   2. scrollend (where supported) — fires when momentum decays naturally
+    //   3. scroll-event debounce as backup
     var touchStartLeft = 0;
-    var touchStartTime = 0;
-    var touchActive = false;
+    var snapPending = false;
 
     function isPortrait() {
       return window.matchMedia('(orientation: portrait)').matches;
     }
 
-    scrollEl.addEventListener('touchstart', function () {
-      if (isPortrait() || pageCount < 2 || pageDistance <= 0) return;
-      touchStartLeft = scrollEl.scrollLeft;
-      touchStartTime = Date.now();
-      touchActive = true;
-    }, { passive: true });
-
-    function snapAfterTouch() {
-      if (!touchActive) return;
-      touchActive = false;
+    function snapToNearestPage() {
+      if (snapPending) return;
       if (isPortrait() || pageCount < 2 || pageDistance <= 0) return;
 
-      // Wait for iOS momentum scroll to come to rest before snapping
-      setTimeout(function () {
-        var maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
-        var dx = scrollEl.scrollLeft - touchStartLeft;
-        var dt = Math.max(1, Date.now() - touchStartTime);
-        var velocity = Math.abs(dx) / dt; // px per ms
-
-        var startPage = Math.round(touchStartLeft / pageDistance);
-        var endPage = Math.round(scrollEl.scrollLeft / pageDistance);
-        var targetPage;
-
-        // Flick threshold: any meaningful movement (>40px or >0.3 px/ms)
-        // commits to advancing by one page in the swipe direction, even
-        // if you didn't quite cross the halfway mark. Otherwise snap to
-        // wherever you ended up (nearest).
-        if (Math.abs(dx) > 40 || velocity > 0.3) {
-          targetPage = startPage + (dx > 0 ? 1 : -1);
-        } else {
-          targetPage = endPage;
-        }
-
-        targetPage = Math.max(0, Math.min(pageCount - 1, targetPage));
-        var targetLeft = Math.min(targetPage * pageDistance, maxScroll);
-        if (Math.abs(scrollEl.scrollLeft - targetLeft) > 2) {
-          scrollEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
-        }
-      }, 80);
+      var maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
+      var endPage = Math.round(scrollEl.scrollLeft / pageDistance);
+      endPage = Math.max(0, Math.min(pageCount - 1, endPage));
+      var targetLeft = Math.min(endPage * pageDistance, maxScroll);
+      if (Math.abs(scrollEl.scrollLeft - targetLeft) > 2) {
+        snapPending = true;
+        scrollEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
+        // Release the lock once the smooth scroll completes
+        setTimeout(function () { snapPending = false; }, 400);
+      }
     }
 
-    scrollEl.addEventListener('touchend', snapAfterTouch, { passive: true });
-    scrollEl.addEventListener('touchcancel', snapAfterTouch, { passive: true });
+    scrollEl.addEventListener('touchstart', function () {
+      touchStartLeft = scrollEl.scrollLeft;
+    }, { passive: true });
+
+    scrollEl.addEventListener('touchend', function () {
+      // Wait for iOS momentum scroll to settle, then snap
+      setTimeout(snapToNearestPage, 350);
+    }, { passive: true });
+
+    // Modern Safari (16.4+) supports scrollend — fires once when scrolling
+    // (including momentum) stops naturally. We use it as a more accurate
+    // trigger than the timed touchend approach when available.
+    if ('onscrollend' in scrollEl) {
+      scrollEl.addEventListener('scrollend', snapToNearestPage);
+    } else {
+      // Fallback: debounced scroll handler
+      var scrollEndTimer = null;
+      scrollEl.addEventListener('scroll', function () {
+        clearTimeout(scrollEndTimer);
+        scrollEndTimer = setTimeout(snapToNearestPage, 180);
+      });
+    }
 
     // Recompute pages when the device rotates
     window.addEventListener('orientationchange', function () {
