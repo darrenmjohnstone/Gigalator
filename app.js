@@ -601,22 +601,49 @@
         return;
       }
 
-      // Step 1: measure linear content height by collapsing to a single
-      // column at column-width (matches the rendered column width).
-      lyricsEl.style.columnCount = '1';
-      lyricsEl.style.width = 'calc(50% - 16px)';
-      lyricsEl.style.minWidth = 'calc(50% - 16px)';
-      // Force layout
-      var contentHeight = lyricsEl.scrollHeight;
-      var columnHeight = lyricsEl.clientHeight;
+      var availableWidth = scrollEl.clientWidth;
+      var columnHeight = scrollEl.clientHeight;
+      if (availableWidth <= 0 || columnHeight <= 0) {
+        // Layout not ready yet — retry next frame
+        requestAnimationFrame(reflowLyricsPages);
+        return;
+      }
 
-      // Step 2: how many columns do we need? Round up to even so each
-      // "page" has 2 columns.
+      // Each rendered column is half a page-width minus the column gap (32px / 2)
+      var columnWidth = Math.floor(availableWidth / 2 - 16);
+
+      // Measure linear content height in a hidden CLONE — measuring on the
+      // live element gives clipped values because of overflow:hidden +
+      // height:100%. The clone is height:auto, overflow:visible, single
+      // column, at the rendered column width. Its offsetHeight is the
+      // exact natural height the lyrics need.
+      var clone = lyricsEl.cloneNode(true);
+      clone.removeAttribute('id');
+      clone.style.position = 'absolute';
+      clone.style.left = '-9999px';
+      clone.style.top = '0';
+      clone.style.visibility = 'hidden';
+      clone.style.pointerEvents = 'none';
+      clone.style.width = columnWidth + 'px';
+      clone.style.minWidth = columnWidth + 'px';
+      clone.style.maxWidth = columnWidth + 'px';
+      clone.style.height = 'auto';
+      clone.style.minHeight = '0';
+      clone.style.maxHeight = 'none';
+      clone.style.overflow = 'visible';
+      clone.style.columnCount = '1';
+      clone.style.columnRule = 'none';
+      // fontSize was set inline on the original — cloneNode preserves it
+      document.body.appendChild(clone);
+      var contentHeight = clone.offsetHeight;
+      document.body.removeChild(clone);
+
+      // How many columns do we need? Round up to even so each "page" has 2 columns.
       var columnsNeeded = Math.max(2, Math.ceil(contentHeight / columnHeight));
       var totalColumns = Math.ceil(columnsNeeded / 2) * 2;
       pageCount = totalColumns / 2;
 
-      // Step 3: apply final layout — N pages of 2 columns each.
+      // Apply final layout — N pages of 2 columns each.
       lyricsEl.style.columnCount = totalColumns;
       lyricsEl.style.width = (pageCount * 100) + '%';
       lyricsEl.style.minWidth = (pageCount * 100) + '%';
