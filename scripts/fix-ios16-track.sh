@@ -10,8 +10,10 @@
 #         ./scripts/fix-ios16-track.sh tracks/*.mp3           # batch
 #
 # Originals are backed up to tracks/_original_ios16_broken/ (git-ignored).
-
-set -e
+#
+# If ffmpeg fails on any file, the original is restored from backup so we
+# never end up with zero-byte files in tracks/. A summary is printed at
+# the end listing any files that couldn't be re-encoded.
 
 if [ $# -lt 1 ]; then
   echo "Usage: $0 <mp3-path> [<mp3-path> ...]"
@@ -25,6 +27,10 @@ fi
 
 BACKUP_DIR="tracks/_original_ios16_broken"
 mkdir -p "$BACKUP_DIR"
+
+succeeded=0
+failed=0
+failures=()
 
 for input in "$@"; do
   if [ ! -f "$input" ]; then
@@ -40,22 +46,51 @@ for input in "$@"; do
     cp "$input" "$backup"
   fi
 
-  echo "Re-encoding: $input"
-  # -write_xing 0   strip the Xing/Info VBR header (iOS 16 can choke on it)
-  # -id3v2_version 0  don't write any ID3v2 tag
-  # -map_metadata -1  drop all source metadata
-  # -fflags / -flags +bitexact  no encoder signature, deterministic output
-  ffmpeg -y -i "$backup" \
-    -c:a libmp3lame -b:a 128k -ac 1 -ar 44100 \
-    -write_xing 0 -id3v2_version 0 -map_metadata -1 \
-    -fflags +bitexact -flags +bitexact \
-    "$input" 2>&1 | grep -E "(size=|error|Error)" | tail -1
+  # Refuse to operate on a file that's already a backed-up zero-byte
+  # corpse — there's no original audio to recover from.
+  if [ ! -s "$backup" ]; then
+    echo "SKIP (backup is zero bytes — no source audio): $input"
+    failed=$((failed + 1))
+    failures+=("$input (no source)")
+    continue
+  fi
 
-  oldsize=$(stat -f%z "$backup")
-  newsize=$(stat -f%z "$input")
-  echo "  $oldsize → $newsize bytes"
+  echo "Re-encoding: $input"
+
+  # Use a temp file so the original is never touched until we know the
+  # re-encode succeeded with non-zero output.
+  tmp="$input.reencode.tmp"
+
+  if ffmpeg -y -i "$backup" \
+       -c:a libmp3lame -b:a 128k -ac 1 -ar 44100 \
+       -write_xing 0 -id3v2_version 0 -map_metadata -1 \
+       -fflags +bitexact -flags +bitexact \
+       "$tmp" </dev/null > /dev/null 2>&1 \
+     && [ -s "$tmp" ]; then
+    mv "$tmp" "$input"
+    oldsize=$(stat -f%z "$backup")
+    newsize=$(stat -f%z "$input")
+    echo "  ok: $oldsize → $newsize bytes"
+    succeeded=$((succeeded + 1))
+  else
+    # ffmpeg failed OR produced zero-byte output — clean up and leave original alone
+    rm -f "$tmp"
+    echo "  FAILED — keeping original"
+    failed=$((failed + 1))
+    failures+=("$input")
+  fi
 done
 
 echo ""
-echo "Done. Originals backed up in $BACKUP_DIR (git-ignored)."
-echo "Now commit + deploy + recache on the 9th gen to test."
+echo "================================================================"
+echo "Summary: $succeeded succeeded, $failed failed"
+if [ $failed -gt 0 ]; then
+  echo ""
+  echo "Files that could not be re-encoded (originals untouched):"
+  for f in "${failures[@]}"; do
+    echo "  - $f"
+  done
+fi
+echo ""
+echo "Originals backed up in $BACKUP_DIR (git-ignored)."
+echo "================================================================"
