@@ -487,9 +487,10 @@
       html += '</div>';
     }
 
+    // Dots are populated dynamically by reflowLyricsPages() based on
+    // measured content height vs available column height.
     html += '<div class="lyrics-page-bar">'
-      + '<div class="lyrics-page-dot active" id="page-dot-0"></div>'
-      + '<div class="lyrics-page-dot" id="page-dot-1"></div>'
+      + '<div class="lyrics-page-dots" id="page-dots"></div>'
       + '<span class="lyrics-page-hint" id="page-hint">Swipe for more &#8250;</span>'
       + '</div>';
 
@@ -539,39 +540,124 @@
     });
 
     // Page dots + page snap on scroll-end.
-    // Why JS not CSS: CSS scroll-snap with multi-column content only allows
-    // one snap target (the .lyrics element itself), so it can't snap to
-    // the half-way page break. We debounce the scroll event and animate
-    // to the nearer page boundary once the user stops scrolling.
+    // Page count is dynamic — reflowLyricsPages() measures the content and
+    // sets column-count + width to fit. Each "page" is one viewport-wide
+    // slice of the multi-column layout.
+    var pageCount = 2; // Updated by reflow
     var snapTimer = null;
-    scrollEl.addEventListener('scroll', function () {
-      var maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
-      if (maxScroll <= 0) return;
-      var scrollPct = scrollEl.scrollLeft / maxScroll;
-      var onPage2 = scrollPct > 0.3;
-      document.getElementById('page-dot-0').classList.toggle('active', !onPage2);
-      document.getElementById('page-dot-1').classList.toggle('active', onPage2);
+
+    function pageBoundaries() {
+      // Returns array of scrollLeft values, one per page boundary.
+      var pageWidth = scrollEl.clientWidth;
+      var stops = [];
+      for (var i = 0; i < pageCount; i++) stops.push(i * pageWidth);
+      return stops;
+    }
+
+    function updateDotsAndHint() {
+      var pageWidth = scrollEl.clientWidth;
+      if (pageWidth <= 0) return;
+      var currentPage = Math.round(scrollEl.scrollLeft / pageWidth);
+      currentPage = Math.max(0, Math.min(pageCount - 1, currentPage));
+      var dots = document.querySelectorAll('#page-dots .lyrics-page-dot');
+      dots.forEach(function (dot, i) {
+        dot.classList.toggle('active', i === currentPage);
+      });
       var hint = document.getElementById('page-hint');
-      if (onPage2) {
-        hint.innerHTML = '&#8249; Swipe back';
-      } else {
-        hint.innerHTML = 'Swipe for more &#8250;';
+      if (hint) {
+        if (pageCount <= 1) {
+          hint.textContent = '';
+        } else if (currentPage === 0) {
+          hint.innerHTML = 'Swipe for more &#8250;';
+        } else if (currentPage === pageCount - 1) {
+          hint.innerHTML = '&#8249; Swipe back';
+        } else {
+          hint.innerHTML = 'Page ' + (currentPage + 1) + ' of ' + pageCount;
+        }
       }
+    }
+
+    function rebuildDots() {
+      var dotBar = document.getElementById('page-dots');
+      if (!dotBar) return;
+      var html = '';
+      for (var i = 0; i < pageCount; i++) {
+        html += '<div class="lyrics-page-dot' + (i === 0 ? ' active' : '') + '"></div>';
+      }
+      dotBar.innerHTML = html;
+    }
+
+    // Measures content and decides how many pages we need. Called after
+    // initial render and after every font-size change.
+    function reflowLyricsPages() {
+      // Portrait: single-column vertical scroll. No paging, no reflow.
+      if (window.matchMedia('(orientation: portrait)').matches) {
+        lyricsEl.style.columnCount = '';
+        lyricsEl.style.width = '';
+        lyricsEl.style.minWidth = '';
+        pageCount = 1;
+        rebuildDots();
+        updateDotsAndHint();
+        return;
+      }
+
+      // Step 1: measure linear content height by collapsing to a single
+      // column at column-width (matches the rendered column width).
+      lyricsEl.style.columnCount = '1';
+      lyricsEl.style.width = 'calc(50% - 16px)';
+      lyricsEl.style.minWidth = 'calc(50% - 16px)';
+      // Force layout
+      var contentHeight = lyricsEl.scrollHeight;
+      var columnHeight = lyricsEl.clientHeight;
+
+      // Step 2: how many columns do we need? Round up to even so each
+      // "page" has 2 columns.
+      var columnsNeeded = Math.max(2, Math.ceil(contentHeight / columnHeight));
+      var totalColumns = Math.ceil(columnsNeeded / 2) * 2;
+      pageCount = totalColumns / 2;
+
+      // Step 3: apply final layout — N pages of 2 columns each.
+      lyricsEl.style.columnCount = totalColumns;
+      lyricsEl.style.width = (pageCount * 100) + '%';
+      lyricsEl.style.minWidth = (pageCount * 100) + '%';
+
+      rebuildDots();
+      updateDotsAndHint();
+    }
+
+    // Expose so adjustFontSize can recompute page count after a size change
+    scrollEl._reflowLyricsPages = reflowLyricsPages;
+
+    scrollEl.addEventListener('scroll', function () {
+      updateDotsAndHint();
 
       // Skip snap entirely in portrait — that view is a single column.
       if (window.matchMedia('(orientation: portrait)').matches) return;
 
       // Debounced snap: 140ms after the last scroll event, animate to
-      // the nearest page boundary (0 or maxScroll). 140ms gives iOS
-      // momentum-scroll time to come to rest before we step in.
+      // the nearest page boundary. 140ms gives iOS momentum-scroll time
+      // to come to rest before we step in.
+      var pageWidth = scrollEl.clientWidth;
+      if (pageWidth <= 0 || pageCount < 2) return;
       clearTimeout(snapTimer);
       snapTimer = setTimeout(function () {
-        var targetLeft = scrollPct > 0.5 ? maxScroll : 0;
+        var nearest = Math.round(scrollEl.scrollLeft / pageWidth);
+        nearest = Math.max(0, Math.min(pageCount - 1, nearest));
+        var targetLeft = nearest * pageWidth;
         if (Math.abs(scrollEl.scrollLeft - targetLeft) > 4) {
           scrollEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
         }
       }, 140);
     });
+
+    // Recompute pages when the device rotates
+    window.addEventListener('orientationchange', function () {
+      // Brief delay so the new viewport dimensions are settled
+      setTimeout(reflowLyricsPages, 200);
+    });
+
+    // Initial reflow — wait one frame so layout is committed first
+    requestAnimationFrame(reflowLyricsPages);
 
     // Lyrics/Sheets toggle
     var toggleLyricsBtn = document.getElementById('toggle-lyrics');
@@ -633,6 +719,9 @@
     document.getElementById('font-label').textContent = currentFontSize + 'px';
     // Persist the new size for this song — survives refresh, app updates, etc.
     if (currentSong) savePref(currentSong, 'fontSize', currentFontSize);
+    // Recompute page count for the new font size — bigger text needs more pages
+    var scrollEl = document.getElementById('lyrics-scroll');
+    if (scrollEl && scrollEl._reflowLyricsPages) scrollEl._reflowLyricsPages();
   }
 
   // ── Audio Controls ──
