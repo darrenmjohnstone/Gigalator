@@ -795,11 +795,30 @@
       for (const song of trackSongs) {
         try {
           const existing = await cache.match(song.track);
-          if (!existing) {
+
+          // Treat a cached entry as VALID only if it actually has content.
+          // Earlier we shipped some zero-byte MP3s by accident, and the SW
+          // happily cached them. Without this check, the broken entries
+          // are sticky forever because cache.match() returns a (zero-byte)
+          // response and we skip the re-fetch.
+          let isValid = false;
+          if (existing) {
+            const buf = await existing.clone().arrayBuffer();
+            isValid = buf.byteLength > 0;
+          }
+
+          if (!isValid) {
+            // Delete any broken/missing entry, then re-fetch fresh
+            if (existing) await cache.delete(song.track);
             await cache.add(song.track);
           }
+
+          // Verify the entry now exists AND has bytes
           const verify = await cache.match(song.track);
           if (!verify) throw new Error('Cache put did not persist');
+          const verifyBuf = await verify.clone().arrayBuffer();
+          if (verifyBuf.byteLength === 0) throw new Error('Cached entry is zero bytes');
+
           cached++;
         } catch (e) {
           console.warn('Failed to cache:', song.track, e);
