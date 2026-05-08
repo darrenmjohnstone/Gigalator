@@ -683,26 +683,63 @@
     // Expose so adjustFontSize can recompute page count after a size change
     scrollEl._reflowLyricsPages = reflowLyricsPages;
 
-    scrollEl.addEventListener('scroll', function () {
-      updateDotsAndHint();
+    // Update dots while scrolling (purely visual)
+    scrollEl.addEventListener('scroll', updateDotsAndHint);
 
-      // Skip snap entirely in portrait — that view is a single column.
-      if (window.matchMedia('(orientation: portrait)').matches) return;
-      if (pageCount < 2 || pageDistance <= 0) return;
+    // Touch-based snap. Records where the swipe started, and on lift
+    // commits to a target page based on direction + distance moved. This
+    // is more deterministic than the scroll-debounce approach on iOS.
+    var touchStartLeft = 0;
+    var touchStartTime = 0;
+    var touchActive = false;
 
-      // Debounced snap: 140ms after the last scroll event, animate to
-      // the nearest page boundary using pageDistance (column geometry).
-      clearTimeout(snapTimer);
-      snapTimer = setTimeout(function () {
+    function isPortrait() {
+      return window.matchMedia('(orientation: portrait)').matches;
+    }
+
+    scrollEl.addEventListener('touchstart', function () {
+      if (isPortrait() || pageCount < 2 || pageDistance <= 0) return;
+      touchStartLeft = scrollEl.scrollLeft;
+      touchStartTime = Date.now();
+      touchActive = true;
+    }, { passive: true });
+
+    function snapAfterTouch() {
+      if (!touchActive) return;
+      touchActive = false;
+      if (isPortrait() || pageCount < 2 || pageDistance <= 0) return;
+
+      // Wait for iOS momentum scroll to come to rest before snapping
+      setTimeout(function () {
         var maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
-        var nearest = Math.round(scrollEl.scrollLeft / pageDistance);
-        nearest = Math.max(0, Math.min(pageCount - 1, nearest));
-        var targetLeft = Math.min(nearest * pageDistance, maxScroll);
-        if (Math.abs(scrollEl.scrollLeft - targetLeft) > 4) {
+        var dx = scrollEl.scrollLeft - touchStartLeft;
+        var dt = Math.max(1, Date.now() - touchStartTime);
+        var velocity = Math.abs(dx) / dt; // px per ms
+
+        var startPage = Math.round(touchStartLeft / pageDistance);
+        var endPage = Math.round(scrollEl.scrollLeft / pageDistance);
+        var targetPage;
+
+        // Flick threshold: any meaningful movement (>40px or >0.3 px/ms)
+        // commits to advancing by one page in the swipe direction, even
+        // if you didn't quite cross the halfway mark. Otherwise snap to
+        // wherever you ended up (nearest).
+        if (Math.abs(dx) > 40 || velocity > 0.3) {
+          targetPage = startPage + (dx > 0 ? 1 : -1);
+        } else {
+          targetPage = endPage;
+        }
+
+        targetPage = Math.max(0, Math.min(pageCount - 1, targetPage));
+        var targetLeft = Math.min(targetPage * pageDistance, maxScroll);
+        if (Math.abs(scrollEl.scrollLeft - targetLeft) > 2) {
           scrollEl.scrollTo({ left: targetLeft, behavior: 'smooth' });
         }
-      }, 140);
-    });
+      }, 80);
+    }
+
+    scrollEl.addEventListener('touchend', snapAfterTouch, { passive: true });
+    scrollEl.addEventListener('touchcancel', snapAfterTouch, { passive: true });
 
     // Recompute pages when the device rotates
     window.addEventListener('orientationchange', function () {
