@@ -1153,8 +1153,13 @@
       color: #111;
     }
 
-    /* Cosmetic page dots inside the iPad mockup (not interactive — actual
-       paging only happens on the real iPad in landscape mode). */
+    /* Page dots + prev/next inside the iPad mockup (functional in
+       Preview mode landscape — match the real iPad's pagination). */
+    .preview-page-dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
     .preview-page-dot {
       width: 8px;
       height: 8px;
@@ -1162,11 +1167,33 @@
       background: #555;
     }
     .preview-page-dot.active { background: #f0a030; }
+    .preview-page-nav {
+      background: transparent;
+      border: 1px solid #444;
+      color: #f0a030;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .preview-page-nav:hover:not(:disabled) {
+      background: rgba(240, 160, 48, 0.15);
+    }
+    .preview-page-nav:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
     .preview-page-hint {
       font-size: 11px;
-      color: #666;
+      color: #888;
       margin-left: 8px;
-      font-style: italic;
+      font-variant-numeric: tabular-nums;
     }
 
     .preview-overflow-warn {
@@ -1601,9 +1628,10 @@
         + '<div class="preview-lyrics-rendered" id="preview-lyrics-rendered" style="display:none"></div>'
         + '</div>'
         + '<div class="preview-page-bar">'
-        + '<span class="preview-page-dot active"></span>'
-        + '<span class="preview-page-dot"></span>'
-        + '<span class="preview-page-hint">Pagination only on actual iPad</span>'
+        + '<button class="preview-page-nav" id="preview-prev-page" type="button" title="Previous page">&#8249;</button>'
+        + '<div class="preview-page-dots" id="preview-page-dots"></div>'
+        + '<button class="preview-page-nav" id="preview-next-page" type="button" title="Next page">&#8250;</button>'
+        + '<span class="preview-page-hint" id="preview-page-hint">1 of 1</span>'
         + '</div>'
         + '<div class="preview-bottom-nav">'
         + '<div class="preview-bnav-btn"><span class="preview-bnav-icon">&#8249;</span>Back</div>'
@@ -1906,12 +1934,9 @@
         // Keep the font label in the preview chrome in sync
         var previewFontLabel = document.getElementById('preview-font-label');
         if (previewFontLabel) previewFontLabel.textContent = fontSize + 'px';
-
-        // Overflow check: warn if content scrolls out of the visible area
-        // at this font size. (User can still scroll within the textarea —
-        // this is just a 'might not all fit on a single iPad page' hint.)
-        var isOverflowing = previewEl.scrollHeight > previewEl.clientHeight + 2;
-        overflowWarn.classList.toggle('visible', isOverflowing);
+        // Hide the legacy OVERFLOWS warning — meaningless now that the
+        // editor is a textarea (which always scrolls if content > height).
+        if (overflowWarn) overflowWarn.classList.remove('visible');
       }
 
       slider.addEventListener('input', function () {
@@ -1935,36 +1960,162 @@
       var modeEditBtn = document.getElementById('mode-edit');
       var modePreviewBtn = document.getElementById('mode-preview');
       var renderedEl = document.getElementById('preview-lyrics-rendered');
+      var scrollEl = document.getElementById('preview-lyrics-scroll');
+      var prevPageBtn = document.getElementById('preview-prev-page');
+      var nextPageBtn = document.getElementById('preview-next-page');
+      var pageDotsEl = document.getElementById('preview-page-dots');
+      var pageHintEl = document.getElementById('preview-page-hint');
+      var COLUMN_GAP = 32;
+      var pageCount = 1;
+      var pageDistance = 0;
+      var currentPage = 0;
+
+      // Reflow the rendered preview into the same multi-column / multi-page
+      // layout as the actual iPad app (see app.js reflowLyricsPages).
+      // Only runs when in Preview mode + landscape; otherwise resets to
+      // single-column.
+      function reflowPreviewPages() {
+        var isPreviewMode = modePreviewBtn.classList.contains('active');
+        var isLandscape = !previewFrameEl.classList.contains('preview-portrait');
+        if (!isPreviewMode || !isLandscape) {
+          renderedEl.style.width = '';
+          renderedEl.style.minWidth = '';
+          renderedEl.style.columnCount = '';
+          pageCount = 1;
+          currentPage = 0;
+          updatePagerUI();
+          return;
+        }
+
+        var availableWidth = scrollEl.clientWidth;
+        var columnHeight = scrollEl.clientHeight;
+        if (availableWidth <= 0 || columnHeight <= 0) return;
+
+        var columnWidth = Math.floor(availableWidth / 2 - COLUMN_GAP / 2);
+
+        // Measure linear content height by briefly setting single-column.
+        var orig = {
+          columnCount: renderedEl.style.columnCount,
+          width: renderedEl.style.width,
+          minWidth: renderedEl.style.minWidth,
+          maxWidth: renderedEl.style.maxWidth,
+          height: renderedEl.style.height,
+          overflow: renderedEl.style.overflow,
+          alignSelf: renderedEl.style.alignSelf,
+        };
+        renderedEl.style.alignSelf = 'flex-start';
+        renderedEl.style.columnCount = '1';
+        renderedEl.style.width = columnWidth + 'px';
+        renderedEl.style.minWidth = columnWidth + 'px';
+        renderedEl.style.maxWidth = columnWidth + 'px';
+        renderedEl.style.height = 'auto';
+        renderedEl.style.overflow = 'visible';
+        var contentHeight = renderedEl.offsetHeight;
+        // restore
+        renderedEl.style.alignSelf = orig.alignSelf;
+        renderedEl.style.maxWidth = orig.maxWidth;
+        renderedEl.style.height = orig.height;
+        renderedEl.style.overflow = orig.overflow;
+
+        var columnsNeeded = Math.ceil(contentHeight / columnHeight);
+        var totalColumns = Math.max(2, Math.ceil(columnsNeeded / 2) * 2);
+        pageCount = totalColumns / 2;
+
+        renderedEl.style.columnCount = totalColumns;
+        renderedEl.style.width = (pageCount * 100) + '%';
+        renderedEl.style.minWidth = (pageCount * 100) + '%';
+
+        // Recompute pageDistance from actual rendered geometry
+        pageDistance = (scrollEl.scrollWidth + COLUMN_GAP) / pageCount;
+        if (currentPage >= pageCount) currentPage = pageCount - 1;
+        scrollPreviewToPage(currentPage, false);
+        updatePagerUI();
+      }
+
+      function scrollPreviewToPage(page, smooth) {
+        if (pageCount < 1 || pageDistance <= 0) return;
+        page = Math.max(0, Math.min(pageCount - 1, page));
+        currentPage = page;
+        var maxScroll = scrollEl.scrollWidth - scrollEl.clientWidth;
+        var target = Math.min(page * pageDistance, maxScroll);
+        scrollEl.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+        updatePagerUI();
+      }
+
+      function updatePagerUI() {
+        // Rebuild dots
+        var dots = '';
+        for (var i = 0; i < pageCount; i++) {
+          dots += '<span class="preview-page-dot' + (i === currentPage ? ' active' : '') + '" data-page="' + i + '"></span>';
+        }
+        pageDotsEl.innerHTML = dots;
+        pageDotsEl.querySelectorAll('.preview-page-dot').forEach(function (d) {
+          d.style.cursor = pageCount > 1 ? 'pointer' : 'default';
+          d.addEventListener('click', function () {
+            scrollPreviewToPage(parseInt(d.getAttribute('data-page'), 10), true);
+          });
+        });
+        prevPageBtn.disabled = currentPage === 0 || pageCount < 2;
+        nextPageBtn.disabled = currentPage >= pageCount - 1 || pageCount < 2;
+        pageHintEl.textContent = pageCount > 1
+          ? (currentPage + 1) + ' of ' + pageCount
+          : (pageCount === 1 ? '1 page' : '');
+        // Hide page bar entirely if we're in Edit mode or portrait
+        var isPreview = modePreviewBtn.classList.contains('active');
+        var isLandscape = !previewFrameEl.classList.contains('preview-portrait');
+        var pageBar = document.querySelector('.preview-page-bar');
+        if (pageBar) {
+          pageBar.style.visibility = (isPreview && isLandscape && pageCount > 1) ? '' : 'hidden';
+        }
+      }
+
+      prevPageBtn.addEventListener('click', function () {
+        scrollPreviewToPage(currentPage - 1, true);
+      });
+      nextPageBtn.addEventListener('click', function () {
+        scrollPreviewToPage(currentPage + 1, true);
+      });
+
+      // Track manual scroll (user might scroll directly with trackpad)
+      scrollEl.addEventListener('scroll', function () {
+        if (pageDistance <= 0) return;
+        var page = Math.round(scrollEl.scrollLeft / pageDistance);
+        if (page !== currentPage) {
+          currentPage = Math.max(0, Math.min(pageCount - 1, page));
+          updatePagerUI();
+        }
+      });
 
       function setMode(mode) {
         if (mode === 'preview') {
-          // Render the current textarea content as formatted HTML
           renderedEl.innerHTML = renderLyricsPreview(lyricsTextarea.value);
           renderedEl.style.fontSize = parseInt(slider.value, 10) + 'px';
           renderedEl.style.display = '';
           lyricsTextarea.style.display = 'none';
           modePreviewBtn.classList.add('active');
           modeEditBtn.classList.remove('active');
+          // Reflow to recompute pages now that the rendered preview is visible
+          requestAnimationFrame(reflowPreviewPages);
         } else {
           renderedEl.style.display = 'none';
           lyricsTextarea.style.display = '';
           modeEditBtn.classList.add('active');
           modePreviewBtn.classList.remove('active');
+          updatePagerUI();
         }
       }
 
       modeEditBtn.addEventListener('click', function () { setMode('edit'); });
       modePreviewBtn.addEventListener('click', function () { setMode('preview'); });
 
-      // While in preview mode, keep it in sync with edits to the source
-      // (in case the user toggles back to edit, makes changes, then back to
-      // preview — also handles AI Format updating the textarea).
+      // Keep preview in sync with edits + recompute pages on changes
       var origUpdatePreview = updatePreview;
       updatePreview = function () {
         origUpdatePreview();
         if (modePreviewBtn.classList.contains('active')) {
           renderedEl.innerHTML = renderLyricsPreview(lyricsTextarea.value);
           renderedEl.style.fontSize = parseInt(slider.value, 10) + 'px';
+          requestAnimationFrame(reflowPreviewPages);
         }
       };
 
