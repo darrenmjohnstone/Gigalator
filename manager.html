@@ -1062,6 +1062,15 @@
       font-weight: 500;
     }
 
+    /* In landscape Preview mode, render lyrics in 2 columns to match
+       what the actual iPad shows. Portrait stays single column. */
+    .preview-frame:not(.preview-portrait) .preview-lyrics-rendered {
+      column-count: 2;
+      column-gap: 32px;
+      column-rule: 1px solid #333;
+      column-fill: auto;
+    }
+
     /* Edit / Preview mode toggle */
     .mode-toggle {
       display: inline-flex;
