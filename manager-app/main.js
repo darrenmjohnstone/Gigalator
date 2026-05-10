@@ -1,12 +1,88 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { execFile } = require('child_process');
+const { execFile, spawn } = require('child_process');
 
 // The Gigalator project root is one level up from this app
 const GIGALATOR_ROOT = path.resolve(__dirname, '..');
+const API_DIR = path.join(GIGALATOR_ROOT, 'api');
+const API_PORT = 3111;
 
 let mainWindow;
+let apiProcess = null;
+
+// Spawn the local Claude API server so the AI Format button works without
+// the user having to remember to launch it manually. We try a few node
+// binaries because Electron's bundled node isn't always on PATH and the
+// system node may live in different places (Homebrew, nvm, system).
+function startApiServer() {
+  if (apiProcess) return;
+  if (!fs.existsSync(path.join(API_DIR, 'server.js'))) {
+    console.warn('[Manager] api/server.js not found — AI Format will fail');
+    return;
+  }
+  if (!fs.existsSync(path.join(API_DIR, 'node_modules'))) {
+    console.warn('[Manager] api/node_modules missing — run "npm install" in /api');
+  }
+
+  // Find a usable node binary. PATH often misses Homebrew on launchd-spawned apps.
+  const candidates = [
+    process.env.NODE_BIN,
+    'node',
+    '/opt/homebrew/bin/node',
+    '/usr/local/bin/node',
+    '/usr/bin/node',
+  ].filter(Boolean);
+
+  function trySpawn(idx) {
+    if (idx >= candidates.length) {
+      console.error('[Manager] No node binary found — API server NOT started');
+      return;
+    }
+    const bin = candidates[idx];
+    try {
+      const proc = spawn(bin, ['server.js'], {
+        cwd: API_DIR,
+        env: { ...process.env, PORT: String(API_PORT) },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      });
+      proc.on('error', (err) => {
+        console.warn('[Manager] node candidate "' + bin + '" failed: ' + err.message);
+        if (apiProcess === proc) apiProcess = null;
+        trySpawn(idx + 1);
+      });
+      proc.stdout.on('data', (chunk) => process.stdout.write('[api] ' + chunk));
+      proc.stderr.on('data', (chunk) => process.stderr.write('[api] ' + chunk));
+      proc.on('exit', (code, signal) => {
+        console.log(`[Manager] API server exited (code=${code} signal=${signal})`);
+        if (apiProcess === proc) apiProcess = null;
+      });
+      apiProcess = proc;
+      console.log('[Manager] API server started via "' + bin + '" (PID ' + proc.pid + ')');
+    } catch (e) {
+      console.warn('[Manager] spawn failed for "' + bin + '": ' + e.message);
+      trySpawn(idx + 1);
+    }
+  }
+
+  trySpawn(0);
+}
+
+function stopApiServer() {
+  if (!apiProcess) return;
+  try {
+    apiProcess.kill('SIGTERM');
+    // Hard kill if it doesn't go quietly
+    setTimeout(() => {
+      if (apiProcess && !apiProcess.killed) {
+        try { apiProcess.kill('SIGKILL'); } catch (_) {}
+      }
+    }, 2000);
+  } catch (e) {
+    console.warn('[Manager] failed to stop API server: ' + e.message);
+  }
+  apiProcess = null;
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -29,11 +105,21 @@ function createWindow() {
   // mainWindow.webContents.openDevTools();
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  startApiServer();
+  createWindow();
+});
 
 app.on('window-all-closed', () => {
+  stopApiServer();
   app.quit();
 });
+
+// Belt-and-suspenders: also stop the API server on hard quits + crashes
+app.on('before-quit', stopApiServer);
+process.on('exit', stopApiServer);
+process.on('SIGINT', () => { stopApiServer(); process.exit(0); });
+process.on('SIGTERM', () => { stopApiServer(); process.exit(0); });
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();

@@ -1600,7 +1600,13 @@
             setTimeout(function () { aiBtn.innerHTML = origLabel; aiBtn.disabled = false; }, 1500);
           } catch (e) {
             console.error(e);
-            alert('AI Format failed: ' + e.message + '\n\nMake sure the API server is running:\n  cd api && node server.js');
+            alert(
+              'AI Format failed: ' + e.message + '\n\n' +
+              'The API server should auto-start with the Manager. ' +
+              'If it failed to start, run this in Terminal as a fallback:\n\n' +
+              '  cd ~/Desktop/Gigalator/api && node server.js\n\n' +
+              '(Then click AI Format again.)'
+            );
             aiBtn.innerHTML = origLabel;
             aiBtn.disabled = false;
           }
