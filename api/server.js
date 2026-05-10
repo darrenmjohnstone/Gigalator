@@ -209,11 +209,19 @@ You are not generating new content. You are not reproducing my song. You are tak
 
 OUTPUT FORMAT
 - Mark every section heading with markdown like this:  **[Verse 1]**, **[Verse 2]**, **[Pre-Chorus]**, **[Bridge]**, **[Outro]**, etc.
-- Wrap every CHORUS heading additionally in highlight markers like this:  **==[Chorus]==**
-  (so all section names are bold; choruses are also highlighted yellow.)
-- Put a blank line BEFORE each section heading and after it.
+- For the CHORUS specifically: wrap the ENTIRE chorus block (the **[Chorus]** heading AND every lyric line in that chorus) in bold markers, and additionally wrap the heading in highlight markers. Example:
+
+    **==[Chorus]==
+    Chorus lyric line one
+    Chorus lyric line two
+    Chorus lyric line three**
+
+  This way the chorus heading is bold + yellow highlighted, AND every chorus lyric line is bold so it stands out at gig.
+- Apply the same chorus-bold rule to every chorus block (Chorus 1, Chorus 2, repeated chorus, etc.).
+- Verses, bridges, outros: heading bold, lyric lines plain (NOT bold).
+- Put a blank line BEFORE each section heading and after the section ends.
 - Lyric lines come right after the section heading, one line per line.
-- Use plain typography — no extra markdown, no italics, no chords inline.
+- Use plain typography otherwise — no italics, no chords inline.
 
 STRIP THESE THINGS FROM MY PASTE
 - Song title / artist line at the top (I have those in separate fields)

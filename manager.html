@@ -952,41 +952,42 @@
 
     .preview-lyrics-scroll {
       flex: 1;
-      overflow: hidden;
-      display: flex;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
       position: relative;
+      display: flex;
     }
 
-    .preview-lyrics {
-      min-width: 200%;
-      width: 200%;
+    /* The textarea IS the editor, styled to look like the iPad lyrics view */
+    .preview-lyrics-editor {
+      width: 100%;
       height: 100%;
-      overflow: hidden;
-      column-count: 4;
-      column-gap: 32px;
-      column-rule: 1px solid #333;
-      column-fill: auto;
-      white-space: pre-wrap;
+      box-sizing: border-box;
+      background: #1a1a1a;
       color: #e8e8e8;
+      border: none;
+      outline: none;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       font-weight: 300;
       line-height: 1.6;
-      transition: transform 0.3s ease;
-      /* font-size set by JS to actual iPad font size (no scaling!) */
+      white-space: pre-wrap;
+      resize: none;
+      padding: 0;
+      margin: 0;
+      caret-color: var(--accent);
+      /* font-size set by JS to match the iPad's lyrics font size */
+    }
+    .preview-lyrics-editor::-webkit-scrollbar { width: 8px; }
+    .preview-lyrics-editor::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+    .preview-lyrics-editor::selection {
+      background: rgba(240, 160, 48, 0.4);
     }
 
-    /* Portrait preview: single column, scrollable vertically — matches iPad portrait mode */
-    .preview-frame.preview-portrait .preview-lyrics {
-      column-count: 1;
-      min-width: 100%;
-      width: 100%;
-      height: auto;
-      overflow: visible;
-    }
-    .preview-frame.preview-portrait .preview-lyrics-scroll {
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
+    /* Portrait hides the page bar (matches iPad behaviour) */
     .preview-frame.preview-portrait .preview-page-bar {
       display: none;
     }
@@ -1041,6 +1042,22 @@
       background: #f0a030;
       border-color: #f0a030;
       color: #111;
+    }
+
+    /* Cosmetic page dots inside the iPad mockup (not interactive — actual
+       paging only happens on the real iPad in landscape mode). */
+    .preview-page-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #555;
+    }
+    .preview-page-dot.active { background: #f0a030; }
+    .preview-page-hint {
+      font-size: 11px;
+      color: #666;
+      margin-left: 8px;
+      font-style: italic;
     }
 
     .preview-overflow-warn {
@@ -1372,7 +1389,7 @@
         + '</div>'
         + '</div>'
         + '<div class="form-group">'
-        + '<label>Lyrics</label>'
+        + '<label>Lyrics — type directly on the iPad below</label>'
         + '<div class="lyrics-toolbar">'
         + '<button type="button" class="fmt-btn" data-fmt="bold" title="Bold (⌘B)"><b>B</b></button>'
         + '<button type="button" class="fmt-btn" data-fmt="italic" title="Italic (⌘I)"><i>I</i></button>'
@@ -1381,7 +1398,6 @@
         + '<button type="button" class="fmt-btn ai-format-btn" id="ai-format-btn" title="Clean up pasted lyrics with AI">&#10024; AI Format</button>'
         + '<span class="fmt-hint">Markdown: **bold** · *italic* · __underline__ · ==highlight==</span>'
         + '</div>'
-        + '<textarea id="song-lyrics">' + esc(song.lyrics) + '</textarea>'
         + '</div>'
         + '<div class="form-group">'
         + '<label>Backing Track</label>'
@@ -1462,11 +1478,12 @@
         + '</div>'
         + '</div>'
         + '<div class="preview-lyrics-scroll" id="preview-lyrics-scroll">'
-        + '<div class="preview-lyrics" id="preview-lyrics">' + esc(song.lyrics) + '</div>'
+        + '<textarea class="preview-lyrics-editor" id="song-lyrics" spellcheck="false">' + esc(song.lyrics) + '</textarea>'
         + '</div>'
         + '<div class="preview-page-bar">'
-        + '<button class="preview-page-btn active" id="preview-page1">Page 1</button>'
-        + '<button class="preview-page-btn" id="preview-page2">Page 2</button>'
+        + '<span class="preview-page-dot active"></span>'
+        + '<span class="preview-page-dot"></span>'
+        + '<span class="preview-page-hint">Pagination only on actual iPad</span>'
         + '</div>'
         + '<div class="preview-bottom-nav">'
         + '<div class="preview-bnav-btn"><span class="preview-bnav-icon">&#8249;</span>Back</div>'
@@ -1500,9 +1517,11 @@
       // Font size slider + live preview
       var slider = document.getElementById('song-fontsize');
       var fsVal = document.getElementById('fontsize-val');
-      var previewEl = document.getElementById('preview-lyrics');
       var overflowWarn = document.getElementById('preview-overflow');
       var lyricsTextarea = document.getElementById('song-lyrics');
+      // The textarea IS the preview now — typing on it directly is the
+      // 'WYSIWYG-on-the-iPad' editing experience the user asked for.
+      var previewEl = lyricsTextarea;
 
       // ── Lyrics formatting toolbar ──
       // Wraps selection in markdown-style markers so chord alignment stays intact.
@@ -1743,10 +1762,6 @@
         previewContainer.style.height = Math.ceil(fullH * scale) + 'px';
       }
 
-      var previewPage = 1;
-      var page1Btn = document.getElementById('preview-page1');
-      var page2Btn = document.getElementById('preview-page2');
-
       function escHtml(s) {
         var d = document.createElement('div');
         d.textContent = s;
@@ -1764,41 +1779,20 @@
 
       function updatePreview() {
         var fontSize = parseInt(slider.value, 10);
-        // Use the REAL font size — the preview is at actual iPad resolution, just scaled down visually
+        // Sync font-size to the textarea (which is the iPad-mockup editor).
+        // 1.6 line-height matches the actual iPad lyrics view.
         previewEl.style.fontSize = fontSize + 'px';
         previewEl.style.lineHeight = '1.6';
         // Keep the font label in the preview chrome in sync
         var previewFontLabel = document.getElementById('preview-font-label');
         if (previewFontLabel) previewFontLabel.textContent = fontSize + 'px';
-        // Render markdown-lite formatting (**bold**, *italic*, __underline__, ==highlight==)
-        // so the Manager preview matches the iPad exactly.
-        previewEl.innerHTML = renderLyricsPreview(lyricsTextarea.value);
 
-        // Shift to show page 1 or page 2 (each page = 50% of the 200% width)
-        if (previewPage === 2) {
-          previewEl.style.transform = 'translateX(-50%)';
-        } else {
-          previewEl.style.transform = 'translateX(0)';
-        }
-
-        // Check overflow — content overflows if it exceeds the full 4-column area
-        var isOverflowing = previewEl.scrollHeight > previewEl.clientHeight;
+        // Overflow check: warn if content scrolls out of the visible area
+        // at this font size. (User can still scroll within the textarea —
+        // this is just a 'might not all fit on a single iPad page' hint.)
+        var isOverflowing = previewEl.scrollHeight > previewEl.clientHeight + 2;
         overflowWarn.classList.toggle('visible', isOverflowing);
       }
-
-      page1Btn.addEventListener('click', function () {
-        previewPage = 1;
-        page1Btn.classList.add('active');
-        page2Btn.classList.remove('active');
-        updatePreview();
-      });
-
-      page2Btn.addEventListener('click', function () {
-        previewPage = 2;
-        page2Btn.classList.add('active');
-        page1Btn.classList.remove('active');
-        updatePreview();
-      });
 
       slider.addEventListener('input', function () {
         fsVal.textContent = slider.value + 'px';
