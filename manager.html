@@ -313,6 +313,17 @@
       transform: translateY(1px);
     }
 
+    .fmt-btn.ai-format-btn {
+      margin-left: 8px;
+      background: linear-gradient(135deg, #f0a030, #e08020);
+      color: #fff;
+      border-color: transparent;
+      font-weight: 600;
+      padding: 4px 14px;
+    }
+    .fmt-btn.ai-format-btn:hover { filter: brightness(1.08); }
+    .fmt-btn.ai-format-btn:disabled { opacity: 0.6; cursor: wait; }
+
     .fmt-hint {
       margin-left: auto;
       font-size: 11px;
@@ -717,9 +728,60 @@
       /* width/height/transform set by JS */
     }
 
+    /* ── Skeuomorphic iPad device bezel ── */
+    .device-bezel {
+      position: relative;
+      background: #111;
+      box-sizing: border-box;
+      box-shadow: 0 0 0 2px #1a1a1a, 0 8px 32px rgba(0,0,0,0.4);
+      /* width/height/padding/border-radius set by JS per device */
+    }
+    .device-screen {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+      border-radius: inherit;
+    }
+    .device-cam {
+      /* Front camera dot. Position is rotated by JS via the rotation class. */
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #2a2a2a;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .device-home {
+      /* Physical home button — only visible on the 9th-gen device. */
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      box-shadow: inset 0 0 0 1px #0a0a0a;
+      z-index: 2;
+      pointer-events: none;
+      display: none; /* hidden by default — JS adds .has-home for ipad-9 */
+    }
+    .device-bezel.has-home .device-home { display: block; }
+
+    /* iPad 9th gen: thicker bezels, home button on one side */
+    .device-bezel.ipad-9.landscape .device-home  { right: 16px; top: 50%; transform: translateY(-50%); }
+    .device-bezel.ipad-9.landscape .device-cam   { left: 16px;  top: 50%; transform: translate(-50%, -50%); }
+    .device-bezel.ipad-9.portrait  .device-home  { bottom: 16px; left: 50%; transform: translateX(-50%); }
+    .device-bezel.ipad-9.portrait  .device-cam   { top: 16px;    left: 50%; transform: translate(-50%, -50%); }
+
+    /* iPad Pro: thin uniform bezels, no home button, front camera centered on top edge */
+    .device-bezel.ipad-pro.landscape .device-cam { left: 8px;  top: 50%; transform: translate(-50%, -50%); }
+    .device-bezel.ipad-pro.portrait  .device-cam { top: 8px;   left: 50%; transform: translate(-50%, -50%); }
+
     .preview-frame {
       background: #1a1a1a;
-      border: 2px solid #444;
+      border: none;
       border-radius: 0;
       overflow: hidden;
       display: flex;
@@ -1316,6 +1378,7 @@
         + '<button type="button" class="fmt-btn" data-fmt="italic" title="Italic (⌘I)"><i>I</i></button>'
         + '<button type="button" class="fmt-btn" data-fmt="underline" title="Underline (⌘U)"><u>U</u></button>'
         + '<button type="button" class="fmt-btn" data-fmt="highlight" title="Highlight"><span style="background:#ffe380;padding:0 4px;border-radius:2px">H</span></button>'
+        + '<button type="button" class="fmt-btn ai-format-btn" id="ai-format-btn" title="Clean up pasted lyrics with AI">&#10024; AI Format</button>'
         + '<span class="fmt-hint">Markdown: **bold** · *italic* · __underline__ · ==highlight==</span>'
         + '</div>'
         + '<textarea id="song-lyrics">' + esc(song.lyrics) + '</textarea>'
@@ -1380,6 +1443,9 @@
         + '</div>'
         + '<div class="preview-container" id="preview-container">'
         + '<div class="preview-scaler" id="preview-scaler">'
+        + '<div class="device-bezel" id="device-bezel">'
+        + '<div class="device-cam"></div>'
+        + '<div class="device-screen">'
         + '<div class="preview-frame" id="preview-frame">'
         + '<div class="preview-header">'
         + '<span class="preview-header-btn">&#8592;</span>'
@@ -1415,8 +1481,11 @@
         + '</div>'
         + '<div class="preview-overflow-warn" id="preview-overflow">OVERFLOWS — reduce font size</div>'
         + '</div>'
-        + '</div>'
-        + '</div>'
+        + '</div>'   /* device-screen */
+        + '<div class="device-home"></div>' /* home button (only shown for ipad-9) */
+        + '</div>'   /* device-bezel */
+        + '</div>'   /* preview-scaler */
+        + '</div>'   /* preview-container */
         + '</div>'
         + '<div class="deploy-info">'
         + '<strong>To update your iPad app:</strong> Hit the green <strong>Deploy to iPad App</strong> button in the sidebar. '
@@ -1477,10 +1546,66 @@
       }
 
       document.querySelectorAll('.fmt-btn').forEach(function (btn) {
+        // Skip the AI Format button — it's not a wrap-selection action
+        if (btn.id === 'ai-format-btn') return;
         btn.addEventListener('click', function () {
           wrapSelection(btn.dataset.fmt);
         });
       });
+
+      // ── AI Format button ──
+      // Sends the textarea contents (typically pasted-in messy lyrics from
+      // a chord site or songbook) to the local API server, which calls
+      // Claude to clean up the text — strips chord notation / ads / page
+      // numbers, marks sections as **[Verse 1]**, makes choruses bold +
+      // highlighted. Result replaces the textarea so the user can review.
+      var aiBtn = document.getElementById('ai-format-btn');
+      if (aiBtn) {
+        aiBtn.addEventListener('click', async function () {
+          var current = lyricsTextarea.value;
+          if (!current.trim()) {
+            alert('Paste some lyrics into the textarea first, then click AI Format.');
+            return;
+          }
+          if (!confirm('Clean up the current lyrics with AI?\n\nThis replaces the textarea contents — but you can review and edit before saving.')) {
+            return;
+          }
+
+          var origLabel = aiBtn.innerHTML;
+          aiBtn.innerHTML = '✨ Formatting...';
+          aiBtn.disabled = true;
+
+          try {
+            var titleEl = document.getElementById('song-title');
+            var artistEl = document.getElementById('song-artist');
+            var resp = await fetch('http://localhost:3111/api/format-lyrics', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                text: current,
+                title: titleEl ? titleEl.value : '',
+                artist: artistEl ? artistEl.value : ''
+              })
+            });
+            if (!resp.ok) {
+              var err = await resp.json().catch(function () { return { error: 'HTTP ' + resp.status }; });
+              throw new Error(err.error || 'Request failed');
+            }
+            var data = await resp.json();
+            if (!data.success || !data.text) throw new Error('No text returned');
+            lyricsTextarea.value = data.text;
+            // Trigger preview update + dirty tracking
+            lyricsTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+            aiBtn.innerHTML = '✓ Done';
+            setTimeout(function () { aiBtn.innerHTML = origLabel; aiBtn.disabled = false; }, 1500);
+          } catch (e) {
+            console.error(e);
+            alert('AI Format failed: ' + e.message + '\n\nMake sure the API server is running:\n  cd api && node server.js');
+            aiBtn.innerHTML = origLabel;
+            aiBtn.disabled = false;
+          }
+        });
+      }
 
       // Keyboard shortcuts: ⌘B / ⌘I / ⌘U while in the lyrics textarea
       lyricsTextarea.addEventListener('keydown', function (e) {
@@ -1505,15 +1630,21 @@
       var IPAD_SIZES = {
         'ipad-pro-11':  {
           w: 1194, h: 834, label: 'iPad Pro 11"',
-          safe: { portrait: { top: 24, bottom: 34 }, landscape: { top: 20, bottom: 21 } }
+          safe: { portrait: { top: 24, bottom: 34 }, landscape: { top: 20, bottom: 21 } },
+          // Bezel widths in screen pixels (uniform on Pro, no home button)
+          bezel: { short: 22, long: 22 }, family: 'ipad-pro', hasHome: false
         },
         'ipad-pro-13':  {
           w: 1366, h: 1024, label: 'iPad Pro 12.9"',
-          safe: { portrait: { top: 24, bottom: 34 }, landscape: { top: 20, bottom: 21 } }
+          safe: { portrait: { top: 24, bottom: 34 }, landscape: { top: 20, bottom: 21 } },
+          bezel: { short: 24, long: 24 }, family: 'ipad-pro', hasHome: false
         },
         'ipad-9':       {
           w: 1080, h: 810, label: 'iPad 9th gen',
-          safe: { portrait: { top: 20, bottom: 0 },  landscape: { top: 20, bottom: 0 } }
+          safe: { portrait: { top: 20, bottom: 0 },  landscape: { top: 20, bottom: 0 } },
+          // 9th gen has thicker bezels on the long edges to fit the
+          // home button on one side and front cam on the other.
+          bezel: { short: 40, long: 100 }, family: 'ipad-9', hasHome: true
         }
       };
 
@@ -1531,8 +1662,49 @@
         // Set the preview frame to exact iPad pixel dimensions
         previewFrameEl.style.width = ipadW + 'px';
         previewFrameEl.style.height = ipadH + 'px';
-        previewScaler.style.width = ipadW + 'px';
-        previewScaler.style.height = ipadH + 'px';
+
+        // Configure the device bezel wrapper to look like the chosen iPad.
+        // For 9th gen: bezels are thicker on the LONG edges (where home
+        // button + cam live). For Pro: uniform thin bezel.
+        var deviceBezelEl = document.getElementById('device-bezel');
+        var bezelShort = device.bezel.short;
+        var bezelLong = device.bezel.long;
+        // In landscape: long edges are horizontal (top/bottom of screen),
+        // short edges are vertical (left/right)... wait, actually the
+        // home button is on the SHORT edge in landscape (one of the
+        // physical short edges sits at the bottom). For 9th gen in
+        // landscape, the home button is on the right short edge.
+        var padTop, padBottom, padLeft, padRight;
+        if (device.hasHome) {
+          if (portrait) {
+            padTop = bezelLong; padBottom = bezelLong;
+            padLeft = bezelShort; padRight = bezelShort;
+          } else {
+            padLeft = bezelLong; padRight = bezelLong;
+            padTop = bezelShort; padBottom = bezelShort;
+          }
+        } else {
+          padTop = bezelShort; padBottom = bezelShort;
+          padLeft = bezelShort; padRight = bezelShort;
+        }
+        deviceBezelEl.style.width = (ipadW + padLeft + padRight) + 'px';
+        deviceBezelEl.style.height = (ipadH + padTop + padBottom) + 'px';
+        deviceBezelEl.style.padding = padTop + 'px ' + padRight + 'px ' + padBottom + 'px ' + padLeft + 'px';
+        // Pro models have rounded screen corners; 9th gen has square corners.
+        deviceBezelEl.style.borderRadius = device.hasHome ? '8px' : '36px';
+        // Class flags for orientation- and family-specific positioning of
+        // the home button and camera dot.
+        deviceBezelEl.classList.remove('ipad-9', 'ipad-pro', 'portrait', 'landscape', 'has-home');
+        deviceBezelEl.classList.add(device.family);
+        deviceBezelEl.classList.add(portrait ? 'portrait' : 'landscape');
+        if (device.hasHome) deviceBezelEl.classList.add('has-home');
+
+        // Match the scaler to the FULL device size (bezel included) so
+        // the scale factor accounts for the chrome too.
+        var fullW = ipadW + padLeft + padRight;
+        var fullH = ipadH + padTop + padBottom;
+        previewScaler.style.width = fullW + 'px';
+        previewScaler.style.height = fullH + 'px';
 
         // Apply safe-area insets — these simulate what env(safe-area-inset-*)
         // returns on the real device, so the lyrics area shrinks by the same
@@ -1541,13 +1713,14 @@
         previewFrameEl.style.setProperty('--preview-safe-top', safe.top + 'px');
         previewFrameEl.style.setProperty('--preview-safe-bottom', safe.bottom + 'px');
 
-        // Scale down to fit in the available editor width
+        // Scale down to fit in the available editor width — scale factor
+        // accounts for the FULL device (screen + bezel), not just the screen.
         var availableWidth = previewContainer.parentElement.clientWidth;
-        var scale = Math.min(1, availableWidth / ipadW);
+        var scale = Math.min(1, availableWidth / fullW);
         previewScaler.style.transform = 'scale(' + scale + ')';
 
-        // Set the container height to match the scaled preview
-        previewContainer.style.height = Math.ceil(ipadH * scale) + 'px';
+        // Set the container height to match the scaled preview (full device)
+        previewContainer.style.height = Math.ceil(fullH * scale) + 'px';
       }
 
       var previewPage = 1;
