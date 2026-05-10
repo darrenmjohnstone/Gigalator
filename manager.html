@@ -1593,6 +1593,20 @@
             }
             var data = await resp.json();
             if (!data.success || !data.text) throw new Error('No text returned');
+
+            // Client-side refusal sniff — belt-and-braces in case the
+            // server didn't catch it. We never overwrite the textarea
+            // with refusal-shaped text.
+            var t = data.text.toLowerCase();
+            var refusalSignals = [
+              "i'm not able", 'i am not able', "i cannot reproduce",
+              "i can't reproduce", 'copyrighted material', 'reproduce the complete',
+              'reproduce the full', "i'm unable to", "i can't help with"
+            ];
+            if (refusalSignals.some(function (p) { return t.indexOf(p) !== -1; })) {
+              throw new Error('AI refused to format these lyrics. Try editing manually or pasting a smaller chunk.');
+            }
+
             lyricsTextarea.value = data.text;
             // Trigger preview update + dirty tracking
             lyricsTextarea.dispatchEvent(new Event('input', { bubbles: true }));
