@@ -9,3 +9,7 @@ api/node_modules/
 manager-app/node_modules/
 stereo/
 tracks/_original_ios16_broken/
+# electron-builder DMG output (regeneratable, large)
+dist/
+# build artifacts auto-regenerated when running npm run dist
+manager-app/build/icon.icns

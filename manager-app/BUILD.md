@@ -56,16 +56,62 @@ then on, normal launches work.
 
 For proper distribution without the warning, add code signing:
 
-1. Apple Developer account (you have this).
-2. Set the env vars before running `npm run dist`:
-   ```
-   export CSC_LINK=/path/to/your/cert.p12
-   export CSC_KEY_PASSWORD=your-cert-password
-   export APPLE_ID=your@apple.id
-   export APPLE_ID_PASSWORD=app-specific-password
-   ```
-3. Add `"hardenedRuntime": true` and `"notarize": true` in `package.json`'s
-   `build.mac` section (currently both off for simpler unsigned dev builds).
+### Step 1: find your Developer ID name
+
+Open Keychain Access on your Mac, search for "Developer ID Application"
+in the login keychain. The full name looks like:
+
+```
+Developer ID Application: Darren Johnstone (ABCD123456)
+```
+
+Copy the entire string (including the team ID in parentheses).
+
+### Step 2: strip extended attributes
+
+Some bundled files acquire macOS metadata (xattrs) that codesign refuses
+to sign with the cryptic error "resource fork, Finder information, or
+similar detritus not allowed". Strip them before every signed build:
+
+```
+xattr -cr api manager-app
+```
+
+### Step 3: build with signing turned on
+
+```
+cd manager-app
+export CSC_NAME="Developer ID Application: Darren Johnstone (ABCD123456)"
+npm run dist:signed
+```
+
+The `dist:signed` script tells electron-builder to use that identity
+for code signing. Output DMG goes to `../dist/` like the unsigned build.
+
+### Step 4 (optional): notarization for Gatekeeper-friendly DMGs
+
+For people downloading the DMG to never see the "unidentified developer"
+warning, the app must be notarized by Apple after signing. In `package.json`
+under `build.mac`, set:
+
+```
+"hardenedRuntime": true,
+"notarize": {
+  "teamId": "YOUR_TEAM_ID"
+}
+```
+
+And export these before building:
+
+```
+export APPLE_ID="your@apple.id"
+export APPLE_APP_SPECIFIC_PASSWORD="abcd-efgh-ijkl-mnop"  # generate at appleid.apple.com
+export APPLE_TEAM_ID="ABCD123456"
+```
+
+Notarization adds 5–15 minutes to each build (Apple's servers verify the
+binary). For private personal use, the unsigned + right-click-Open path
+is faster.
 
 ## Where the app expects your data
 
