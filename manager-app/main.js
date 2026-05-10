@@ -1,12 +1,60 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const { execFile, spawn } = require('child_process');
 
-// The Gigalator project root is one level up from this app
-const GIGALATOR_ROOT = path.resolve(__dirname, '..');
-const API_DIR = path.join(GIGALATOR_ROOT, 'api');
+// ── Path resolution: dev vs packaged ──
+//
+// In dev (npx electron .) the layout is:
+//   Gigalator/
+//     manager-app/   ← __dirname
+//     manager.html
+//     api/
+//     songs/, tracks/, sheets/  ← user data lives here too
+//
+// When packaged as a DMG and installed in /Applications, the bundled
+// HTML + API live in process.resourcesPath. The USER DATA folder
+// (songs/, tracks/, sheets/, .git) cannot be inside the .app — it's
+// the user's local git repo on Desktop. We locate it by trying common
+// paths first, falling back to a saved choice via the Open Folder dialog.
+const isDev = !app.isPackaged;
+const RESOURCES_PATH = isDev ? path.resolve(__dirname, '..') : process.resourcesPath;
+const MANAGER_HTML = path.join(RESOURCES_PATH, 'manager.html');
+const API_DIR = path.join(RESOURCES_PATH, 'api');
 const API_PORT = 3111;
+
+// The data folder (user's git repo). In dev this IS the same as RESOURCES_PATH;
+// in packaged mode we look it up.
+function findGigalatorDataDir() {
+  if (isDev) return RESOURCES_PATH;
+  const saved = (function () {
+    try {
+      const cfg = path.join(app.getPath('userData'), 'config.json');
+      if (fs.existsSync(cfg)) return JSON.parse(fs.readFileSync(cfg, 'utf8')).dataDir;
+    } catch (_) {}
+    return null;
+  })();
+  const candidates = [
+    saved,
+    path.join(os.homedir(), 'Desktop', 'Gigalator'),
+    path.join(os.homedir(), 'Documents', 'Gigalator'),
+    path.join(os.homedir(), 'Gigalator'),
+  ].filter(Boolean);
+  for (const p of candidates) {
+    if (fs.existsSync(path.join(p, 'songs', 'songs.json'))) return p;
+  }
+  return null; // Will prompt user via dialog on first read
+}
+
+let GIGALATOR_ROOT = findGigalatorDataDir() || path.resolve(__dirname, '..');
+
+function saveDataDirChoice(p) {
+  try {
+    const cfg = path.join(app.getPath('userData'), 'config.json');
+    fs.writeFileSync(cfg, JSON.stringify({ dataDir: p }, null, 2));
+  } catch (_) {}
+}
 
 let mainWindow;
 let apiProcess = null;
@@ -98,8 +146,8 @@ function createWindow() {
     },
   });
 
-  // Load the manager.html from the parent directory
-  mainWindow.loadFile(path.join(GIGALATOR_ROOT, 'manager.html'));
+  // Load manager.html — from project root in dev, from packaged resources otherwise
+  mainWindow.loadFile(MANAGER_HTML);
 
   // Open DevTools in development
   // mainWindow.webContents.openDevTools();
@@ -218,6 +266,49 @@ function runGit(args) {
     });
   });
 }
+
+// ── API key management ──
+// Reads/writes ANTHROPIC_API_KEY to api/.env. After a write, restarts
+// the API server child process so the new key takes effect immediately.
+const ENV_PATH = path.join(API_DIR, '.env');
+
+function readApiKey() {
+  try {
+    if (!fs.existsSync(ENV_PATH)) return '';
+    const content = fs.readFileSync(ENV_PATH, 'utf8');
+    const m = content.match(/ANTHROPIC_API_KEY\s*=\s*(.+)/);
+    return m ? m[1].trim() : '';
+  } catch (e) {
+    return '';
+  }
+}
+
+function writeApiKey(key) {
+  let content = '';
+  try {
+    if (fs.existsSync(ENV_PATH)) content = fs.readFileSync(ENV_PATH, 'utf8');
+  } catch (_) {}
+  // Replace existing line or append
+  if (/ANTHROPIC_API_KEY\s*=/.test(content)) {
+    content = content.replace(/ANTHROPIC_API_KEY\s*=.*/g, 'ANTHROPIC_API_KEY=' + key);
+  } else {
+    if (content && !content.endsWith('\n')) content += '\n';
+    content += 'ANTHROPIC_API_KEY=' + key + '\n';
+  }
+  fs.writeFileSync(ENV_PATH, content, 'utf8');
+}
+
+ipcMain.handle('settings:getApiKey', () => readApiKey());
+
+ipcMain.handle('settings:setApiKey', async (event, key) => {
+  writeApiKey((key || '').trim());
+  // Bounce the API server so it picks up the new key
+  stopApiServer();
+  // Brief gap so the port is fully released
+  await new Promise(r => setTimeout(r, 300));
+  startApiServer();
+  return { ok: true };
+});
 
 ipcMain.handle('git:deploy', async () => {
   const MAX_RETRIES = 3;

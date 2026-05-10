@@ -16,4 +16,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Git deploy (commit + push everything)
   gitDeploy: () => ipcRenderer.invoke('git:deploy'),
+
+  // API key (Anthropic) — stored in api/.env, used by the local AI server
+  getApiKey: () => ipcRenderer.invoke('settings:getApiKey'),
+  setApiKey: (key) => ipcRenderer.invoke('settings:setApiKey', key),
 });
