@@ -1024,6 +1024,69 @@
       background: rgba(240, 160, 48, 0.4);
     }
 
+    /* Rendered preview shown in Preview mode — same chrome as the textarea
+       but with markdown turned into actual bold/italic/highlight formatting
+       so you can verify before deploying. Read-only. */
+    .preview-lyrics-rendered {
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      background: #1a1a1a;
+      color: #e8e8e8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      padding: 0;
+      margin: 0;
+    }
+    .preview-lyrics-rendered::-webkit-scrollbar { width: 8px; }
+    .preview-lyrics-rendered::-webkit-scrollbar-thumb {
+      background: #444;
+      border-radius: 4px;
+    }
+    .preview-lyrics-rendered strong { font-weight: 700; color: #fff; }
+    .preview-lyrics-rendered em { font-style: italic; color: var(--accent); }
+    .preview-lyrics-rendered u {
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+      text-decoration-color: var(--accent);
+    }
+    .preview-lyrics-rendered mark {
+      background: #ffd84a;
+      color: #111;
+      padding: 0 4px;
+      border-radius: 3px;
+      font-weight: 500;
+    }
+
+    /* Edit / Preview mode toggle */
+    .mode-toggle {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .mode-btn {
+      background: var(--bg-white, #fff);
+      border: none;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+    .mode-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+    .mode-btn:not(.active):hover {
+      background: var(--bg-card, #f6f6f6);
+      color: var(--text);
+    }
+
     /* Portrait hides the page bar (matches iPad behaviour) */
     .preview-frame.preview-portrait .preview-page-bar {
       display: none;
@@ -1499,6 +1562,10 @@
         + '<option value="portrait">Portrait</option>'
         + '<option value="landscape" selected>Landscape</option>'
         + '</select>'
+        + '<div class="mode-toggle" style="margin-left:auto">'
+        + '<button class="mode-btn active" id="mode-edit" type="button">Edit</button>'
+        + '<button class="mode-btn" id="mode-preview" type="button">Preview</button>'
+        + '</div>'
         + '</div>'
         + '<div class="preview-container" id="preview-container">'
         + '<div class="preview-scaler" id="preview-scaler">'
@@ -1522,6 +1589,7 @@
         + '</div>'
         + '<div class="preview-lyrics-scroll" id="preview-lyrics-scroll">'
         + '<textarea class="preview-lyrics-editor" id="song-lyrics" spellcheck="false">' + esc(song.lyrics) + '</textarea>'
+        + '<div class="preview-lyrics-rendered" id="preview-lyrics-rendered" style="display:none"></div>'
         + '</div>'
         + '<div class="preview-page-bar">'
         + '<span class="preview-page-dot active"></span>'
@@ -1853,6 +1921,60 @@
         sizePreview();
         updatePreview();
       });
+
+      // Edit / Preview mode toggle
+      var modeEditBtn = document.getElementById('mode-edit');
+      var modePreviewBtn = document.getElementById('mode-preview');
+      var renderedEl = document.getElementById('preview-lyrics-rendered');
+
+      function setMode(mode) {
+        if (mode === 'preview') {
+          // Render the current textarea content as formatted HTML
+          renderedEl.innerHTML = renderLyricsPreview(lyricsTextarea.value);
+          renderedEl.style.fontSize = parseInt(slider.value, 10) + 'px';
+          renderedEl.style.display = '';
+          lyricsTextarea.style.display = 'none';
+          modePreviewBtn.classList.add('active');
+          modeEditBtn.classList.remove('active');
+        } else {
+          renderedEl.style.display = 'none';
+          lyricsTextarea.style.display = '';
+          modeEditBtn.classList.add('active');
+          modePreviewBtn.classList.remove('active');
+        }
+      }
+
+      modeEditBtn.addEventListener('click', function () { setMode('edit'); });
+      modePreviewBtn.addEventListener('click', function () { setMode('preview'); });
+
+      // While in preview mode, keep it in sync with edits to the source
+      // (in case the user toggles back to edit, makes changes, then back to
+      // preview — also handles AI Format updating the textarea).
+      var origUpdatePreview = updatePreview;
+      updatePreview = function () {
+        origUpdatePreview();
+        if (modePreviewBtn.classList.contains('active')) {
+          renderedEl.innerHTML = renderLyricsPreview(lyricsTextarea.value);
+          renderedEl.style.fontSize = parseInt(slider.value, 10) + 'px';
+        }
+      };
+
+      // ── Per-song "sheets section open" memory ──
+      var sheetsDetails = editor.querySelector('details.sheets-details');
+      if (sheetsDetails) {
+        try {
+          var prefs = JSON.parse(localStorage.getItem('gigalator-mgr-song-prefs') || '{}');
+          if (prefs[songId] && prefs[songId].sheetsOpen) sheetsDetails.open = true;
+        } catch (e) {}
+        sheetsDetails.addEventListener('toggle', function () {
+          try {
+            var p = JSON.parse(localStorage.getItem('gigalator-mgr-song-prefs') || '{}');
+            if (!p[songId]) p[songId] = {};
+            p[songId].sheetsOpen = sheetsDetails.open;
+            localStorage.setItem('gigalator-mgr-song-prefs', JSON.stringify(p));
+          } catch (e) {}
+        });
+      }
 
       // Initial render
       sizePreview();
