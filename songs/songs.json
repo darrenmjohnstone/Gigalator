@@ -752,9 +752,10 @@
     "we-are-the-champions": {
       "title": "We are the Champions",
       "artist": "Queen",
-      "lyrics": "Cm\nI've paid my dues\nGm         Cm\nTime after time\nGm          Cm\nI've done my sentence\nGm                  Cm\nBut committed no crime\nGm         Eb\nAnd bad mistakes\nBb\nI've made a few\nEbBb         Eb\nI've had my share of sand\n         C\nKicked in my face\nF        Bb   C\nBut I've come through\n\nF         Am         Dm\nWe are the champions my friend\nBbC  F            Am              Bb\nAnd we'll keep on fighting till the end\nGbdim7Gm\nWe are the champions\nBbm\nWe are the champions\nF          Gm7\nNo time for losers\nAb       Bb     Csus4\n'Cause we are the champions of the world\n\nFmBbFmBb\nFm\nCsus4Cm\nI've taken my bows\n\nGm             Cm\nAnd my curtain calls\nGm               Cm\nYou've bought me fame and fortune\nGm\nAnd everything that goes with it\nCm\nI thank you all\nGm                      Eb Bb          Eb\nBut it's been no bed of roses no pleasure cruise\nBb                  Eb                     C\nI consider it a challenge before the whole human race\nF         Bb   C\nAnd I ain't gonna lose\n\nF         Am         Dm\nWe are the champions my friend\nBbC  F            Am              Bb\nAnd we'll keep on fighting till the end\nGbdim7Gm\nWe are the champions\nBbm\nWe are the champions\nF          Gm7\nNo time for losers\nAb       Bb     Csus4  F\n'Cause we are the champions of the world We\n\nF       Am         Dm\nAre the champions my friend\nBbC  F           Am      Bb\nAnd we'll keep on fighting till the end\nGbdim7Gm          Bbm\nWe are the champions\nF\nWe are the champions\nGm7\nNo time for losers\nAb          Bb     Csus4\n'Cause we are the champ\nDm",
+      "lyrics": "\nI've paid my dues\nTime after time\nI've done my sentence\nBut committed no crime\n\nAnd bad mistakes\nI've made a few\nI've had my share of sand\nKicked in my face\nBut I've come through\n\n**We are the champions my friend\nAnd we'll keep on fighting till the end\nWe are the champions\nWe are the champions\nNo time for losers\n'Cause we are the champions of the world**\n\nI've taken my bows\nAnd my curtain calls\nYou've bought me fame and fortune\nAnd everything that goes with it\nI thank you all\n\nBut it's been no bed of roses\nno pleasure cruise\nI consider it a challenge before the whole human race\nAnd I ain't gonna lose\n\n**We are the champions my friend\nAnd we'll keep on fighting till the end\nWe are the champions\nWe are the champions\nNo time for losers\n'Cause we are the champions of the world We...REPEAT CHORUS**\n\n",
       "track": null,
-      "fontSize": null
+      "fontSize": 20,
+      "sheetSize": null
     },
     "rivers-of-babylon": {
       "title": "Rivers of Babylon",
@@ -1348,9 +1349,10 @@
     "to-her-door": {
       "title": "To Her Door",
       "artist": "Paul Kelly",
-      "lyrics": "Turned my back on the old grey town\nNothing there to hold me\nPacked my bags and I headed south\nLike the weather told me\n\nTook a room in a terrace house\nOn a street with no trees\nLaid around for a month or more\nTil I started to feel at ease\n\nBut then one day the phone rang\nI heard a voice I knew\nShe said I've been thinking 'bout you\n\n[Chorus]\nSo I went to her door in the morning\nI went to her door in the rain\nI went to her door in the morning\nBut she'd gone back to him again\n\nFlew up north to a nowhere town\nTripped over myself at the station\nFelt like the loneliest man around\nLost my way to the one I'd been chasing\n\nI found a phone on a corner street\nAnd I called my mother\nShe told me straight to get back on my feet\nAnd to get back down there and love her\n\nSo I turned myself around again\nAnd my head was feeling clear\nI was ready for the world outside\nI had no more fear\n\n[Chorus]\n\nSo I went to her door in the morning\nI went to her door in the rain\nI went to her door in the morning\nAnd she let me in again",
+      "lyrics": "They got married early, never had no money\nThen when he got laid off they really hit the skids\n\nHe started up his drinking, then they started fighting\nHe took it pretty badly, she took both the kids\n\n**She said, \"I'm not standing by, to watch you slowly die\nSo watch me walking, out the door\"\nShe said, \"Shove it, Jack, I'm walking out the fucking door\"**\n\nShe went to her brother's, got a little bar work\nHe went to the Buttery, stayed about a year\n\nThen he wrote a letter, said I want to see you\nShe thought he sounded better, she sent him up the fare\n\n**He was riding through the cane in the pouring rain\nOn Olympic to her door\nTo her door\nTo her door\nTo her door\nAnd his heart was singing like a lowdown guitar**\n\nHe came in on a Sunday, every muscle aching\nWalking in slow motion like he'd just been hit\n\nDid they have a future? Would he know his children?\nCould he make a picture and get them all to fit?\n\n**He was shaking in his seat, riding through the streets\nIn a silvertop, to her\nShaking in his seat riding through the streets\nIn a silvertop to her door\nTo her door\nTo her door\nTo her door**",
       "track": "tracks/to-her-door.mp3",
-      "fontSize": null
+      "fontSize": 20,
+      "sheetSize": null
     },
     "the-lady-is-a-tramp": {
       "title": "The Lady Is a Tramp",
@@ -1419,9 +1421,10 @@
     "cheap-wine": {
       "title": "Cheap Wine",
       "artist": "Cold Chisel",
-      "lyrics": "I could give you money\nI could give you time\nBut if I gave you anything\nI'd give you cheap wine\n\nCheap wine\nAlways makes me feel fine\nGet it anytime\nCheap wine\n\nI could tell you stories\nI could tell you lies\nBut if I told you anything\nI'd tell you cheap wine\n\nCheap wine\nAlways makes me feel fine\nGet it anytime\nCheap wine\n\nAnything you want girl\nAnything at all\nAnything to stop you climbing up the wall\nCheap wine\n\nCheap wine\nAlways makes me feel fine\nGet it anytime\nCheap wine\n\nCheap wine\nAlways makes me feel fine\nGet it anytime\nCheap wine",
+      "lyrics": "Once I smoked a Dannemann cigar\nI drove a foreign car\nBut baby, that was years ago\nI left it all behind\n\nI had a friend, I heard she died\nWell, on a needle she was crucified\nBaby, that was years ago\nI left it all behind for my\n\n**Cheap wine and a three day growth\nCheap wine and a three day growth\nCome on, come on, well come on**\n\nI don't mind takin' charity\nFrom those that I despise\nBaby, I don't need your love, I don't need your love\n\nBaby, you can shout at me\nBut you can't meet my eyes\nI don't need your love, I don't need your love, I got my\n\n**Cheap wine and a three day growth\nCheap wine and a three day growth\nCome on, come on, well come on, come on**\n\nI'm sitting on the beach, drinkin' rocket fuels, oh, yeah!\nI spent the whole night, breakin' all the rules, oh, yeah!\n\nI'm mending every minute of the day before\nWatching the ocean, watching the shore\nWatching the sunrise, and thinkin' there could never be more\nWill never be more, yeah\n\nWell, anytime you want to find me\nI don't have a telephone\nI'm another world away\nBut I always feel at home, with my\n\n**Cheap wine and a three day growth\nA cheap wine and a three day growth\nOh, come on, come on, come on**",
       "track": "tracks/cheap-wine.mp3",
-      "fontSize": null
+      "fontSize": 20,
+      "sheetSize": null
     },
     "dock-of-the-bay": {
       "title": "Dock of the Bay",
