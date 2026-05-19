@@ -3,8 +3,9 @@
   "tracks": {
     "tracks/500-miles.mp3": {
       "mono": true,
-      "size": 2648607,
-      "mtime": 1777551460172
+      "size": 2649025,
+      "mtime": 1779181160549,
+      "normalised": "v1-I-10-LRA5-TP-1"
     },
     "tracks/all-of-me.mp3": {
       "mono": true,
