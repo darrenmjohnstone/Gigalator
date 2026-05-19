@@ -9,6 +9,8 @@ api/node_modules/
 manager-app/node_modules/
 stereo/
 tracks/_original_ios16_broken/
+tracks/_original_stereo/
+tracks/_pre_normalise/
 # electron-builder DMG output (regeneratable, large)
 dist/
 # build artifacts auto-regenerated when running npm run dist

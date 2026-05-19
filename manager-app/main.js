@@ -49,11 +49,27 @@ function findGigalatorDataDir() {
 
 let GIGALATOR_ROOT = findGigalatorDataDir() || path.resolve(__dirname, '..');
 
-function saveDataDirChoice(p) {
+function readConfig() {
   try {
     const cfg = path.join(app.getPath('userData'), 'config.json');
-    fs.writeFileSync(cfg, JSON.stringify({ dataDir: p }, null, 2));
+    if (fs.existsSync(cfg)) return JSON.parse(fs.readFileSync(cfg, 'utf8'));
   } catch (_) {}
+  return {};
+}
+
+function writeConfig(patch) {
+  try {
+    const cfg = path.join(app.getPath('userData'), 'config.json');
+    const current = readConfig();
+    const merged = { ...current, ...patch };
+    fs.writeFileSync(cfg, JSON.stringify(merged, null, 2));
+  } catch (e) {
+    console.warn('[Manager] writeConfig failed: ' + e.message);
+  }
+}
+
+function saveDataDirChoice(p) {
+  writeConfig({ dataDir: p });
 }
 
 let mainWindow;
@@ -89,9 +105,17 @@ function startApiServer() {
     }
     const bin = candidates[idx];
     try {
+      // Pass the API key directly via env so the server doesn't have to
+      // depend on the .env file (which is unreliable inside the packaged
+      // .app bundle — gets blown away on updates, may be read-only).
+      const storedKey = readConfig().anthropicApiKey || readApiKeyFromEnv() || '';
       const proc = spawn(bin, ['server.js'], {
         cwd: API_DIR,
-        env: { ...process.env, PORT: String(API_PORT) },
+        env: {
+          ...process.env,
+          PORT: String(API_PORT),
+          ANTHROPIC_API_KEY: storedKey,
+        },
         stdio: ['ignore', 'pipe', 'pipe'],
       });
       proc.on('error', (err) => {
@@ -99,8 +123,23 @@ function startApiServer() {
         if (apiProcess === proc) apiProcess = null;
         trySpawn(idx + 1);
       });
-      proc.stdout.on('data', (chunk) => process.stdout.write('[api] ' + chunk));
-      proc.stderr.on('data', (chunk) => process.stderr.write('[api] ' + chunk));
+      // Mirror stdout/stderr to both the parent console AND a log file in
+      // userData. The log file is the only way to diagnose startup failures
+      // when the Manager is launched from Finder (no Terminal attached).
+      let apiLogStream = null;
+      try {
+        const logPath = path.join(app.getPath('userData'), 'api-server.log');
+        apiLogStream = fs.createWriteStream(logPath, { flags: 'a' });
+        apiLogStream.write('\n=== API server start ' + new Date().toISOString() + ' (' + bin + ') ===\n');
+      } catch (_) {}
+      proc.stdout.on('data', (chunk) => {
+        process.stdout.write('[api] ' + chunk);
+        if (apiLogStream) try { apiLogStream.write(chunk); } catch (_) {}
+      });
+      proc.stderr.on('data', (chunk) => {
+        process.stderr.write('[api] ' + chunk);
+        if (apiLogStream) try { apiLogStream.write(chunk); } catch (_) {}
+      });
       proc.on('exit', (code, signal) => {
         console.log(`[Manager] API server exited (code=${code} signal=${signal})`);
         if (apiProcess === proc) apiProcess = null;
@@ -268,11 +307,13 @@ function runGit(args) {
 }
 
 // ── API key management ──
-// Reads/writes ANTHROPIC_API_KEY to api/.env. After a write, restarts
-// the API server child process so the new key takes effect immediately.
+// Primary storage: Electron's userData/config.json (survives DMG updates,
+// always writable, isolated per-user). The api/.env file is only read as
+// a one-time migration source for users who set their key under the old
+// scheme — and in dev mode, written so `node server.js` standalone works.
 const ENV_PATH = path.join(API_DIR, '.env');
 
-function readApiKey() {
+function readApiKeyFromEnv() {
   try {
     if (!fs.existsSync(ENV_PATH)) return '';
     const content = fs.readFileSync(ENV_PATH, 'utf8');
@@ -283,22 +324,36 @@ function readApiKey() {
   }
 }
 
+function readApiKey() {
+  // Prefer userData config; fall back to api/.env (migration / dev convenience)
+  const fromConfig = readConfig().anthropicApiKey;
+  if (fromConfig) return fromConfig;
+  return readApiKeyFromEnv();
+}
+
 function writeApiKey(key) {
-  let content = '';
+  // Primary store: userData config — persists across app updates
+  writeConfig({ anthropicApiKey: key });
+  // Secondary: api/.env so a standalone `node server.js` (dev fallback) still works.
+  // Best-effort — failing here is non-fatal because the spawned server gets the
+  // key via env var directly.
   try {
+    let content = '';
     if (fs.existsSync(ENV_PATH)) content = fs.readFileSync(ENV_PATH, 'utf8');
-  } catch (_) {}
-  // Replace existing line or append
-  if (/ANTHROPIC_API_KEY\s*=/.test(content)) {
-    content = content.replace(/ANTHROPIC_API_KEY\s*=.*/g, 'ANTHROPIC_API_KEY=' + key);
-  } else {
-    if (content && !content.endsWith('\n')) content += '\n';
-    content += 'ANTHROPIC_API_KEY=' + key + '\n';
+    if (/ANTHROPIC_API_KEY\s*=/.test(content)) {
+      content = content.replace(/ANTHROPIC_API_KEY\s*=.*/g, 'ANTHROPIC_API_KEY=' + key);
+    } else {
+      if (content && !content.endsWith('\n')) content += '\n';
+      content += 'ANTHROPIC_API_KEY=' + key + '\n';
+    }
+    fs.writeFileSync(ENV_PATH, content, 'utf8');
+  } catch (e) {
+    console.warn('[Manager] could not mirror key to api/.env (ok — using env var): ' + e.message);
   }
-  fs.writeFileSync(ENV_PATH, content, 'utf8');
 }
 
 ipcMain.handle('settings:getApiKey', () => readApiKey());
+ipcMain.handle('settings:hasApiKey', () => Boolean(readApiKey()));
 
 ipcMain.handle('settings:setApiKey', async (event, key) => {
   writeApiKey((key || '').trim());
@@ -358,4 +413,305 @@ ipcMain.handle('git:deploy', async () => {
   }
 
   throw lastError || new Error('Deploy failed after ' + MAX_RETRIES + ' attempts');
+});
+
+// ── Audio processing (Mono Songs / Normalise Songs) ──
+//
+// Both operations walk every track referenced in songs.json, skip already-
+// processed files (state recorded in audio-state.json at repo root), and
+// re-encode through ffmpeg with the safe pattern from fix-ios16-track.sh:
+//   1. Back up original to tracks/_original_stereo/ or tracks/_pre_normalise/
+//   2. Encode to a .tmp file
+//   3. Only `mv` over the original if ffmpeg succeeded AND output is non-zero
+//   4. On any failure, leave the original untouched
+//
+// Progress is streamed to the renderer via 'audio:progress' webContents events.
+
+const NORMALISE_VERSION = 'v1-I-10-LRA5-TP-1'; // bump if loudnorm params change
+const AUDIO_STATE_FILE = 'audio-state.json'; // at GIGALATOR_ROOT, tracked in git
+const MONO_BACKUP_DIR = 'tracks/_original_stereo';
+const NORM_BACKUP_DIR = 'tracks/_pre_normalise';
+
+function findBinary(name) {
+  const candidates = [
+    process.env[name.toUpperCase() + '_BIN'],
+    name,
+    '/opt/homebrew/bin/' + name,
+    '/usr/local/bin/' + name,
+    '/usr/bin/' + name,
+  ].filter(Boolean);
+  for (const p of candidates) {
+    if (p.startsWith('/')) {
+      if (fs.existsSync(p)) return p;
+    } else {
+      // bare name — assume on PATH; we'll let spawn fail naturally if not
+      return p;
+    }
+  }
+  return name; // fallback — spawn will error if truly missing
+}
+
+function audioStatePath() {
+  return path.join(GIGALATOR_ROOT, AUDIO_STATE_FILE);
+}
+
+function readAudioState() {
+  try {
+    const p = audioStatePath();
+    if (!fs.existsSync(p)) return { version: 1, tracks: {} };
+    const parsed = JSON.parse(fs.readFileSync(p, 'utf8'));
+    if (!parsed.tracks) parsed.tracks = {};
+    return parsed;
+  } catch (e) {
+    console.warn('[audio] state file unreadable, starting fresh: ' + e.message);
+    return { version: 1, tracks: {} };
+  }
+}
+
+function writeAudioState(state) {
+  fs.writeFileSync(audioStatePath(), JSON.stringify(state, null, 2));
+}
+
+// Track-fingerprint: if the file's size+mtime differs from what we stamped,
+// it's been replaced and prior stamps are invalid. This guards against
+// "I re-uploaded a track and now it's stale".
+function fingerprint(absPath) {
+  const st = fs.statSync(absPath);
+  return { size: st.size, mtime: Math.floor(st.mtimeMs) };
+}
+
+function stampMatches(stamp, fp) {
+  if (!stamp) return false;
+  return stamp.size === fp.size && stamp.mtime === fp.mtime;
+}
+
+// Run ffmpeg/ffprobe with stdio captured. Resolves with stdout; rejects
+// with stderr on non-zero exit.
+function runFfBinary(binPath, args) {
+  return new Promise((resolve, reject) => {
+    execFile(binPath, args, { maxBuffer: 16 * 1024 * 1024 }, (err, stdout, stderr) => {
+      if (err) reject(new Error(stderr || err.message));
+      else resolve(stdout);
+    });
+  });
+}
+
+async function getChannelCount(ffprobeBin, absPath) {
+  const out = await runFfBinary(ffprobeBin, [
+    '-v', 'error',
+    '-select_streams', 'a:0',
+    '-show_entries', 'stream=channels',
+    '-of', 'csv=p=0',
+    absPath,
+  ]);
+  return parseInt(out.trim(), 10) || 0;
+}
+
+// Collect every unique relative track path from songs.json
+function getAllTrackRelPaths() {
+  const songsJsonPath = path.join(GIGALATOR_ROOT, 'songs', 'songs.json');
+  const data = JSON.parse(fs.readFileSync(songsJsonPath, 'utf8'));
+  const seen = new Set();
+  Object.values(data.songs || {}).forEach((s) => {
+    if (s && s.track && typeof s.track === 'string') seen.add(s.track);
+  });
+  return Array.from(seen).sort();
+}
+
+function emitProgress(event, payload) {
+  try { event.sender.send('audio:progress', payload); } catch (_) {}
+}
+
+// Safe re-encode helper. Backs up to backupDir, encodes via ffmpeg args,
+// only swaps the original on success.
+async function safeReencode(ffmpegBin, absPath, backupDir, ffmpegArgs) {
+  const name = path.basename(absPath);
+  const backupAbs = path.join(GIGALATOR_ROOT, backupDir, name);
+  fs.mkdirSync(path.dirname(backupAbs), { recursive: true });
+
+  if (!fs.existsSync(backupAbs)) fs.copyFileSync(absPath, backupAbs);
+
+  // Refuse to operate on a corrupt backup
+  if (fs.statSync(backupAbs).size === 0) {
+    throw new Error('backup is zero bytes — refusing to encode');
+  }
+
+  const tmpPath = absPath + '.reencode.tmp';
+  try { fs.unlinkSync(tmpPath); } catch (_) {}
+
+  try {
+    // Always read from the backup (the canonical original) so successive
+    // ops don't compound losses, e.g. mono then normalise.
+    const args = ['-y', '-i', backupAbs, ...ffmpegArgs, tmpPath];
+    await runFfBinary(ffmpegBin, args);
+    if (!fs.existsSync(tmpPath) || fs.statSync(tmpPath).size === 0) {
+      throw new Error('ffmpeg produced zero-byte output');
+    }
+    fs.renameSync(tmpPath, absPath);
+  } catch (e) {
+    try { fs.unlinkSync(tmpPath); } catch (_) {}
+    throw e;
+  }
+}
+
+// ── Mono ──
+ipcMain.handle('audio:monoAll', async (event) => {
+  const ffmpegBin = findBinary('ffmpeg');
+  const ffprobeBin = findBinary('ffprobe');
+  const state = readAudioState();
+  const tracks = getAllTrackRelPaths();
+
+  let converted = 0, skipped = 0, failed = 0;
+  const failures = [];
+
+  for (let i = 0; i < tracks.length; i++) {
+    const relPath = tracks[i];
+    const absPath = path.join(GIGALATOR_ROOT, relPath);
+
+    emitProgress(event, { phase: 'mono', current: i + 1, total: tracks.length, name: path.basename(relPath) });
+
+    if (!fs.existsSync(absPath)) { skipped++; continue; }
+
+    try {
+      const fp = fingerprint(absPath);
+      const stamp = state.tracks[relPath];
+
+      // Skip if already stamped mono AND file hasn't changed
+      if (stamp && stamp.mono && stampMatches(stamp, fp)) { skipped++; continue; }
+
+      // Also skip via ffprobe — if file is already 1-channel, just stamp it
+      const channels = await getChannelCount(ffprobeBin, absPath);
+      if (channels === 1) {
+        state.tracks[relPath] = { ...(stamp || {}), mono: true, ...fingerprint(absPath) };
+        writeAudioState(state);
+        skipped++;
+        continue;
+      }
+
+      // Convert to mono, 128k CBR, iOS16-safe headers (same flags as fix-ios16-track.sh)
+      await safeReencode(ffmpegBin, absPath, MONO_BACKUP_DIR, [
+        '-c:a', 'libmp3lame', '-b:a', '128k', '-ac', '1', '-ar', '44100',
+        '-write_xing', '0', '-id3v2_version', '0', '-map_metadata', '-1',
+        '-fflags', '+bitexact', '-flags', '+bitexact',
+      ]);
+      state.tracks[relPath] = { ...(stamp || {}), mono: true, ...fingerprint(absPath) };
+      // Normalisation stamp is invalid now — file content changed
+      delete state.tracks[relPath].normalised;
+      writeAudioState(state);
+      converted++;
+    } catch (e) {
+      console.error('[audio:mono] failed for ' + relPath + ': ' + e.message);
+      failed++;
+      failures.push({ track: relPath, error: e.message });
+    }
+  }
+
+  emitProgress(event, { phase: 'mono', done: true });
+  return { converted, skipped, failed, failures, total: tracks.length };
+});
+
+// ── Normalise ──
+// Two-pass loudnorm: pass 1 measures the file, pass 2 applies correction.
+ipcMain.handle('audio:normaliseAll', async (event) => {
+  const ffmpegBin = findBinary('ffmpeg');
+  const state = readAudioState();
+  const tracks = getAllTrackRelPaths();
+
+  let processed = 0, skipped = 0, failed = 0;
+  const failures = [];
+
+  for (let i = 0; i < tracks.length; i++) {
+    const relPath = tracks[i];
+    const absPath = path.join(GIGALATOR_ROOT, relPath);
+
+    emitProgress(event, { phase: 'normalise', current: i + 1, total: tracks.length, name: path.basename(relPath) });
+
+    if (!fs.existsSync(absPath)) { skipped++; continue; }
+
+    try {
+      const fp = fingerprint(absPath);
+      const stamp = state.tracks[relPath];
+
+      if (stamp && stamp.normalised === NORMALISE_VERSION && stampMatches(stamp, fp)) {
+        skipped++; continue;
+      }
+
+      // Pass 1: measure (output to /dev/null, capture JSON from stderr)
+      // loudnorm writes its JSON to stderr — ffmpeg execFile capture handles it.
+      let measureStderr = '';
+      await new Promise((resolve, reject) => {
+        execFile(ffmpegBin, [
+          '-hide_banner', '-i', absPath,
+          '-af', 'loudnorm=I=-10:TP=-1:LRA=5:print_format=json',
+          '-f', 'null', '-',
+        ], { maxBuffer: 16 * 1024 * 1024 }, (err, stdout, stderr) => {
+          measureStderr = stderr || '';
+          if (err) reject(new Error(stderr || err.message));
+          else resolve();
+        });
+      });
+
+      // The JSON is the last { ... } block in stderr
+      const jsonMatch = measureStderr.match(/\{[\s\S]*?"input_i"[\s\S]*?\}/);
+      if (!jsonMatch) throw new Error('could not parse loudnorm measurement');
+      const m = JSON.parse(jsonMatch[0]);
+
+      // Pass 2: apply correction with measured values + force mono + iOS16-safe
+      const filterArgs = [
+        'loudnorm',
+        'I=-10',
+        'TP=-1',
+        'LRA=5',
+        'measured_I=' + m.input_i,
+        'measured_TP=' + m.input_tp,
+        'measured_LRA=' + m.input_lra,
+        'measured_thresh=' + m.input_thresh,
+        'offset=' + m.target_offset,
+        'linear=true',
+        'print_format=summary',
+      ].join(':');
+
+      await safeReencode(ffmpegBin, absPath, NORM_BACKUP_DIR, [
+        '-af', filterArgs,
+        '-c:a', 'libmp3lame', '-b:a', '128k', '-ac', '1', '-ar', '44100',
+        '-write_xing', '0', '-id3v2_version', '0', '-map_metadata', '-1',
+      ]);
+
+      state.tracks[relPath] = {
+        ...(stamp || {}),
+        mono: true,
+        normalised: NORMALISE_VERSION,
+        ...fingerprint(absPath),
+      };
+      writeAudioState(state);
+      processed++;
+    } catch (e) {
+      console.error('[audio:normalise] failed for ' + relPath + ': ' + e.message);
+      failed++;
+      failures.push({ track: relPath, error: e.message });
+    }
+  }
+
+  emitProgress(event, { phase: 'normalise', done: true });
+  return { processed, skipped, failed, failures, total: tracks.length };
+});
+
+// Quick summary of how many tracks need each operation (for UI display)
+ipcMain.handle('audio:status', async () => {
+  const ffprobeBin = findBinary('ffprobe');
+  const state = readAudioState();
+  const tracks = getAllTrackRelPaths();
+
+  let needsMono = 0, needsNormalise = 0, missing = 0;
+  for (const relPath of tracks) {
+    const absPath = path.join(GIGALATOR_ROOT, relPath);
+    if (!fs.existsSync(absPath)) { missing++; continue; }
+    const fp = fingerprint(absPath);
+    const stamp = state.tracks[relPath];
+    const isMono = stamp && stamp.mono && stampMatches(stamp, fp);
+    const isNorm = stamp && stamp.normalised === NORMALISE_VERSION && stampMatches(stamp, fp);
+    if (!isMono) needsMono++;
+    if (!isNorm) needsNormalise++;
+  }
+  return { total: tracks.length, needsMono, needsNormalise, missing };
 });

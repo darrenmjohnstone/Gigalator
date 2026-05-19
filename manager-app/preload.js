@@ -20,4 +20,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // API key (Anthropic) — stored in api/.env, used by the local AI server
   getApiKey: () => ipcRenderer.invoke('settings:getApiKey'),
   setApiKey: (key) => ipcRenderer.invoke('settings:setApiKey', key),
+  hasApiKey: () => ipcRenderer.invoke('settings:hasApiKey'),
+
+  // Audio processing (Mono / Normalise) for the Settings modal
+  audioStatus: () => ipcRenderer.invoke('audio:status'),
+  audioMonoAll: () => ipcRenderer.invoke('audio:monoAll'),
+  audioNormaliseAll: () => ipcRenderer.invoke('audio:normaliseAll'),
+  onAudioProgress: (cb) => {
+    const wrapped = (_e, payload) => cb(payload);
+    ipcRenderer.on('audio:progress', wrapped);
+    return () => ipcRenderer.removeListener('audio:progress', wrapped);
+  },
 });

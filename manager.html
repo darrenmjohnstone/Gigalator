@@ -1346,7 +1346,7 @@
         <h2>Settings</h2>
         <h3>Anthropic API Key</h3>
         <p class="modal-help">
-          Used by the AI Format button to clean up pasted lyrics. Stored locally in <code>api/.env</code>, never sent anywhere except Anthropic.
+          Used by the AI Format button to clean up pasted lyrics. Stored locally in your user data folder, never sent anywhere except Anthropic.
           Get a key at <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>.
         </p>
         <input type="password" id="settings-api-key" class="modal-input" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
@@ -1358,6 +1358,21 @@
           <button class="btn" id="settings-cancel">Cancel</button>
           <button class="btn btn-primary" id="settings-save">Save</button>
         </div>
+
+        <hr style="margin:24px 0;border:none;border-top:1px solid var(--border, #333)">
+
+        <h3>Audio Maintenance</h3>
+        <p class="modal-help">
+          Process all backing tracks referenced in <code>songs.json</code>. Each file is backed up
+          (in <code>tracks/_original_stereo/</code> or <code>tracks/_pre_normalise/</code>) before re-encoding.
+          Already-processed tracks are skipped automatically.
+        </p>
+        <div id="audio-status" class="modal-help" style="margin-bottom:10px"></div>
+        <div class="modal-row" style="gap:8px">
+          <button class="btn" id="audio-mono-btn">Mono Songs</button>
+          <button class="btn" id="audio-normalise-btn">Normalise Songs</button>
+        </div>
+        <div id="audio-progress" class="modal-help" style="margin-top:10px;min-height:18px"></div>
       </div>
     </div>
     <div id="editor">
@@ -1836,6 +1851,21 @@
             alert('Paste some lyrics into the textarea first, then click AI Format.');
             return;
           }
+
+          // Pre-flight: if no API key is set, open Settings immediately
+          // instead of letting the request fail with a cryptic error.
+          if (isElectron && window.electronAPI && window.electronAPI.hasApiKey) {
+            try {
+              var hasKey = await window.electronAPI.hasApiKey();
+              if (!hasKey) {
+                alert('AI Format needs an Anthropic API key. Opening Settings…');
+                var sbtn = document.getElementById('settings-btn');
+                if (sbtn) sbtn.click();
+                return;
+              }
+            } catch (_) { /* ignore — let the request error itself */ }
+          }
+
           if (!confirm('Clean up the current lyrics with AI?\n\nThis replaces the textarea contents — but you can review and edit before saving.')) {
             return;
           }
@@ -1883,13 +1913,24 @@
             setTimeout(function () { aiBtn.innerHTML = origLabel; aiBtn.disabled = false; }, 1500);
           } catch (e) {
             console.error(e);
-            alert(
-              'AI Format failed: ' + e.message + '\n\n' +
-              'The API server should auto-start with the Manager. ' +
-              'If it failed to start, run this in Terminal as a fallback:\n\n' +
-              '  cd ~/Desktop/Gigalator/api && node server.js\n\n' +
-              '(Then click AI Format again.)'
-            );
+            var msg = (e && e.message) || '';
+            // If the server reports a missing key, open Settings directly
+            // — this is by far the most common failure mode and the fix
+            // is a 10-second paste in the modal, not a Terminal command.
+            if (/ANTHROPIC_API_KEY|api[_ ]?key/i.test(msg)) {
+              alert('AI Format needs an Anthropic API key. Opening Settings…');
+              var sbtn2 = document.getElementById('settings-btn');
+              if (sbtn2) sbtn2.click();
+            } else if (/Failed to fetch|NetworkError|ECONNREFUSED/i.test(msg)) {
+              alert(
+                'AI Format failed: the local API server isn\'t responding.\n\n' +
+                'Quit and relaunch the Manager — the server auto-starts with the app. ' +
+                'If that doesn\'t help, run as a fallback:\n\n' +
+                '  cd ~/Desktop/Gigalator/api && node server.js'
+              );
+            } else {
+              alert('AI Format failed: ' + msg);
+            }
             aiBtn.innerHTML = origLabel;
             aiBtn.disabled = false;
           }
@@ -2907,7 +2948,7 @@
         try {
           var key = await window.electronAPI.getApiKey();
           input.value = key || '';
-          setStatus(key ? 'Key loaded from api/.env' : 'No key set yet — paste one above', key ? 'ok' : '');
+          setStatus(key ? 'Key loaded.' : 'No key set yet — paste one above and click Save.', key ? 'ok' : '');
         } catch (e) {
           setStatus('Failed to load: ' + e.message, 'err');
         }
