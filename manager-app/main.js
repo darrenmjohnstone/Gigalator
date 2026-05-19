@@ -4,6 +4,12 @@ const fs = require('fs');
 const os = require('os');
 const { execFile, spawn } = require('child_process');
 
+// Pin the app name so dev (npx electron .) and packaged DMG use the SAME
+// userData folder. Without this, dev reads from "gigalator-manager" and
+// packaged reads from "Gigalator Manager" — the API key set in one
+// doesn't appear in the other.
+app.setName('Gigalator Manager');
+
 // ── Path resolution: dev vs packaged ──
 //
 // In dev (npx electron .) the layout is:
@@ -193,6 +199,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  migrateLegacyKey();
   startApiServer();
   createWindow();
 });
@@ -324,6 +331,26 @@ function readApiKeyFromEnv() {
   }
 }
 
+// One-time migration: if our config is empty, look for a key that was
+// saved under the OLD dev-mode userData folder name ("gigalator-manager")
+// before we pinned app.setName(). Copy it forward so the user doesn't
+// have to retype it after installing the DMG.
+function migrateLegacyKey() {
+  try {
+    if (readConfig().anthropicApiKey) return; // already have one
+    const appSupport = path.join(os.homedir(), 'Library', 'Application Support');
+    const legacyPath = path.join(appSupport, 'gigalator-manager', 'config.json');
+    if (!fs.existsSync(legacyPath)) return;
+    const legacy = JSON.parse(fs.readFileSync(legacyPath, 'utf8'));
+    if (legacy && legacy.anthropicApiKey) {
+      writeConfig({ anthropicApiKey: legacy.anthropicApiKey });
+      console.log('[Manager] migrated API key from legacy userData folder');
+    }
+  } catch (e) {
+    console.warn('[Manager] legacy migration failed: ' + e.message);
+  }
+}
+
 function readApiKey() {
   // Prefer userData config; fall back to api/.env (migration / dev convenience)
   const fromConfig = readConfig().anthropicApiKey;
@@ -433,22 +460,21 @@ const MONO_BACKUP_DIR = 'tracks/_original_stereo';
 const NORM_BACKUP_DIR = 'tracks/_pre_normalise';
 
 function findBinary(name) {
-  const candidates = [
-    process.env[name.toUpperCase() + '_BIN'],
-    name,
+  // Probe absolute paths FIRST — apps launched from Finder/Launchpad don't
+  // inherit Homebrew's PATH, so bare names like 'ffmpeg' would ENOENT.
+  // Only fall back to the bare name if no absolute candidate exists.
+  const envOverride = process.env[name.toUpperCase() + '_BIN'];
+  const absoluteCandidates = [
+    envOverride,
     '/opt/homebrew/bin/' + name,
     '/usr/local/bin/' + name,
+    '/opt/local/bin/' + name,
     '/usr/bin/' + name,
   ].filter(Boolean);
-  for (const p of candidates) {
-    if (p.startsWith('/')) {
-      if (fs.existsSync(p)) return p;
-    } else {
-      // bare name — assume on PATH; we'll let spawn fail naturally if not
-      return p;
-    }
+  for (const p of absoluteCandidates) {
+    if (p.startsWith('/') && fs.existsSync(p)) return p;
   }
-  return name; // fallback — spawn will error if truly missing
+  return name; // last resort — relies on PATH
 }
 
 function audioStatePath() {
