@@ -2979,6 +2979,91 @@
           saveBtn.disabled = false;
         }
       });
+
+      // ── Audio Maintenance: Mono / Normalise buttons ──
+      var monoBtn = document.getElementById('audio-mono-btn');
+      var normBtn = document.getElementById('audio-normalise-btn');
+      var audioStatusEl = document.getElementById('audio-status');
+      var audioProgressEl = document.getElementById('audio-progress');
+      var unsubProgress = null;
+
+      async function refreshAudioStatus() {
+        if (!isElectron || !window.electronAPI.audioStatus) return;
+        try {
+          var s = await window.electronAPI.audioStatus();
+          var bits = [s.total + ' track' + (s.total === 1 ? '' : 's')];
+          bits.push(s.needsMono === 0 ? 'all mono ✓' : s.needsMono + ' need mono');
+          bits.push(s.needsNormalise === 0 ? 'all normalised ✓' : s.needsNormalise + ' need normalise');
+          if (s.missing) bits.push(s.missing + ' missing on disk');
+          audioStatusEl.textContent = bits.join(' · ');
+        } catch (e) {
+          audioStatusEl.textContent = 'Could not read track status: ' + e.message;
+        }
+      }
+
+      function setAudioBusy(busy) {
+        monoBtn.disabled = busy;
+        normBtn.disabled = busy;
+      }
+
+      function attachProgress() {
+        if (unsubProgress) return;
+        unsubProgress = window.electronAPI.onAudioProgress(function (p) {
+          if (p.done) {
+            audioProgressEl.textContent = 'Finishing up…';
+            return;
+          }
+          audioProgressEl.textContent =
+            (p.phase === 'mono' ? 'Mono' : 'Normalise') +
+            ' ' + p.current + '/' + p.total + ' — ' + p.name;
+        });
+      }
+
+      function detachProgress() {
+        if (unsubProgress) { unsubProgress(); unsubProgress = null; }
+      }
+
+      async function runAudioOp(kind) {
+        var label = kind === 'mono' ? 'convert all stereo tracks to mono'
+                                    : 'normalise all tracks to a consistent loudness (-10 LUFS, low dynamic range)';
+        if (!confirm('About to ' + label + '.\n\nOriginals are backed up and already-processed tracks are skipped. Continue?')) return;
+
+        setAudioBusy(true);
+        audioProgressEl.textContent = 'Scanning…';
+        attachProgress();
+
+        try {
+          var fn = kind === 'mono' ? window.electronAPI.audioMonoAll : window.electronAPI.audioNormaliseAll;
+          var result = await fn();
+          var done = (result.converted != null ? result.converted : result.processed) || 0;
+          var summary = '✓ ' + done + ' processed, ' + result.skipped + ' skipped, ' + result.failed + ' failed';
+          audioProgressEl.textContent = summary;
+          if (result.failed && result.failures && result.failures.length) {
+            var firstFew = result.failures.slice(0, 5).map(function (f) { return f.track + ' (' + f.error + ')'; }).join('\n');
+            alert('Some tracks failed:\n\n' + firstFew + (result.failures.length > 5 ? '\n…and more' : ''));
+          }
+        } catch (e) {
+          audioProgressEl.textContent = '';
+          alert('Failed: ' + e.message);
+        } finally {
+          detachProgress();
+          setAudioBusy(false);
+          refreshAudioStatus();
+        }
+      }
+
+      if (monoBtn && normBtn && isElectron && window.electronAPI.audioMonoAll) {
+        monoBtn.addEventListener('click', function () { runAudioOp('mono'); });
+        normBtn.addEventListener('click', function () { runAudioOp('normalise'); });
+      } else if (monoBtn) {
+        monoBtn.disabled = true;
+        normBtn.disabled = true;
+        audioStatusEl.textContent = 'Audio maintenance requires the desktop Manager.';
+      }
+
+      // Refresh status alongside the existing open handler (separate listener
+      // — doesn't matter which order they fire in, both are idempotent).
+      btn.addEventListener('click', function () { refreshAudioStatus(); });
     })();
 
     async function deployToGitHub() {
