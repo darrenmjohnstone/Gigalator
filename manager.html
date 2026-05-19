@@ -3039,8 +3039,20 @@
           var summary = '✓ ' + done + ' processed, ' + result.skipped + ' skipped, ' + result.failed + ' failed';
           audioProgressEl.textContent = summary;
           if (result.failed && result.failures && result.failures.length) {
-            var firstFew = result.failures.slice(0, 5).map(function (f) { return f.track + ' (' + f.error + ')'; }).join('\n');
-            alert('Some tracks failed:\n\n' + firstFew + (result.failures.length > 5 ? '\n…and more' : ''));
+            // Show failures inline (scrollable) instead of a blocking alert
+            // that can push its OK button off-screen with long ffmpeg errors.
+            var detail = result.failures.map(function (f) {
+              var err = (f.error || '').replace(/\s+/g, ' ').trim();
+              if (err.length > 160) err = err.slice(0, 160) + '…';
+              return '• ' + f.track + ' — ' + err;
+            }).join('\n');
+            audioProgressEl.innerHTML =
+              '<div style="margin-top:6px"><strong>' + summary + '</strong></div>' +
+              '<pre style="max-height:160px;overflow:auto;white-space:pre-wrap;' +
+              'background:rgba(0,0,0,0.05);padding:8px;border-radius:6px;' +
+              'font-size:11px;margin-top:6px">' +
+              detail.replace(/[<>&]/g, function (c) { return ({'<':'&lt;','>':'&gt;','&':'&amp;'})[c]; }) +
+              '</pre>';
           }
         } catch (e) {
           audioProgressEl.textContent = '';

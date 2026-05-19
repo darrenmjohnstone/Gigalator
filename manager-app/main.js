@@ -487,10 +487,25 @@ function stampMatches(stamp, fp) {
 
 // Run ffmpeg/ffprobe with stdio captured. Resolves with stdout; rejects
 // with stderr on non-zero exit.
+// Distil ffmpeg/ffprobe stderr down to the first useful error line —
+// the full output is hundreds of lines of banner + library versions and
+// blows up dialogs in the UI. We pick the first line that looks like an
+// actual error message, then truncate.
+function distilFfError(stderr, fallback) {
+  if (!stderr) return fallback || 'unknown ffmpeg error';
+  const lines = String(stderr).split('\n');
+  const signal = lines.find((l) =>
+    /error|invalid|unable to|failed|no such|not found|denied|refus/i.test(l) &&
+    !/^ffmpeg version|^\s*built with|^\s*configuration:|^\s*lib(av|sw)/i.test(l)
+  );
+  const pick = (signal || lines[lines.length - 1] || '').trim();
+  return pick.length > 200 ? pick.slice(0, 200) + '…' : (pick || (fallback || 'ffmpeg failed'));
+}
+
 function runFfBinary(binPath, args) {
   return new Promise((resolve, reject) => {
     execFile(binPath, args, { maxBuffer: 16 * 1024 * 1024 }, (err, stdout, stderr) => {
-      if (err) reject(new Error(stderr || err.message));
+      if (err) reject(new Error(distilFfError(stderr, err.message)));
       else resolve(stdout);
     });
   });
@@ -536,7 +551,10 @@ async function safeReencode(ffmpegBin, absPath, backupDir, ffmpegArgs) {
     throw new Error('backup is zero bytes — refusing to encode');
   }
 
-  const tmpPath = absPath + '.reencode.tmp';
+  // Keep the .mp3 extension on the temp file so ffmpeg can infer the output
+  // format from the filename — without this it errors with "Unable to choose
+  // an output format".
+  const tmpPath = absPath + '.reencode.tmp.mp3';
   try { fs.unlinkSync(tmpPath); } catch (_) {}
 
   try {
@@ -646,7 +664,7 @@ ipcMain.handle('audio:normaliseAll', async (event) => {
           '-f', 'null', '-',
         ], { maxBuffer: 16 * 1024 * 1024 }, (err, stdout, stderr) => {
           measureStderr = stderr || '';
-          if (err) reject(new Error(stderr || err.message));
+          if (err) reject(new Error(distilFfError(stderr, err.message)));
           else resolve();
         });
       });

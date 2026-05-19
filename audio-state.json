@@ -1,0 +1,720 @@
+{
+  "version": 1,
+  "tracks": {
+    "tracks/500-miles.mp3": {
+      "mono": true,
+      "size": 2648607,
+      "mtime": 1777551460172
+    },
+    "tracks/all-of-me.mp3": {
+      "mono": true,
+      "size": 4620120,
+      "mtime": 1777551461821
+    },
+    "tracks/always-on-my-mind.mp3": {
+      "mono": true,
+      "size": 3525067,
+      "mtime": 1777551465898
+    },
+    "tracks/am-i-ever-gonna-see-your-face-again.mp3": {
+      "mono": true,
+      "size": 3224555,
+      "mtime": 1777551466586
+    },
+    "tracks/american-pie.mp3": {
+      "mono": true,
+      "size": 4401110,
+      "mtime": 1777551467512
+    },
+    "tracks/angels-higher.mp3": {
+      "mono": true,
+      "size": 1800986,
+      "mtime": 1777551467898
+    },
+    "tracks/angels.mp3": {
+      "mono": true,
+      "size": 4290958,
+      "mtime": 1778209572050
+    },
+    "tracks/april-sun-in-cuba.mp3": {
+      "mono": true,
+      "size": 3185266,
+      "mtime": 1777551468617
+    },
+    "tracks/bad-moon-rising.mp3": {
+      "mono": true,
+      "size": 2186344,
+      "mtime": 1777551469094
+    },
+    "tracks/beds-are-burning.mp3": {
+      "mono": true,
+      "size": 4263930,
+      "mtime": 1778209572012
+    },
+    "tracks/before-too-long.mp3": {
+      "mono": true,
+      "size": 3334060,
+      "mtime": 1777551469868
+    },
+    "tracks/better-man.mp3": {
+      "mono": true,
+      "size": 3151830,
+      "mtime": 1777551473793
+    },
+    "tracks/blister-in-the-sun.mp3": {
+      "mono": true,
+      "size": 2334302,
+      "mtime": 1777551477305
+    },
+    "tracks/blue-suede-shoes.mp3": {
+      "mono": true,
+      "size": 2645263,
+      "mtime": 1777551477868
+    },
+    "tracks/blueberry-hill.mp3": {
+      "mono": true,
+      "size": 2417057,
+      "mtime": 1777551480800
+    },
+    "tracks/boys-light-up.mp3": {
+      "mono": true,
+      "size": 3473658,
+      "mtime": 1777551481528
+    },
+    "tracks/bright-side-of-the-road.mp3": {
+      "mono": true,
+      "size": 3114631,
+      "mtime": 1777551482198
+    },
+    "tracks/brown-eyed-girl.mp3": {
+      "mono": true,
+      "size": 3140127,
+      "mtime": 1777551482868
+    },
+    "tracks/cant-buy-me-love.mp3": {
+      "mono": true,
+      "size": 2190106,
+      "mtime": 1777551486049
+    },
+    "tracks/cant-help-falling-in-love.mp3": {
+      "mono": true,
+      "size": 2899382,
+      "mtime": 1777551489286
+    },
+    "tracks/cheap-wine.mp3": {
+      "mono": true,
+      "size": 3155591,
+      "mtime": 1777551493479
+    },
+    "tracks/could-i-have-this-dance.mp3": {
+      "mono": true,
+      "size": 2969600,
+      "mtime": 1777551494109
+    },
+    "tracks/country-roads.mp3": {
+      "mono": true,
+      "size": 2940342,
+      "mtime": 1777551494752
+    },
+    "tracks/crocodile-rock.mp3": {
+      "mono": true,
+      "size": 3558086,
+      "mtime": 1777551498315
+    },
+    "tracks/cup-of-life.mp3": {
+      "mono": true,
+      "size": 4105195,
+      "mtime": 1777551503123
+    },
+    "tracks/desperado.mp3": {
+      "mono": true,
+      "size": 3483271,
+      "mtime": 1777551504530
+    },
+    "tracks/dock-of-the-bay.mp3": {
+      "mono": true,
+      "size": 3574804,
+      "mtime": 1777551505270
+    },
+    "tracks/dont-be-cruel.mp3": {
+      "mono": true,
+      "size": 2006622,
+      "mtime": 1777551510586
+    },
+    "tracks/dont-dream-its-over.mp3": {
+      "mono": true,
+      "size": 3780683,
+      "mtime": 1778209572021
+    },
+    "tracks/dont-stop-believing.mp3": {
+      "mono": true,
+      "size": 4234641,
+      "mtime": 1778209571994
+    },
+    "tracks/down-under.mp3": {
+      "mono": true,
+      "size": 3166876,
+      "mtime": 1777551511358
+    },
+    "tracks/eagle-rock.mp3": {
+      "mono": true,
+      "size": 4096835,
+      "mtime": 1777551512242
+    },
+    "tracks/escape-the-pina-colada-song.mp3": {
+      "mono": true,
+      "size": 4404453,
+      "mtime": 1777551516188
+    },
+    "tracks/every-breath-you-take.mp3": {
+      "mono": true,
+      "size": 3326955,
+      "mtime": 1777551516889
+    },
+    "tracks/feelin-alright.mp3": {
+      "mono": true,
+      "size": 4102269,
+      "mtime": 1777551517753
+    },
+    "tracks/fields-of-gold.mp3": {
+      "mono": true,
+      "size": 3497064,
+      "mtime": 1777551518508
+    },
+    "tracks/flame-trees.mp3": {
+      "mono": true,
+      "size": 4244375,
+      "mtime": 1777551519399
+    },
+    "tracks/fly-me-to-the-moon.mp3": {
+      "mono": true,
+      "size": 2432522,
+      "mtime": 1777551519915
+    },
+    "tracks/fresh-eyes.mp3": {
+      "mono": true,
+      "size": 3257991,
+      "mtime": 1777551520585
+    },
+    "tracks/friends-in-low-places.mp3": {
+      "mono": true,
+      "size": 4066742,
+      "mtime": 1777551521447
+    },
+    "tracks/green-door.mp3": {
+      "mono": true,
+      "size": 2308806,
+      "mtime": 1777551521957
+    },
+    "tracks/hark-the-herald-angels-sing.mp3": {
+      "mono": true,
+      "size": 2604721,
+      "mtime": 1777551522525
+    },
+    "tracks/have-i-told-you-lately.mp3": {
+      "mono": true,
+      "size": 4088894,
+      "mtime": 1777551523385
+    },
+    "tracks/have-yourself-a-merry-little-christmas.mp3": {
+      "mono": true,
+      "size": 3370004,
+      "mtime": 1777551527712
+    },
+    "tracks/heart-of-gold.mp3": {
+      "mono": true,
+      "size": 2965420,
+      "mtime": 1777551528342
+    },
+    "tracks/home.mp3": {
+      "mono": true,
+      "size": 3638752,
+      "mtime": 1777551532013
+    },
+    "tracks/honky-tonk-woman.mp3": {
+      "mono": true,
+      "size": 3026024,
+      "mtime": 1777551535515
+    },
+    "tracks/hound-dog.mp3": {
+      "mono": true,
+      "size": 2267428,
+      "mtime": 1777551535988
+    },
+    "tracks/hurts-so-good.mp3": {
+      "mono": true,
+      "size": 3395082,
+      "mtime": 1777551536727
+    },
+    "tracks/ill-be-home-for-christmas.mp3": {
+      "mono": true,
+      "size": 3589851,
+      "mtime": 1777551537504
+    },
+    "tracks/im-a-believer.mp3": {
+      "mono": true,
+      "size": 2685387,
+      "mtime": 1777551538071
+    },
+    "tracks/is-this-love.mp3": {
+      "mono": true,
+      "size": 3544711,
+      "mtime": 1777551538830
+    },
+    "tracks/its-beginning-to-look-a-lot-like-christmas.mp3": {
+      "mono": true,
+      "size": 3303967,
+      "mtime": 1777551542487
+    },
+    "tracks/its-now-or-never.mp3": {
+      "mono": true,
+      "size": 3010560,
+      "mtime": 1777551545896
+    },
+    "tracks/ive-got-you-under-my-skin.mp3": {
+      "mono": true,
+      "size": 3555578,
+      "mtime": 1777551546648
+    },
+    "tracks/jailhouse-rock.mp3": {
+      "mono": true,
+      "size": 2205988,
+      "mtime": 1777551547118
+    },
+    "tracks/jessies-girl.mp3": {
+      "mono": true,
+      "size": 3038145,
+      "mtime": 1777551547791
+    },
+    "tracks/jingle-bell-rock.mp3": {
+      "mono": true,
+      "size": 2070151,
+      "mtime": 1777551548246
+    },
+    "tracks/jingle-bells.mp3": {
+      "mono": true,
+      "size": 1939748,
+      "mtime": 1777551551440
+    },
+    "tracks/joy-to-the-world.mp3": {
+      "mono": true,
+      "size": 1731186,
+      "mtime": 1777551554455
+    },
+    "tracks/just-the-way-you-are.mp3": {
+      "mono": true,
+      "size": 3530083,
+      "mtime": 1777551555199
+    },
+    "tracks/khe-sanh.mp3": {
+      "mono": true,
+      "size": 3772081,
+      "mtime": 1777551555984
+    },
+    "tracks/la-bamba.mp3": {
+      "mono": true,
+      "size": 2211422,
+      "mtime": 1777551556463
+    },
+    "tracks/let-it-be.mp3": {
+      "mono": true,
+      "size": 3494974,
+      "mtime": 1777551557214
+    },
+    "tracks/long-and-winding-road.mp3": {
+      "mono": true,
+      "size": 3735055,
+      "mtime": 1778209572043
+    },
+    "tracks/long-train-running.mp3": {
+      "mono": true,
+      "size": 3237511,
+      "mtime": 1777551560978
+    },
+    "tracks/love-is-all-around.mp3": {
+      "mono": true,
+      "size": 3872809,
+      "mtime": 1777551561786
+    },
+    "tracks/lyin-eyes.mp3": {
+      "mono": true,
+      "size": 6123520,
+      "mtime": 1777551563053
+    },
+    "tracks/mamma-mia.mp3": {
+      "mono": true,
+      "size": 3685146,
+      "mtime": 1777551563793
+    },
+    "tracks/marys-boy-child.mp3": {
+      "mono": true,
+      "size": 3794233,
+      "mtime": 1777551564611
+    },
+    "tracks/message-in-a-bottle.mp3": {
+      "mono": true,
+      "size": 3959745,
+      "mtime": 1777551565445
+    },
+    "tracks/message-to-my-girl.mp3": {
+      "mono": true,
+      "size": 3522785,
+      "mtime": 1778209572028
+    },
+    "tracks/midnight-hour.mp3": {
+      "mono": true,
+      "size": 2240261,
+      "mtime": 1777551569275
+    },
+    "tracks/moondance.mp3": {
+      "mono": true,
+      "size": 4528587,
+      "mtime": 1777551570225
+    },
+    "tracks/mustang-sally.mp3": {
+      "mono": true,
+      "size": 3876153,
+      "mtime": 1777551571051
+    },
+    "tracks/my-girl.mp3": {
+      "mono": true,
+      "size": 2807013,
+      "mtime": 1777551571633
+    },
+    "tracks/my-happiness.mp3": {
+      "mono": true,
+      "size": 4637613,
+      "mtime": 1778209572036
+    },
+    "tracks/never-tear-us-apart.mp3": {
+      "mono": true,
+      "size": 3659232,
+      "mtime": 1777551575640
+    },
+    "tracks/o-holy-night.mp3": {
+      "mono": true,
+      "size": 2944940,
+      "mtime": 1777551576243
+    },
+    "tracks/oh-pretty-woman.mp3": {
+      "mono": true,
+      "size": 2677446,
+      "mtime": 1777551576809
+    },
+    "tracks/perfect-ed-sheeran.mp3": {
+      "mono": true,
+      "size": 4624718,
+      "mtime": 1777551580802
+    },
+    "tracks/proud-mary.mp3": {
+      "mono": true,
+      "size": 2861348,
+      "mtime": 1777551581424
+    },
+    "tracks/quando-quando-quando.mp3": {
+      "mono": true,
+      "size": 3276800,
+      "mtime": 1777551582087
+    },
+    "tracks/rhinestone-cowboy.mp3": {
+      "mono": true,
+      "size": 3278053,
+      "mtime": 1777551582822
+    },
+    "tracks/ring-of-fire.mp3": {
+      "mono": true,
+      "size": 2502321,
+      "mtime": 1777551586826
+    },
+    "tracks/riptide.mp3": {
+      "mono": true,
+      "size": 3455686,
+      "mtime": 1777551592024
+    },
+    "tracks/rock-around-the-clock.mp3": {
+      "mono": true,
+      "size": 2578390,
+      "mtime": 1777551592577
+    },
+    "tracks/rock-dj.mp3": {
+      "mono": true,
+      "size": 3803428,
+      "mtime": 1777551596555
+    },
+    "tracks/rockin-robin.mp3": {
+      "mono": true,
+      "size": 2544953,
+      "mtime": 1777551601170
+    },
+    "tracks/rude.mp3": {
+      "mono": true,
+      "size": 3562266,
+      "mtime": 1777551601930
+    },
+    "tracks/rudolf.mp3": {
+      "mono": true,
+      "size": 2363141,
+      "mtime": 1777551602453
+    },
+    "tracks/run-to-paradise.mp3": {
+      "mono": true,
+      "size": 3731957,
+      "mtime": 1777551603196
+    },
+    "tracks/runaway.mp3": {
+      "mono": true,
+      "size": 2318001,
+      "mtime": 1777551603702
+    },
+    "tracks/santa-claus-is-coming-to-town.mp3": {
+      "mono": true,
+      "size": 2723422,
+      "mtime": 1777551610687
+    },
+    "tracks/shake-a-tail-feather.mp3": {
+      "mono": true,
+      "size": 2852989,
+      "mtime": 1777551611289
+    },
+    "tracks/shake-rattle-and-roll.mp3": {
+      "mono": true,
+      "size": 2174223,
+      "mtime": 1777551611762
+    },
+    "tracks/shape-of-you.mp3": {
+      "mono": true,
+      "size": 4145496,
+      "mtime": 1778209572003
+    },
+    "tracks/she-believes-in-me.mp3": {
+      "mono": true,
+      "size": 4100597,
+      "mtime": 1777551612682
+    },
+    "tracks/she-loves-you.mp3": {
+      "mono": true,
+      "size": 2382367,
+      "mtime": 1777551613200
+    },
+    "tracks/she-will-be-loved.mp3": {
+      "mono": true,
+      "size": 4121077,
+      "mtime": 1777551614055
+    },
+    "tracks/signed-sealed-delivered.mp3": {
+      "mono": true,
+      "size": 2591346,
+      "mtime": 1777551614604
+    },
+    "tracks/so-this-is-christmas.mp3": {
+      "mono": true,
+      "size": 3553071,
+      "mtime": 1777551615373
+    },
+    "tracks/something.mp3": {
+      "mono": true,
+      "size": 3163965,
+      "mtime": 1778209572058
+    },
+    "tracks/south-of-the-border.mp3": {
+      "mono": true,
+      "size": 4149916,
+      "mtime": 1777551619445
+    },
+    "tracks/stand-by-me.mp3": {
+      "mono": true,
+      "size": 3245453,
+      "mtime": 1777551620133
+    },
+    "tracks/still-got-the-blues.mp3": {
+      "mono": true,
+      "size": 6078798,
+      "mtime": 1777551621410
+    },
+    "tracks/summer-of-69.mp3": {
+      "mono": true,
+      "size": 3468643,
+      "mtime": 1777551622144
+    },
+    "tracks/sunday-morning.mp3": {
+      "mono": true,
+      "size": 3954729,
+      "mtime": 1777551622933
+    },
+    "tracks/superstition.mp3": {
+      "mono": true,
+      "size": 4191294,
+      "mtime": 1777551623837
+    },
+    "tracks/sway.mp3": {
+      "mono": true,
+      "size": 3200313,
+      "mtime": 1777551624539
+    },
+    "tracks/sweet-caroline.mp3": {
+      "mono": true,
+      "size": 3407621,
+      "mtime": 1777551626013
+    },
+    "tracks/sweet-home-alabama.mp3": {
+      "mono": true,
+      "size": 3438132,
+      "mtime": 1777551628837
+    },
+    "tracks/take-it-easy.mp3": {
+      "mono": true,
+      "size": 3398844,
+      "mtime": 1777551629567
+    },
+    "tracks/temple-of-the-king.mp3": {
+      "mono": true,
+      "size": 4288679,
+      "mtime": 1777551630428
+    },
+    "tracks/tennessee-waltz.mp3": {
+      "mono": true,
+      "size": 2697508,
+      "mtime": 1777551631047
+    },
+    "tracks/thatll-be-the-day.mp3": {
+      "mono": true,
+      "size": 2366484,
+      "mtime": 1777551631558
+    },
+    "tracks/the-christmas-song.mp3": {
+      "mono": true,
+      "size": 3832267,
+      "mtime": 1777551632356
+    },
+    "tracks/the-gambler.mp3": {
+      "mono": true,
+      "size": 3414308,
+      "mtime": 1777551633080
+    },
+    "tracks/the-lady-is-a-tramp.mp3": {
+      "mono": true,
+      "size": 2907742,
+      "mtime": 1777551633691
+    },
+    "tracks/the-last-waltz.mp3": {
+      "mono": true,
+      "size": 3254648,
+      "mtime": 1777551634385
+    },
+    "tracks/the-wanderer.mp3": {
+      "mono": true,
+      "size": 2517786,
+      "mtime": 1777551639255
+    },
+    "tracks/the-way-you-look-tonight.mp3": {
+      "mono": true,
+      "size": 3322357,
+      "mtime": 1777551639966
+    },
+    "tracks/the-wonder-of-you.mp3": {
+      "mono": true,
+      "size": 2443389,
+      "mtime": 1777551640481
+    },
+    "tracks/there-goes-my-everything.mp3": {
+      "mono": true,
+      "size": 2948702,
+      "mtime": 1777551641139
+    },
+    "tracks/thinking-out-loud.mp3": {
+      "mono": true,
+      "size": 4570801,
+      "mtime": 1777551642725
+    },
+    "tracks/this-love.mp3": {
+      "mono": true,
+      "size": 3355794,
+      "mtime": 1777551647866
+    },
+    "tracks/to-her-door.mp3": {
+      "mono": true,
+      "size": 3293518,
+      "mtime": 1777551652641
+    },
+    "tracks/unchained-melody.mp3": {
+      "mono": true,
+      "size": 3633737,
+      "mtime": 1777551653420
+    },
+    "tracks/video-killed-the-radio-star.mp3": {
+      "mono": true,
+      "size": 3179415,
+      "mtime": 1777551654101
+    },
+    "tracks/viva-la-vida.mp3": {
+      "mono": true,
+      "size": 3943444,
+      "mtime": 1777551657735
+    },
+    "tracks/walk-of-life.mp3": {
+      "mono": true,
+      "size": 3770409,
+      "mtime": 1777551658558
+    },
+    "tracks/what-about-me.mp3": {
+      "mono": true,
+      "size": 3358302,
+      "mtime": 1777551659248
+    },
+    "tracks/when-the-war-is-over.mp3": {
+      "mono": true,
+      "size": 4421590,
+      "mtime": 1777551660143
+    },
+    "tracks/when-you-say-nothing-at-all.mp3": {
+      "mono": true,
+      "size": 3301041,
+      "mtime": 1777551664507
+    },
+    "tracks/woman.mp3": {
+      "mono": true,
+      "size": 3651291,
+      "mtime": 1777551665276
+    },
+    "tracks/wonderwall.mp3": {
+      "mono": true,
+      "size": 4119405,
+      "mtime": 1777551668432
+    },
+    "tracks/ymca.mp3": {
+      "mono": true,
+      "size": 3622452,
+      "mtime": 1777551669174
+    },
+    "tracks/you-raise-me-up.mp3": {
+      "mono": true,
+      "size": 4185443,
+      "mtime": 1777551673285
+    },
+    "tracks/youre-the-voice.mp3": {
+      "mono": true,
+      "size": 5014761,
+      "mtime": 1777551901550
+    },
+    "tracks/as-it-was2.mp3": {
+      "mono": true,
+      "size": 4097253,
+      "mtime": 1779177718075
+    },
+    "tracks/blinding-lights2.mp3": {
+      "mono": true,
+      "size": 3180669,
+      "mtime": 1779177718770
+    },
+    "tracks/celebration.mp3": {
+      "mono": true,
+      "size": 4033306,
+      "mtime": 1779177719674
+    },
+    "tracks/im-yours.m4a": {
+      "mono": true,
+      "size": 3840626,
+      "mtime": 1779177720546
+    }
+  }
+}
