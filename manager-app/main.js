@@ -321,14 +321,23 @@ function runGit(args) {
 const ENV_PATH = path.join(API_DIR, '.env');
 
 function readApiKeyFromEnv() {
-  try {
-    if (!fs.existsSync(ENV_PATH)) return '';
-    const content = fs.readFileSync(ENV_PATH, 'utf8');
-    const m = content.match(/ANTHROPIC_API_KEY\s*=\s*(.+)/);
-    return m ? m[1].trim() : '';
-  } catch (e) {
-    return '';
+  // Probe both the bundled api/.env (next to server.js — useful in dev)
+  // and the user's actual repo at GIGALATOR_ROOT/api/.env (where keys
+  // from before this rework still live). First non-empty match wins.
+  const probes = [
+    ENV_PATH,
+    GIGALATOR_ROOT ? path.join(GIGALATOR_ROOT, 'api', '.env') : null,
+  ].filter(Boolean);
+  for (const p of probes) {
+    try {
+      if (!fs.existsSync(p)) continue;
+      const content = fs.readFileSync(p, 'utf8');
+      const m = content.match(/ANTHROPIC_API_KEY\s*=\s*(.+)/);
+      const key = m ? m[1].trim() : '';
+      if (key) return key;
+    } catch (_) { /* try next */ }
   }
+  return '';
 }
 
 // One-time migration: if our config is empty, look for a key that was
@@ -338,13 +347,27 @@ function readApiKeyFromEnv() {
 function migrateLegacyKey() {
   try {
     if (readConfig().anthropicApiKey) return; // already have one
+
+    // Source 1: legacy userData folder (dev-mode app name before pinning)
     const appSupport = path.join(os.homedir(), 'Library', 'Application Support');
     const legacyPath = path.join(appSupport, 'gigalator-manager', 'config.json');
-    if (!fs.existsSync(legacyPath)) return;
-    const legacy = JSON.parse(fs.readFileSync(legacyPath, 'utf8'));
-    if (legacy && legacy.anthropicApiKey) {
-      writeConfig({ anthropicApiKey: legacy.anthropicApiKey });
-      console.log('[Manager] migrated API key from legacy userData folder');
+    if (fs.existsSync(legacyPath)) {
+      const legacy = JSON.parse(fs.readFileSync(legacyPath, 'utf8'));
+      if (legacy && legacy.anthropicApiKey) {
+        writeConfig({ anthropicApiKey: legacy.anthropicApiKey });
+        console.log('[Manager] migrated API key from legacy userData folder');
+        return;
+      }
+    }
+
+    // Source 2: api/.env in the user's actual repo. This catches keys
+    // that were set the old way (before we moved storage to userData) —
+    // packaged builds don't see api/.env at all, so without this migration
+    // the user has to retype the key after installing the DMG.
+    const repoEnv = readApiKeyFromEnv();
+    if (repoEnv) {
+      writeConfig({ anthropicApiKey: repoEnv });
+      console.log('[Manager] migrated API key from api/.env');
     }
   } catch (e) {
     console.warn('[Manager] legacy migration failed: ' + e.message);
@@ -700,9 +723,12 @@ ipcMain.handle('audio:normaliseAll', async (event) => {
       if (!jsonMatch) throw new Error('could not parse loudnorm measurement');
       const m = JSON.parse(jsonMatch[0]);
 
-      // Pass 2: apply correction with measured values + force mono + iOS16-safe
-      const filterArgs = [
-        'loudnorm',
+      // Pass 2: apply correction with measured values + force mono + iOS16-safe.
+      // ffmpeg filter syntax is `name=param1=value:param2=value` — the FIRST
+      // separator after the filter name must be `=`, not `:`, otherwise the
+      // whole string is parsed as a different filter and you get
+      // "Error parsing a filter description around:" for every file.
+      const filterArgs = 'loudnorm=' + [
         'I=-10',
         'TP=-1',
         'LRA=5',
