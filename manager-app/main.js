@@ -477,7 +477,11 @@ ipcMain.handle('git:deploy', async () => {
 //
 // Progress is streamed to the renderer via 'audio:progress' webContents events.
 
-const NORMALISE_VERSION = 'v1-I-10-LRA5-TP-1'; // bump if loudnorm params change
+// v2: switched away from loudnorm pass-2 (whose envelope-follower causes an
+// audible ramp at the start of quiet songs when linear mode silently falls
+// back to dynamic). Now uses measure→single-gain→limiter, which is ramp-free.
+// Bumping the version reprocesses every track on the next Normalise run.
+const NORMALISE_VERSION = 'v2-gain-comp-limit-I-10';
 const AUDIO_STATE_FILE = 'audio-state.json'; // at GIGALATOR_ROOT, tracked in git
 const MONO_BACKUP_DIR = 'tracks/_original_stereo';
 const NORM_BACKUP_DIR = 'tracks/_pre_normalise';
@@ -655,8 +659,11 @@ ipcMain.handle('audio:monoAll', async (event) => {
         continue;
       }
 
-      // Convert to mono, 128k CBR, iOS16-safe headers (same flags as fix-ios16-track.sh)
+      // Convert to mono, 128k CBR, iOS16-safe headers (same flags as fix-ios16-track.sh).
+      // -vn drops any attached album-art image streams which would otherwise
+      // break the mp3 muxer with "Could not write header (incorrect codec parameters)".
       await safeReencode(ffmpegBin, absPath, MONO_BACKUP_DIR, [
+        '-vn',
         '-c:a', 'libmp3lame', '-b:a', '128k', '-ac', '1', '-ar', '44100',
         '-write_xing', '0', '-id3v2_version', '0', '-map_metadata', '-1',
         '-fflags', '+bitexact', '-flags', '+bitexact',
@@ -723,25 +730,34 @@ ipcMain.handle('audio:normaliseAll', async (event) => {
       if (!jsonMatch) throw new Error('could not parse loudnorm measurement');
       const m = JSON.parse(jsonMatch[0]);
 
-      // Pass 2: apply correction with measured values + force mono + iOS16-safe.
-      // ffmpeg filter syntax is `name=param1=value:param2=value` — the FIRST
-      // separator after the filter name must be `=`, not `:`, otherwise the
-      // whole string is parsed as a different filter and you get
-      // "Error parsing a filter description around:" for every file.
-      const filterArgs = 'loudnorm=' + [
-        'I=-10',
-        'TP=-1',
-        'LRA=5',
-        'measured_I=' + m.input_i,
-        'measured_TP=' + m.input_tp,
-        'measured_LRA=' + m.input_lra,
-        'measured_thresh=' + m.input_thresh,
-        'offset=' + m.target_offset,
-        'linear=true',
-        'print_format=summary',
-      ].join(':');
+      // Pass 2: compute a single linear gain to hit -10 LUFS, then apply
+      // a chain that has NO startup ramp:
+      //   acompressor → static volume gain → look-ahead brick-wall limiter
+      // The compressor reduces dynamic range (so loud and quiet sections sit
+      // closer together) without an envelope-follower attack at t=0 because
+      // it's at unity gain until signal exceeds threshold. The limiter only
+      // engages on peaks, so it doesn't touch quiet intros.
+      const TARGET_LUFS = -10;
+      const measuredI = parseFloat(m.input_i);
+      if (!Number.isFinite(measuredI)) {
+        throw new Error('measured loudness is invalid (' + m.input_i + ') — likely silent or corrupt file');
+      }
+      const gainDb = (TARGET_LUFS - measuredI).toFixed(2);
+      const filterArgs = [
+        // Gentle 2:1 compression above -20 dBFS to tame dynamic range —
+        // attack/release are fast enough to follow musical phrasing but
+        // not so fast they pump audibly. knee=6 smooths the transition.
+        'acompressor=threshold=-20dB:ratio=2:attack=20:release=250:knee=6:makeup=0dB',
+        // Single fixed gain — true linear, no envelope follower.
+        'volume=' + gainDb + 'dB',
+        // Brick-wall limiter at -1 dBTP catches any peaks that would clip
+        // after the gain. limit=0.891 ≈ -1 dB. Short attack to catch
+        // transients cleanly, modest release.
+        'alimiter=level_in=1:level_out=1:limit=0.891:attack=5:release=50',
+      ].join(',');
 
       await safeReencode(ffmpegBin, absPath, NORM_BACKUP_DIR, [
+        '-vn', // drop attached album-art so the mp3 muxer doesn't choke
         '-af', filterArgs,
         '-c:a', 'libmp3lame', '-b:a', '128k', '-ac', '1', '-ar', '44100',
         '-write_xing', '0', '-id3v2_version', '0', '-map_metadata', '-1',
