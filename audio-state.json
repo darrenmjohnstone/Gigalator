@@ -876,6 +876,24 @@
       "size": 3951804,
       "mtime": 1779258429700,
       "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/jack-diane.m4a": {
+      "mono": true,
+      "size": 4214700,
+      "mtime": 1779368905349,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/mental-as-anything-live-it-up-hq-g-122bpm-440hz.mp3": {
+      "mono": true,
+      "size": 3945534,
+      "mtime": 1779368909764,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/roadhouse-blues.m4a": {
+      "mono": true,
+      "size": 4238524,
+      "mtime": 1779368914427,
+      "normalised": "v2-gain-comp-limit-I-10"
     }
   }
 }
