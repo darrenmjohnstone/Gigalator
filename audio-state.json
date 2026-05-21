@@ -894,6 +894,108 @@
       "size": 4238524,
       "mtime": 1779368914427,
       "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/14-piano-man-as-made-famous-by-billy-joel-karaoke-version.m4a": {
+      "mono": true,
+      "size": 5490311,
+      "mtime": 1779372445694,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/3145-you-are-the-sunshine-of-my-life-jazz.m4a": {
+      "mono": true,
+      "size": 2495634,
+      "mtime": 1779372448772,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/3994-my-way-2.m4a": {
+      "mono": true,
+      "size": 4420754,
+      "mtime": 1779372454408,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/all-of-me.m4a": {
+      "mono": true,
+      "size": 2855915,
+      "mtime": 1779372457720,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/amore.m4a": {
+      "mono": true,
+      "size": 2271608,
+      "mtime": 1779372460402,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/autumn-leaves.m4a": {
+      "mono": true,
+      "size": 2970017,
+      "mtime": 1779372463968,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/bon-jovi-medley.m4a": {
+      "mono": true,
+      "size": 6985769,
+      "mtime": 1779372472594,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/december-63.m4a": {
+      "mono": true,
+      "size": 3628721,
+      "mtime": 1779372476914,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/delilah.m4a": {
+      "mono": true,
+      "size": 3350778,
+      "mtime": 1779372480914,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/feeling-good.m4a": {
+      "mono": true,
+      "size": 3939265,
+      "mtime": 1779372487072,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/ive-got-the-world-on-a-string.m4a": {
+      "mono": true,
+      "size": 2195539,
+      "mtime": 1779372489665,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/long-train-running.m4a": {
+      "mono": true,
+      "size": 3237929,
+      "mtime": 1779372493470,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/new-york-new-york.m4a": {
+      "mono": true,
+      "size": 3160189,
+      "mtime": 1779372497152,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/oz-home.m4a": {
+      "mono": true,
+      "size": 3282651,
+      "mtime": 1779372501140,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/tennessee-waltz.m4a": {
+      "mono": true,
+      "size": 2450494,
+      "mtime": 1779372504145,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/time-warp.m4a": {
+      "mono": true,
+      "size": 3351196,
+      "mtime": 1779372508031,
+      "normalised": "v2-gain-comp-limit-I-10"
+    },
+    "tracks/you-can-leave-your-hat-on.m4a": {
+      "mono": true,
+      "size": 4474671,
+      "mtime": 1779372513300,
+      "normalised": "v2-gain-comp-limit-I-10"
     }
   }
 }

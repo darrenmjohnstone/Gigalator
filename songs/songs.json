@@ -316,6 +316,7 @@
         "bad-moon-rising",
         "blinding-lights",
         "blister-in-the-sun",
+        "bon-jovi-medley",
         "boys-light-up",
         "brown-eyed-girl",
         "celebration",
@@ -336,10 +337,12 @@
         "is-this-love",
         "jack-and-dianne",
         "khe-sanh",
+        "live-it-up",
         "message-in-a-bottle",
         "proud-mary",
         "roadhouse-blues",
         "rock-dj",
+        "rude",
         "run-to-paradise",
         "she-will-be-loved",
         "still-got-the-blues",
@@ -349,9 +352,68 @@
         "sweet-home",
         "take-it-easy",
         "teenage-dirtbag",
+        "time-warp",
         "to-her-door",
         "ymca",
         "youre-the-voice"
+      ]
+    },
+    {
+      "id": "crooner",
+      "name": "Crooner",
+      "songs": [
+        "all-of-me-1779371207203",
+        "always-on-my-mind",
+        "amore",
+        "autumn-leaves-1779371349803",
+        "come-fly-with-me",
+        "delilah",
+        "feelin-good",
+        "fly-me",
+        "home",
+        "i-still-call-australia-home",
+        "i-ve-got-the-world-on-a-string",
+        "ive-got-you-under-my-skin",
+        "moondance",
+        "my-way",
+        "new-york-new-york",
+        "quando-quando-quando",
+        "she-believes-in-me",
+        "sway",
+        "sweet-caroline",
+        "the-lady-is-a-tramp",
+        "the-last-waltz",
+        "the-way-you-look-tonight",
+        "the-wonder-of-you",
+        "there-goes-my-everything",
+        "you-are-the-sunshine-of-me-life",
+        "you-raise-me-up",
+        "all-of-me-1779371207203",
+        "always-on-my-mind",
+        "amore",
+        "autumn-leaves-1779371349803",
+        "come-fly-with-me",
+        "delilah",
+        "feelin-good",
+        "fly-me",
+        "home",
+        "i-still-call-australia-home",
+        "i-ve-got-the-world-on-a-string",
+        "ive-got-you-under-my-skin",
+        "moondance",
+        "my-way",
+        "new-york-new-york",
+        "quando-quando-quando",
+        "she-believes-in-me",
+        "sway",
+        "sweet-caroline",
+        "the-lady-is-a-tramp",
+        "the-last-waltz",
+        "the-way-you-look-tonight",
+        "the-wonder-of-you",
+        "there-goes-my-everything",
+        "you-are-the-sunshine-of-me-life",
+        "you-raise-me-up"
       ]
     }
   ],
@@ -570,9 +632,10 @@
     "piano-man": {
       "title": "Piano Man",
       "artist": "Billy Joel",
-      "lyrics": "Dm   Dm       Ddim Ddim\n[INTRO]\n\n                                     Am     C    F    C    D    G                              Am     C\n\nF    G7     C    F    G           C    F    G         C    F    G\n\n     C       Em         Am        C    F                  C              D   G\nIt's nine o' clock on a Saturday.             The regular crowd shuffles in. \n           C        Em               Am          C             F           G7        C\nThere's an old man,          sittin' next to me,        makin' love to his tonic and gin.\n\nCEm     Am     C     F    G7     C    C    F    F\n\n         C           Em        Am      C          F          C           D    G\nHe says \"Son can you play me a memory.        I'm not really sure how it goes.\n         C            Em          Am         C           F        G7            C\nBut it's sad and it's sweet and I knew it complete, when I wore a younger man's clothes.\"\n\nAm                  D   F    Am                      G        F   G    Gadd       Em     G7\nLa  la  la  la  de  da.              La  la  le  de  daaaaah  da  dum.                   \n\n                                F          C      F         C      D      G\nSing     us a song,  you're the piano man.        Sing us a song tonight. \n           C          Em         Am      C          F             G7        C\nWell we're all in the mood for a melody,        and you've got us feelin' alright.\n\nCEm     Am     C     F    G7     C    F    G           C    F    G         C    F    G\n\n    C           Em       Am              C         F          C          D     G\nNow John at the bar is a friend of mine.        He gets me my drinks for free. \n         C            Em          Am            C                  F              G7          C   C    F    G\nAnd he's quick with a joke, or to light up your smoke, but there's someplace that he'd rather be.           \n\n         C         Em            F            C             F         C             D     G\nHe says \"Bill, I believe this is killing me.\"        As the smile ran away from his face. \n         C           Em         F           C         F           G7          C\n\"But I'm sure that I could be a movie star,        if I could get out of this place.\"\n\nAm                  D   F    Am                      G         F   G    F    C    G\nLa  la  la  la  de  da.              La  la  le  de  daaaaaah  da  dum.           \n\n    C         Em          Am        C          F         C          D     G\nNow Paul is a real estate novelist,        who never had time for a wife. \n         C            Em          F            Am        F        G7          C\nAnd he's talkin' with Davy, who's still in the navy, and probably will be for life.\n\nCEm     Am     C     F    G7     C    C    F    F\n\n                               Am        C             F           C          D       G\nAnd the waitress is practicing politics,        as the businessmen slowly get stoned. \n                                       Am                   F           G7         C\nYes they're sharing a drink  they call loneliness, but it's better than drinkin' a lone.\n\nAmC   D    F    Am     C    D    F    Am     C      D    D     G    F    Em     G7\n\n                                F                     F         C      D      G\nSing     us a song,  you're the piano man.            Sing us a song tonight. \n           C          Em         Am                    F             G7        C\nWell we're all in the mood for a melody,           and you've got us feelin' alright.\n\nCEm     Am     C     F    G7     C   F    G           C    F    G         C    F    G\n\n       C           Em          Am        C              F       C          D      G\nIt's a pretty good crowd for a Saturday,        and the manager gives me a smile. \n          C               Em              Am        C           F         G7         C      C    F    F\n'Cause he knows that it's me they've been coming to see,  to forget about life for a while.           \n\n                                  F         C             F          C             D     G\nAnd the piano,   it sounds like a carnival,       and the microphone smells like a beer. \n                                           F           C            F            G7        C      C\nAnd they sit         at the bar    and put bread in my jar and say \"Man what are you doin' here?\" \n\n    Am                  D   F    Am                      G        F   G    Gadd       Em     G7\nOh  la  la  la  la  de  da.              La  la  le  de  daaaaah  da  dum.                   \n\n                                F          C      F         C      D     G\nSing     us a song,  you're the piano man.        Sing us a song tonight.\n           C          Em         Am      C          F             G7        C\nWell we're all in the mood for a melody,        and you've got us feelin' alright.\n\nCEm     Am     C     F    G7     C   F    G           C    F    G\n\n       FCGaddC",
-      "track": null,
-      "fontSize": null
+      "lyrics": "**[Verse 1]**\n\nIt's nine o' clock on a Saturday. The regular crowd shuffles in.\nThere's an old man, sittin' next to me, makin' love to his tonic and gin.\n\nHe says \"Son can you play me a memory. I'm not really sure how it goes.\nBut it's sad and it's sweet and I knew it complete, when I wore a younger man's clothes.\"\n\nLa la la la de da. La la le de daaaaah da dum.\n\n**==[Chorus]==\nSing us a song, you're the piano man. Sing us a song tonight.\nWell we're all in the mood for a melody, and you've got us feelin' alright.**\n\n**[Verse 2]**\n\nNow John at the bar is a friend of mine. He gets me my drinks for free.\nAnd he's quick with a joke, or to light up your smoke, but there's someplace that he'd rather be.\n\nHe says \"Bill, I believe this is killing me.\" As the smile ran away from his face.\n\"But I'm sure that I could be a movie star, if I could get out of this place.\"\n\nLa la la la de da. La la le de daaaaaah da dum.\n\n**[Verse 3]**\n\nNow Paul is a real estate novelist, who never had time for a wife.\nAnd he's talkin' with Davy, who's still in the navy, and probably will be for life.\n\nAnd the waitress is practicing politics, as the businessmen slowly get stoned.\nYes they're sharing a drink they call loneliness, but it's better than drinkin' a lone.\n\n**==[Chorus]==\nSing us a song, you're the piano man. Sing us a song tonight.\nWell we're all in the mood for a melody, and you've got us feelin' alright.**\n\n**[Verse 4]**\n\nIt's a pretty good crowd for a Saturday, and the manager gives me a smile.\n'Cause he knows that it's me they've been coming to see, to forget about life for a while.\n\nAnd the piano, it sounds like a carnival, and the microphone smells like a beer.\nAnd they sit at the bar and put bread in my jar and say \"Man what are you doin' here?\"\n\nOh la la la la de da. La la le de daaaaah da dum.\n\n**==[Chorus]==\nSing us a song, you're the piano man. Sing us a song tonight.\nWell we're all in the mood for a melody, and you've got us feelin' alright.**",
+      "track": "tracks/14-piano-man-as-made-famous-by-billy-joel-karaoke-version.m4a",
+      "fontSize": 20,
+      "sheetSize": null
     },
     "pina-colada-song": {
       "title": "Pina Colada Song",
@@ -1028,8 +1091,9 @@
       "title": "Tennessee Waltz",
       "artist": "Patti Page",
       "lyrics": "I was dancin' with my darlin' to the Tennessee Waltz\nWhen an old friend I happened to see\nI introduced her to my loved one\nAnd while they were dancin'\nMy friend stole my sweetheart from me\n\nI remember the night and the Tennessee Waltz\nNow I know just how much I have lost\nYes, I lost my little darlin' the night they were playing\nThe beautiful Tennessee Waltz\n\nI was dancin' with my darlin' to the Tennessee Waltz\nWhen an old friend I happened to see\nI introduced her to my loved one\nAnd while they were dancin'\nMy friend stole my sweetheart from me\n\nI remember the night and the Tennessee Waltz\nNow I know just how much I have lost\nYes, I lost my little darlin' the night they were playing\nThe beautiful Tennessee Waltz",
-      "track": "tracks/tennessee-waltz.mp3",
-      "fontSize": null
+      "track": "tracks/tennessee-waltz.m4a",
+      "fontSize": 20,
+      "sheetSize": null
     },
     "you-raise-me-up": {
       "title": "You Raise Me Up",
@@ -2022,6 +2086,133 @@
       "artist": "Mental as Anything",
       "lyrics": "**[Verse 1]**\nHow can you see looking through those tears?\nDon't you know you're worth your weight in gold?\nI can't believe that you're alone in here\nLet me warm your hands against the cold\n\n**[Verse 2]**\nA close encounter with a hard-hearted man\nWho never gave half of what he got\nHas made you wish that you'd never been born\nThat's a shame 'cause you got the lot\n\n**==[Chorus]==\nHey there, you, with the sad face\nCome up to my place and live it up\nYou, beside the dance floor\nWhat do you cry for? Let's live it up**\n\n**[Verse 3]**\nIf you smiled the walls would fall down\nOn all the people in this pickup joint\nBut if you laughed you'd level this town\nHey lonely girl, that's just the point\n\n**==[Chorus]==\nHey there, you, with the sad face\nCome up to my place and live it up\nYou beside the dance floor\nWhat do you cry for? Let's live it up**\n\n**[Bridge]**\nJust answer me, the question, \"Why\nYou stand alone by the phone in the corner and cry?\"\n\n**[Guitar Solo]**\n\n**[Verse 1]**\nHow can you see looking through those tears?\nDon't you know you're worth your weight in gold?\nI can't believe that you're alone in here\nLet me warm your hands against the cold\n\n**[Verse 3]**\nIf you smiled the walls would fall down\nOn all the people in this pickup joint\nBut if you laughed, you'd level this town\nHey lonely girl, that's just the point\n\n**==[Chorus]==\nHey there, you, with the sad face\nCome up to my place and live it up\nYou beside the dance floor\nWhat do you cry for? Let's live it up**\n\n**[Post-Chorus]**\nLet's live it up\nLive it up\nMmm, live it up",
       "track": "tracks/mental-as-anything-live-it-up-hq-g-122bpm-440hz.mp3",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "december-63": {
+      "title": "December '63",
+      "artist": "Four Seasons",
+      "lyrics": "**[Verse 1]**\nOh, what a night,\nlate December back in sixty-three\nwhat a very special time for me,\nas I remember, what a night.\n\n**[Verse 2]**\nOh, what a night, you know I didn't even know her name,\nbut I was never gonna be the same;\nwhat a lady, what a night.\n\n**[Pre-Chorus]**\nOh, I, I got a funny feelin' when she walked in the room.\nOh my, as I recall it ended much too soon.\n\n**==[Chorus]==\nOh what a night hypnotizin' mesmerizing me,\nshe was ev'rything I dreamed she'd be;\nsweet surrender, what a night.**\n\n**[Verse 3]**\nI felt a rush like a rollin' ball of thunder,\nspinnin' my head around n' takin' my body under.\nOh, what a night.\n\n**[Bridge]**\nWhy'd it take so long to see the light,\nSeemed so wrong, but now it seems so right.\nWhat a lady, what a night.\n\n**[Verse 4]**\nI felt a rush like a rollin' ball of thunder,\nspinnin' my head around n' takin' my body under.\n\n**[Outro]**\nOh what a night!\nOh what a night!\nOh what a night!\nOh what a night!\nOh what a night!",
+      "track": "tracks/december-63.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "delilah": {
+      "title": "Delilah",
+      "artist": "Tom Jones",
+      "lyrics": "**[Verse 1]**\nI saw the light on the night that I passed by her window\nI saw the flickering shadow of love on her blind\nShe was my woman\nAs she deceived me I watched and went out of my mind\n\n**==[Chorus]==\nMy, my, my Delilah\nWhy, why, why Delilah\nI could see, that girl was no good for me\nBut I was lost like a slave that no man could free**\n\n**[Verse 2]**\nAt break of day when that man drove away I was waiting\nI crossed the street to her house and she opened the door\nShe stood there laughing\nI felt the knife in my hand and she laughed no more\n\n**==[Chorus]==\nMy, my, my Delilah\nWhy, why, why Delilah\nSo before they come to break down the door\nForgive me Delilah I just couldn't take anymore**\n\n**[Bridge]**\nShe stood there laughing\nI felt the knife in my hand and she laughed no more\n\n**==[Chorus]==\nMy, my, my Delilah\nWhy, why, why Delilah\nSo before they come to break down the door\nForgive me Delilah I just couldn't take anymore\nForgive me Delilah I just couldn't take anymore**",
+      "track": "tracks/delilah.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "long-train-running-1779369534448": {
+      "title": "Long train running",
+      "artist": "The Doobie Brothers",
+      "lyrics": "[Verse 1]\nDown around the corner, half a mile from here\nYou see them long trains runnin' and you watch 'em disappear\n\n[Chorus]\nWithout love\nWhere would you be now?\nWithout love\n\n[Verse 2]\nYou know, I saw Miss Lucy down along the tracks\nShe lost her home and her family and she won't be coming back\n\n[Chorus]\nWithout love\nWhere would you be right now?\nWithout love\n\n[Verse 3]\nWell, the Illinois Central and the Southern Central Freight\nGot to keep on pushin', mama, 'cause you know they're runnin' late\n\n[Chorus]\nWithout love\nWhere would you be now, na-na-now?\nWithout love\nSee The Doobie Brothers Live\nGet tickets as low as $39\n\nYou might also like\nFlorida!!!\nTaylor Swift\nSo Long, London\nTaylor Swift\nListen to the Music\nThe Doobie Brothers\n\n[Harmonica Solo]\n\n[Verse 3]\nWell, the Illinois Central and the Southern Central Freight\nGot to keep on pushin', mama, 'cause you know they're runnin' late\n\n[Chorus]\nWithout love\nWhere would you be now?\nWithout love\n\n[Verse 4]\nWell, pistons keep on churnin' and the wheels go 'round and 'round\nAnd the steel rails lie cold and hard on the mountains they go down\n\n[Chorus]\nWithout love\nWhere would you be right now?\nWithout love\nOoh, where would you be now?\n\n[Outro]\nMmm, got to get you, baby, baby, won't you move it down?\nWon't you move it down?\nBaby, baby, baby, baby, won't you move it down?\nWhen the big train run\nWhen the train is movin' on\nI got to keep on movin'\nKeep on movin'\nWon't you keep on movin'?\nGonna keep on movin'",
+      "track": "tracks/long-train-running.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "new-york-new-york": {
+      "title": "New York New York",
+      "artist": "Frank Sinatra",
+      "lyrics": "**[Verse 1]**\nStart spreading the news, you're leaving today, tell 'em, Frank\nI want to be a part of it, New York, New York\nYour vagabond shoes, they are longing to stray\nAnd step around the heart of it, New York, New York\n\n**==[Chorus]==\nI wanna wake up in that city that doesn't sleep\nAnd find your king of the hill, top of the heap\nYour small town blues, they are melting away\nI'm gonna make a brand-new start of it in old New York\nYou always make it there, you make it anywhere\nIt's up to you, New York, New York**\n\n**[Bridge]**\nTa-ta, ta-da-da (hey!)\nTa-ta, ta-da-da, doh-reh\nTa-da-da-da-da\nPa-pa-pa-pa\nIn New York, New York\n\n**==[Chorus]==\nI wanna wake up in that city that doesn't sleep\nAnd find I'm king of the hill, top of the list, you bet\nAnd I'm the right, king of the heap\nThese are little town blues, they have all melted away\nAnd I'm gonna make a brand-new start of it\nRight there in old New York, you better believe it, folks\nYou always make it there, you make it anywhere\nCome on, come through, New York, New York**\n\n**[Outro]**\nNew York",
+      "track": "tracks/new-york-new-york.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "i-still-call-australia-home": {
+      "title": "I still Call Australia Home",
+      "artist": "Peter Allen",
+      "lyrics": "**[Verse 1]**\nI've been to cities that never close down\nFrom New York to Rio and old London town\nBut no matter how far\nOr how wide I roam\nI still call Australia home\n\n**[Verse 2]**\nI'm always travelin'\nAnd I love bein' free\nSo I keep leavin' the sun and the sea\nBut my heart lies waiting over the foam\nI still call Australia home\n\n**[Bridge]**\nAll the sons and daughters spinning 'round the world\nAway from their families and friends\nAh, but as the world gets older and colder\nIt's good to know where your journey ends\n\n**[Verse 3]**\nAnd someday we'll all be together once more\nWhen all the ships come back to the shore\nThen I realize something I've always known\nI still call Australia home\n\n**[Outro]**\nNo matter how far\nOr how wide I roam\nI still call Australia home",
+      "track": "tracks/oz-home.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "time-warp": {
+      "title": "Time Warp",
+      "artist": "Musical",
+      "lyrics": "**[Verse 1]**\nIt's astounding\nTime is fleeting\nMadness takes its toll\nBut listen closely\nNot for very much longer\nI've got to keep control\n\n**[Verse 2]**\nI remember doing the Time Warp\nDrinking those moments when\nThe blackness would hit me\nAnd the void would be calling\n\n**==[Chorus]==\nLet's do the Time Warp again\nLet's do the Time Warp again\nIt's just a jump to the left\nAnd then a step to the right\nPut your hands on your hips\nYou bring your knees in tight\nBut it's the pelvic thrust\nThat really drives you insane\nLet's do the Time Warp again\nLet's do the Time Warp again**\n\n**[Verse 3]**\nIt's so dreamy\nOh, fantasy free me\nSo you can't see me\nNo, not at all\nIn another dimension\nWith voyeuristic intention\nWell-secluded\nI see all\n\n**[Verse 4]**\nWith a bit of a mind flip\nYou're into the time slip\nAnd nothing can ever be the same\nYou're spaced out on sensation\nLike you're under sedation\n\n**==[Chorus]==\nLet's do the Time Warp again\nLet's do the Time Warp again**\n\n**[Verse 5]**\nWell, I was walking down the street just a-having a think\nWhen a snake of a guy gave me an evil wink\nHe shook-a me up, he took me by surprise\nHe had a pickup truck and the devil's eyes\nHe stared at me and I felt a change\nTime meant nothing, never would again\n\n**==[Chorus]==\nLet's do the Time Warp again\nLet's do the Time Warp again\nIt's just a jump to the left\nAnd then a step to the right\nPut your hands on your hips\nYou bring your knees in tight\nBut it's the pelvic thrust\nThat really drives you insane\nLet's do the Time Warp again\nLet's do the Time Warp again**",
+      "track": "tracks/time-warp.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "new-song-1779370263020": {
+      "title": "You Can Leave your hat On",
+      "artist": "Jo Cocker",
+      "lyrics": "",
+      "track": "tracks/you-can-leave-your-hat-on.m4a",
+      "fontSize": 20
+    },
+    "bon-jovi-medley": {
+      "title": "Bon Jovi Medley",
+      "artist": "Bon Jovi",
+      "lyrics": "**[Verse 1]**\nTommy used to work on the docks, union's been on strike\nHe's down on his luck, it's tough, so tough\nGina works the diner all day, working for her man\nShe brings home her pay, for love, mmm, for love\n\n**[Pre-Chorus]**\nShe says, \"We've gotta hold on to what we've got\nIt doesn't make a difference if we make it or not\nWe've got each other and that's a lot for love\nWe'll give it a shot\"\n\n**==[Chorus]==\nWhoa, we're half way there\nWhoa oh, livin' on a prayer\nTake my hand, we'll make it, I swear\nWhoa oh, livin' on a prayer**\n\nShot through the heart and you're to blame\nYou give love a bad name.\n\n**[Verse]**\nAn angel's smile is what you sell\nYou promised me heaven, then put me through hell\nChains of love got a hold on me\nWhen passion's a prison, you can't break free\n\n**[Pre-Chorus]**\nWoah, you're a loaded gun, yeah\nOh, there's nowhere to run\nNo one can save me, the damage is done\n\n**==[Chorus]==\nShot through the heart and you're to blame\nYou give love a bad name (Bad name)\nI play my part and you play your game\nYou give love a bad name (Bad name)\nYeah, you give love a bad name**\n\n__**It's My Life**__\n\nThis ain't a song for the broken-hearted\nNo silent prayer for the faith-departed\nI ain't gonna be just a face in the crowd\nYou're gonna hear my voice\nWhen I shout it out loud\n\n**==[Chorus]==\nIt's my life\nIt's now or never\nI ain't gonna live forever\nI just want to live while I'm alive\nIt's my life\nMy heart is like the open highway\nLike Frankie said, \"I did it my way\"\nI just want to live while I'm alive\nIt's my life**\n\n**[Bridge]**\nThis is for the ones who stood their ground\nIt's for Tommy and Gina who never backed down\nTomorrow's getting harder, make no mistake\nLuck ain't enough, you've got to make your own breaks\n\n**==[Chorus]==\nIt's my life\nIt's now or never\nI ain't gonna live forever\nI just want to live while I'm alive\nIt's my life\nMy heart is like the open highway\nLike Frankie said, \"I did it my way\"\nI just want to live while I'm alive\nIt's my life**\n\n**[Outro]**\nYou better stand tall when they're calling you out\nDon't bend, don't break, baby, don't back down\n\n**==[Chorus]==\nIt's my life\nIt's now or never\nI ain't gonna live forever\nI just want to live while I'm alive\nIt's my life\nMy heart is like the open highway\nLike Frankie said, \"I did it my way\"\nI just want to live while I'm alive\nIt's my life**",
+      "track": "tracks/bon-jovi-medley.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "all-of-me-1779371207203": {
+      "title": "All of Me",
+      "artist": "Jazz Standard",
+      "lyrics": "All of me, why not take all of me?\nCan't you see I'm no good without you?\nTake my lips, I want to lose them\nTake my arms, I'll never use them\nYour goodbye left me with eyes that cry\nHow can I go on, dear, without you?\nYou took the part that once was my heart\nSo why not take all of me?",
+      "track": "tracks/all-of-me.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "amore": {
+      "title": "Amore",
+      "artist": "Deam Martin",
+      "lyrics": "**==[Chorus]==\nWhen the moon hits your eye\nLike a big pizza pie, that's amore\nWhen the world seems to shine\nLike you've had too much wine, that's amore\nBells will ring, ting-a-ling-a-ling\nTing-a-ling-a-ling and you'll sing, \"Vita bella\"\nHearts will play tippy-tippy-tay, tippy-tippy-tay\nLike a gay tarantella**\n\n**[Verse]**\nWhen the stars make you drool\nJust like a pasta e fasule, that's amore\nWhen you dance down the street\nWith a cloud at your feet, you're in love\nWhen you walk in a dream\nBut you know, you're not dreaming, signore\nScusami, but you see\nBack in old Napoli, that's amore\n\n**==[Chorus]==\nWhen the moon hits your eye\nLike a big pizza pie, that's amore\nWhen the world seems to shine\nLike you've had too much wine, that's amore\nBells will ring ting-a-ling-a-ling\nTing-a-ling-a-ling and you'll sing, \"Vita bella, vita bell-, vita bella\"\nHearts will play tippy-tippy-tay, tippy-tippy-tay\nLike a gay tarantella**",
+      "track": "tracks/amore.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "autumn-leaves-1779371349803": {
+      "title": "Autumn Leaves",
+      "artist": "Jazz Standard",
+      "lyrics": "The falling leaves drift by the window\nThe autumn leaves of red and gold\nI see your lips, the summer kisses\nThe sun-burned hands I used to hold\nSince you went away the days grow long\nAnd soon I'll hear old winter's song\nBut I miss you most of all my darling\nWhen autumn leaves start to fall",
+      "track": "tracks/autumn-leaves.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "come-fly-with-me": {
+      "title": "Come Fly With Me",
+      "artist": "Frank Sinatra",
+      "lyrics": "**[Verse 1]**\nCome fly with me, let's fly, let's fly away\nIf you can use some exotic booze, there's a bar in far Bombay\nCome on and fly with me, let's fly, let's fly away\n\n**[Verse 2]**\nCome fly with me, let's float down to Peru\nIn llama land, there's a one man band\nAnd he'll toot his flute for you\nCome on fly with me, let's take off in the blue\n\n**[Bridge 1]**\nOnce I get you up there, where the air is rarefied\nWe'll just glide, starry-eyed\nOnce I get you up there, I'll be holding you so near\nYou may hear all angels cheer because we're together\n\n**[Verse 3]**\nWeather wise, it's such a lovely day\nJust say the words and we'll beat the birds down to Acapulco Bay\nIt's perfect for a flying honeymoon, they say\nCome fly with me, let's fly, let's fly away\n\n**[Bridge 2]**\nOnce I get you up there, where the air is rarefied\nWe'll just glide, starry-eyed\nOnce I get you up there, I'll be holding you so very near\nYou might even hear a whole gang cheers just because we're together\n\n**[Outro]**\nWeather wise, it's such a coo-coo day\nYou just say those words and we'll take our birds down to Acapulco Bay\nIt's so perfect for a flying honeymoon, oh, babe\nCome fly with me, let's fly, let's fly\nPack up, let's fly away\nAnd don't tell yo' mama",
+      "track": null,
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "feelin-good": {
+      "title": "Feelin' Good",
+      "artist": "Michael Buble",
+      "lyrics": "**[Verse 1]**\nBirds flying high, you know how I feel\nSun in the sky, you know how I feel\nBreeze driftin' on by, you know how I feel\n\n**==[Chorus]==\nIt's a new dawn, it's a new day\nIt's a new life, for me\nAnd I'm feeling good\nI'm feeling good**\n\n**[Verse 2]**\nFish in the sea, you know how I feel\nRiver running free, you know how I feel\nBlossom on a tree, you know how I feel\n\n**==[Chorus]==\nIt's a new dawn, it's a new day\nIt's a new life, for me\nAnd I'm feeling good**\n\n**[Verse 3]**\nDragonfly out in the sun\nYou know what I mean, don't you know?\nButterflies all havin' fun\nYou know what I mean\nSleep in peace when day is done, that's what I mean",
+      "track": "tracks/feeling-good.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "i-ve-got-the-world-on-a-string": {
+      "title": "I've Got the World on a String",
+      "artist": "Frank Sinatra",
+      "lyrics": "**==[Chorus]==\nI've got the world on a string\nSitting on a rainbow\nGot the string around my finger\nWhat a world, what a life, I'm in love**\n\n**[Verse 1]**\nI've got a song that I sing\nI can make the rain go\nAnytime I move my finger\nLucky me, can't you see, I'm in love\n\n**[Pre-Chorus]**\nLife is a beautiful thing\nAs long as I hold the string\nI'd be a silly so-and-so\nIf I should ever let it go\n\n**==[Chorus]==\nI've got the world on a string\nSitting on a rainbow\nGot the string around my finger\nWhat a world, what a life, I'm in love**\n\n**[Pre-Chorus]**\nLife is a beautiful thing\nAs long as I hold the string\nI'd be a silly so-and-so\nIf I should ever let it go",
+      "track": "tracks/ive-got-the-world-on-a-string.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "my-way": {
+      "title": "My Way",
+      "artist": "Frank Sinatra",
+      "lyrics": "**[Verse 1]**\n\nAnd now, the end is near\nAnd so I face the final curtain\nMy friend, I'll say it clear\nI'll state my case, of which I'm certain\nI've lived a life that's full\nI traveled each and every highway\nAnd more, much more than this\nI did it my way\n\n**[Verse 2]**\n\nRegrets, I've had a few\nBut then again, too few to mention\nI did what I had to do\nAnd saw it through without exemption\nI planned each charted course\nEach careful step along the byway\nAnd more, much more than this\nI did it my way\n\n**==[Chorus]==\nYes, there were times, I'm sure you knew\nWhen I bit off more than I could chew\nBut through it all, when there was doubt\nI ate it up and spit it out\nI faced it all, and I stood tall\nAnd did it my way**\n\n**[Verse 3]**\n\nI've loved, I've laughed and cried\nI've had my fill, my share of losing\nAnd now, as tears subside\nI find it all so amusing\nTo think I did all that\nAnd may I say, not in a shy way\nOh, no, oh, no, not me\nI did it my way\n\n**==[Chorus]==\nFor what is a man, what has he got?\nIf not himself, then he has naught\nTo say the things he truly feels\nAnd not the words of one who kneels\nThe record shows I took the blows\nAnd did it my way**\n\n**[Outro]**\n\nYes, it was my way",
+      "track": "tracks/3994-my-way-2.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "you-are-the-sunshine-of-me-life": {
+      "title": "You are the Sunshine of me Life",
+      "artist": "Frank Sinatra",
+      "lyrics": "You are the sunshine of my life\nThat's why I'll always be around\nYou are the apple of my eye\nForever you'll stay in my heart\nI feel like this is the beginning\nThough I've loved you for a million years\nAnd if I thought our love was ending\nI'd find myself drowning in my own tears\nYou are the sunshine of my life\nThat's why I'll always stay around\nYou are the apple of my eye\nForever you'll stay in my heart\nYou must have known that I was lonely\nBecause you came to my rescue\nAnd I know that this must be heaven\nHow could so much love be inside of you?\nYou are the sunshine of my life, yeah\nThat's why I'll always stay around\nYou are the apple of my eye\nForever you'll stay in my heart\nLove has joined us\nLove has joined us\nLet's think sweet love",
+      "track": "tracks/3145-you-are-the-sunshine-of-my-life-jazz.m4a",
       "fontSize": 20,
       "sheetSize": null
     }
