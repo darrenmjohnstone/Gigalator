@@ -2735,7 +2735,10 @@
         + '<input type="text" id="setlist-name" value="' + escAttr(sl.name) + '">'
         + '</div>'
         + '<div class="form-group">'
-        + '<label>Songs in Setlist (' + sl.songs.length + ')</label>'
+        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+        + '<label style="margin:0;flex:1">Songs in Setlist (' + sl.songs.length + ')</label>'
+        + '<button class="btn btn-sm" id="alphabetise-btn" title="Sort songs A–Z by title (click Save Changes to persist)">A&ndash;Z</button>'
+        + '</div>'
         + '<div class="setlist-songs" id="setlist-songs">'
         + (songsHtml || '<div style="padding:16px;text-align:center;color:var(--text-dim)">No songs yet</div>')
         + '</div>'
@@ -2788,6 +2791,31 @@
           showSetlistEditor(setlistId);
         });
       });
+
+      // Alphabetise — sort the in-memory setlist songs by title (case-
+      // insensitive, locale-aware). Missing songs sink to the bottom so
+      // they're visible and easy to remove. User must hit Save Changes
+      // to persist — no auto-save, in case the click was accidental.
+      var alphaBtn = document.getElementById('alphabetise-btn');
+      if (alphaBtn) {
+        alphaBtn.addEventListener('click', function () {
+          if (sl.songs.length < 2) return;
+          sl.songs.sort(function (a, b) {
+            var sa = data.songs[a], sb = data.songs[b];
+            if (!sa && !sb) return 0;
+            if (!sa) return 1;
+            if (!sb) return -1;
+            return (sa.title || '').localeCompare(sb.title || '', undefined, { sensitivity: 'base' });
+          });
+          showSetlistEditor(setlistId);
+          // Nudge: flag the save button so user knows there's an unsaved change
+          var save = document.getElementById('save-setlist-btn');
+          if (save) {
+            save.textContent = 'Save Changes *';
+            save.classList.add('btn-primary');
+          }
+        });
+      }
 
       // Song picker — search filter
       document.getElementById('song-picker-search').addEventListener('input', function () {

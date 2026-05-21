@@ -14,14 +14,12 @@
         "imagine",
         "passenger",
         "space-oddity",
-        "sweet-child-o-mine",
         "sweet-child-of-mine",
         "dreams",
         "kiss-from-a-rose",
         "youre-got-a-friend",
         "hey-there-delilah",
         "fire-and-rain",
-        "have-you-ever-seen-the-rain-creedence-clearwater-revival",
         "over-the-rainbow",
         "moondance",
         "perfect"
@@ -61,7 +59,8 @@
         "message-to-my-girl",
         "sweet-caroline",
         "to-her-door",
-        "midnight-hour"
+        "midnight-hour",
+        "i-m-yours"
       ]
     },
     {
@@ -70,8 +69,9 @@
       "songs": [
         "as-it-was",
         "blinding-lights",
-        "don-t-change",
         "celebration",
+        "don-t-change",
+        "live-it-up",
         "teenage-dirtbag"
       ]
     },
@@ -185,7 +185,6 @@
         "superstition",
         "sway",
         "sweet-caroline",
-        "sweet-child-o-mine",
         "sweet-home",
         "take-it-easy",
         "tennessee-waltz",
@@ -305,6 +304,54 @@
         "santa-claus-is-coming-to-town",
         "so-this-is-christmas",
         "angels-on-high"
+      ]
+    },
+    {
+      "id": "electric",
+      "name": "Electric",
+      "songs": [
+        "am-i-ever-gonna-see-your-face-again",
+        "april-sun-in-cuba",
+        "as-it-was",
+        "bad-moon-rising",
+        "blinding-lights",
+        "blister-in-the-sun",
+        "boys-light-up",
+        "brown-eyed-girl",
+        "celebration",
+        "cheap-wine",
+        "don-t-change",
+        "dont-dream-its-over",
+        "don-t-stop-believin-journey",
+        "down-under",
+        "eagle-rock",
+        "every-breath-you-take",
+        "flame-trees",
+        "fresh-eyes",
+        "hurts-so-good",
+        "im-a-believer",
+        "500-miles",
+        "i-m-yours",
+        "midnight-hour",
+        "is-this-love",
+        "jack-and-dianne",
+        "khe-sanh",
+        "message-in-a-bottle",
+        "proud-mary",
+        "roadhouse-blues",
+        "rock-dj",
+        "run-to-paradise",
+        "she-will-be-loved",
+        "still-got-the-blues",
+        "summer-of-69",
+        "sunday-morning",
+        "superstition",
+        "sweet-home",
+        "take-it-easy",
+        "teenage-dirtbag",
+        "to-her-door",
+        "ymca",
+        "youre-the-voice"
       ]
     }
   ],
@@ -1527,13 +1574,6 @@
       "track": "tracks/ring-of-fire.mp3",
       "fontSize": null
     },
-    "sweet-child-o-mine": {
-      "title": "Sweet Child O' Mine",
-      "artist": "Guns N' Roses",
-      "lyrics": "DCadd9GD\n\nD\nShe's got a smile that it seems to me\nCadd9\nReminds me of childhood memories\nG\nWhere everything\nD\nWas as fresh as the bright blue sky\nNow and then when I see her face\nCadd9\nShe takes me away to that special place\nG\nAnd if I feel too long\nD\nI'd probably break down and cry\n\nA         C                    D\nWhoa, whoa, whoa, sweet child o' mine\nWhoa oh, oh oh, sweet love o' mine\n\nDCadd9GCm7\nDbm7\nD\n\nD\nShe's got eyes of the bluest skies\nCadd9\nAs if they thought of rain\nGm7\nI hate to look into those eyes\nD\nAnd see an ounce\nHer hair reminds me of a warm safe place\nCadd9\nWhere as a child I'd hide\nG\nAnd pray to feel the thunder\nD\nTo quietly pass me by\n\nGm7\n\nA         C                    D\nWhoa, whoa, whoa, sweet child o' mine\nA        C                    D\nWhoa oh, oh oh, sweet love o' mine\n\nDCadd9GDD\nCadd9GGm7\nDbm7\nD\n\nA         C               DA\nWhoa oh, oh oh, sweet child o' mine\nWhoa oh, oh oh, oh sweet love o' mine\nWhoa oh, oh oh, sweet child o' mine\nOh yeah yeah\nOh sweet love o' mine\n\nEmCB7Am\n- - - -\n\nEm7\n\nEmEmGACD\n\nEmGACDEm7\nWhere do we go\nOh, where do we go now\nWhere do you feel\nWhere do we go now?\nAih aih, aih, aih, aih, ai, aih aih\nWhere do you feel now? Ah aih aw aw aw aw\n\nEmGACDEm7\nWhere do you feel like\nAh where do we go now\nAh where do we go\nWhere do we go now\nWhere do we go\nWhere do we go now?\nNo no no no no no no\nSweet child\nSweet child of mine",
-      "track": null,
-      "fontSize": null
-    },
     "take-it-easy": {
       "title": "Take It Easy",
       "artist": "The Eagles",
@@ -1958,6 +1998,30 @@
       "artist": "Wheatus",
       "lyrics": "**[Verse 1]**\nHer name is Noelle, I have a dream about her\nShe rings my bell, I got gym class in half an hour\nOh, how she rocks in Keds and tube socks\nBut she doesn't know who I am, and she doesn't give a damn about me\n\n**==[Chorus]==\n'Cause I'm just a teenage dirtbag, baby\nYeah, I'm just a teenage dirtbag, baby\nListen to Iron Maiden, baby, with me, ooh**\n\n**[Verse 2]**\nHer boyfriend's a dick and he brings a gun to school\nAnd he'd simply kick my ass if he knew the truth\nHe lives on my block, and he drives an IROC\nBut he doesn't know who I am, and he doesn't give a damn about me\n\n**==[Chorus]==\n'Cause I'm just a teenage dirtbag, baby\nYeah, I'm just a teenage dirtbag, baby\nListen to Iron Maiden, baby, with me, ooh**\n\n**[Refrain]**\nOh, yeah, dirtbag\nNo, she doesn't know what she's missin'\nOh, yeah, dirtbag\nNo, she doesn't know what she's missin'\n\n**[Verse 3]**\nMan, I feel like mold, it's prom night and I am lonely\nLo and behold, she's walkin' over to me\nThis must be fake, my lip starts to shake\nHow does she know who I am? And why does she give a damn about me?\n\n**[Bridge]**\nI've got two tickets to Iron Maiden, baby\nCome with me Friday, don't say maybe\nI'm just a teenage dirtbag, baby, like you, ooh\n\n**[Refrain]**\nOh, yeah, dirtbag\nNo, she doesn't know what she's missin'\nOh, yeah, dirtbag\nNo, she doesn't know what she's missin'",
       "track": "tracks/wheatus-teenage-dirtbag-e-95bpm-440hz.mp3",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "jack-and-dianne": {
+      "title": "Jack and Dianne",
+      "artist": "John Mellencamp",
+      "lyrics": "**[Verse 1]**\nLittle ditty 'bout Jack and Diane\nTwo American kids growin' up in the heartland\nJacky gon' be a football star\nDiane's debutante backseat of Jacky's car\n\n**[Verse 2]**\nSuckin' on a chili dog outside the Tastee Freez\nDiane's sittin' on Jacky's lap, he's got his hands between her knees\nJacky say, \"Hey, Diane, let's run off behind a shady tree\nDribble off those Bobby Brooks, let me do what I please\"\n\n**==[Chorus]==\nSay uh, oh, yeah, life goes on\nLong after the thrill of livin' is gone\nSay, oh, yeah, life goes on\nLong after the thrill of livin' is gone\nThey walk on**\n\n**[Verse 3]**\nJacky sits back, collects his thoughts for the moment\nScratches his head and does his best James Dean\n\"Well then, there Diane, we oughta run off to the city\"\nDiane says, \"Baby, you ain't missin' a thing\"\n\n**==[Chorus]==\nBut Jacky say uh, \"Oh, yeah, life goes on\nLong after the thrill of livin' is gone\"\nOh, yeah, they say life goes on\nLong after the thrill of livin' is gone**\n\n**[Bridge]**\nSo let it rock, let it roll\nLet the Bible Belt come and save my soul\nHoldin' on to sixteen as long as you can\nChanges come around real soon, make us women and men\n\n**==[Chorus]==\nOh, yeah, life goes on\nLong after the thrill of livin' is gone\nOh, yeah, they say life goes on\nLong after the thrill of livin' is gone**\n\n**[Outro]**\nA little ditty 'bout Jack and Diane\nTwo American kids doin' the best they can",
+      "track": "tracks/jack-diane.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "roadhouse-blues": {
+      "title": "Roadhouse Blues",
+      "artist": "The Doors",
+      "lyrics": "**[Verse 1]**\nA-keep your eyes on the road, your hand upon the wheel\nKeep your eyes on the road, your hand upon the wheel\nYeah, we're going to the Roadhouse, gonna have a real\nA-good time\n\n**[Verse 2]**\nYeah, the back of the Roadhouse, they got some bungalows\nYeah, the back of the Roadhouse, they got some bungalows\nAnd that's for the people who like to go down slow\n\n**==[Chorus]==\nLet it roll, baby, roll\nLet it roll, baby, roll\nLet it roll, baby, roll\nLet it roll\nAll night long**\n\n**[Guitar Solo]**\nDo it, Robby, do it\n\n**[Bridge]**\nYou gotta roll, roll, roll, you gotta thrill my soul, alright\nRoll, roll, roll, roll, a-thrill my soul\nDa-ga-da-beep-a-con-ja-choo-chon, honk, honk, honk\nA-don-ta, ee-cha-koo-na-nee-cha\nBop-a-loo-la-ree-chow\nBomp-a-kee-cho, ee-sonk-konk\nYeah, ride\nAshen lady\nAshen lady\nGive up your vows\nGive up your vows\nSave our city\nSave our city\nRight now",
+      "track": "tracks/roadhouse-blues.m4a",
+      "fontSize": 20,
+      "sheetSize": null
+    },
+    "live-it-up": {
+      "title": "Live it Up",
+      "artist": "Mental as Anything",
+      "lyrics": "**[Verse 1]**\nHow can you see looking through those tears?\nDon't you know you're worth your weight in gold?\nI can't believe that you're alone in here\nLet me warm your hands against the cold\n\n**[Verse 2]**\nA close encounter with a hard-hearted man\nWho never gave half of what he got\nHas made you wish that you'd never been born\nThat's a shame 'cause you got the lot\n\n**==[Chorus]==\nHey there, you, with the sad face\nCome up to my place and live it up\nYou, beside the dance floor\nWhat do you cry for? Let's live it up**\n\n**[Verse 3]**\nIf you smiled the walls would fall down\nOn all the people in this pickup joint\nBut if you laughed you'd level this town\nHey lonely girl, that's just the point\n\n**==[Chorus]==\nHey there, you, with the sad face\nCome up to my place and live it up\nYou beside the dance floor\nWhat do you cry for? Let's live it up**\n\n**[Bridge]**\nJust answer me, the question, \"Why\nYou stand alone by the phone in the corner and cry?\"\n\n**[Guitar Solo]**\n\n**[Verse 1]**\nHow can you see looking through those tears?\nDon't you know you're worth your weight in gold?\nI can't believe that you're alone in here\nLet me warm your hands against the cold\n\n**[Verse 3]**\nIf you smiled the walls would fall down\nOn all the people in this pickup joint\nBut if you laughed, you'd level this town\nHey lonely girl, that's just the point\n\n**==[Chorus]==\nHey there, you, with the sad face\nCome up to my place and live it up\nYou beside the dance floor\nWhat do you cry for? Let's live it up**\n\n**[Post-Chorus]**\nLet's live it up\nLive it up\nMmm, live it up",
+      "track": "tracks/mental-as-anything-live-it-up-hq-g-122bpm-440hz.mp3",
       "fontSize": 20,
       "sheetSize": null
     }
