@@ -1368,9 +1368,35 @@
           Already-processed tracks are skipped automatically.
         </p>
         <div id="audio-status" class="modal-help" style="margin-bottom:10px"></div>
-        <div class="modal-row" style="gap:8px">
+
+        <details style="margin:8px 0 12px">
+          <summary style="cursor:pointer;font-size:13px;color:var(--text-dim, #666)">Normalisation settings</summary>
+          <div style="padding:10px 0 4px;display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center;font-size:13px">
+            <label for="norm-i">Target loudness</label>
+            <input type="range" id="norm-i" min="-16" max="-6" step="0.5">
+            <span id="norm-i-val" style="font-variant-numeric:tabular-nums;min-width:60px;text-align:right"></span>
+
+            <label for="norm-ratio">Compression</label>
+            <input type="range" id="norm-ratio" min="1" max="6" step="0.5">
+            <span id="norm-ratio-val" style="font-variant-numeric:tabular-nums;min-width:60px;text-align:right"></span>
+
+            <label for="norm-threshold">Compressor threshold</label>
+            <input type="range" id="norm-threshold" min="-30" max="-10" step="1">
+            <span id="norm-threshold-val" style="font-variant-numeric:tabular-nums;min-width:60px;text-align:right"></span>
+          </div>
+          <p class="modal-help" style="margin:6px 0 0;font-size:11px">
+            Changing any value marks all tracks as needing re-normalisation.
+            <strong>Compression = 1</strong> disables compression entirely (preserves original dynamics).
+          </p>
+        </details>
+
+        <div class="modal-row" style="gap:8px;flex-wrap:wrap">
           <button class="btn" id="audio-mono-btn">Mono Songs</button>
           <button class="btn" id="audio-normalise-btn">Normalise Songs</button>
+        </div>
+        <div class="modal-row" style="gap:8px;margin-top:6px;flex-wrap:wrap">
+          <button class="btn" id="audio-remove-mono-btn" style="font-size:12px">Remove Mono</button>
+          <button class="btn" id="audio-remove-normalise-btn" style="font-size:12px">Remove Normalise</button>
         </div>
         <div id="audio-progress" class="modal-help" style="margin-top:10px;min-height:18px"></div>
       </div>
@@ -1659,6 +1685,12 @@
         + '<div style="margin-top:8px">'
         + '<button class="btn btn-sm" id="upload-track-btn">Upload MP3</button>'
         + '</div>'
+        + (song.track
+          ? '<details class="form-group" id="audio-tweak-panel" style="margin-top:12px">'
+            + '<summary style="cursor:pointer;font-size:13px;color:var(--text-dim,#666)">Normalisation (this song)</summary>'
+            + '<div id="audio-tweak-body" style="padding:10px 0 4px;font-size:13px">Loading…</div>'
+            + '</details>'
+          : '')
         + '</div>'
         + '<details class="form-group sheets-section sheets-details">'
         + (function () {
@@ -2300,6 +2332,22 @@
         });
       }
 
+      // ── Per-song normalisation panel ──
+      // Lives inside <details id="audio-tweak-panel"> when the song has a track.
+      // Hydrated lazily on first open so we don't make an IPC round-trip
+      // for every song view.
+      var tweakPanel = document.getElementById('audio-tweak-panel');
+      if (tweakPanel && song.track && isElectron && window.electronAPI.audioGetTrackParams) {
+        var bodyEl = document.getElementById('audio-tweak-body');
+        var hydrated = false;
+        tweakPanel.addEventListener('toggle', function () {
+          if (tweakPanel.open && !hydrated) {
+            hydrated = true;
+            hydrateAudioTweakPanel(song.track, bodyEl);
+          }
+        });
+      }
+
       // ── Sheet images ──
       var sheetSizeSlider = document.getElementById('sheet-size-slider');
       var sheetSizeVal = document.getElementById('sheet-size-val');
@@ -2922,6 +2970,156 @@
       showSetlistEditor(id);
     }
 
+    // ── Per-song normalisation tweak panel ──
+    // Renders into the given container element. Loads current effective params
+    // (per-song override if set, else global defaults), shows sliders, Preview
+    // and Apply buttons, and a Reset link that drops back to global defaults.
+    async function hydrateAudioTweakPanel(trackRelPath, container) {
+      try {
+        var info = await window.electronAPI.audioGetTrackParams(trackRelPath);
+      } catch (e) {
+        container.textContent = 'Could not load settings: ' + e.message;
+        return;
+      }
+
+      var p = info.effective;
+      var stateLabel;
+      if (info.normalised && info.lastApplied) {
+        stateLabel = 'Last applied: ' + info.lastApplied.I + ' LUFS, '
+          + info.lastApplied.ratio + ':1, threshold ' + info.lastApplied.threshold + ' dB';
+      } else {
+        stateLabel = 'Not yet normalised';
+      }
+      var overrideBadge = info.isOverride
+        ? '<span style="background:#fde68a;color:#92400e;padding:1px 6px;border-radius:3px;font-size:11px;margin-left:6px">per-song override</span>'
+        : '<span style="color:var(--text-dim,#888);font-size:11px;margin-left:6px">using global defaults</span>';
+
+      container.innerHTML =
+        '<div style="margin-bottom:8px;color:var(--text-dim,#666);font-size:12px">' + stateLabel + overrideBadge + '</div>' +
+        '<div style="display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center">' +
+          '<label for="ts-i">Target loudness</label>' +
+          '<input type="range" id="ts-i" min="-16" max="-6" step="0.5" value="' + p.I + '">' +
+          '<span id="ts-i-val" style="font-variant-numeric:tabular-nums;min-width:60px;text-align:right">' + p.I + ' LUFS</span>' +
+
+          '<label for="ts-ratio">Compression</label>' +
+          '<input type="range" id="ts-ratio" min="1" max="6" step="0.5" value="' + p.ratio + '">' +
+          '<span id="ts-ratio-val" style="font-variant-numeric:tabular-nums;min-width:60px;text-align:right">' +
+            (Number(p.ratio) === 1 ? '1:1 (off)' : p.ratio + ':1') + '</span>' +
+
+          '<label for="ts-threshold">Compressor threshold</label>' +
+          '<input type="range" id="ts-threshold" min="-30" max="-10" step="1" value="' + p.threshold + '">' +
+          '<span id="ts-threshold-val" style="font-variant-numeric:tabular-nums;min-width:60px;text-align:right">' + p.threshold + ' dB</span>' +
+        '</div>' +
+        '<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
+          '<button class="btn btn-sm" id="ts-preview-btn">▶ Preview 8s</button>' +
+          '<button class="btn btn-sm" id="ts-stop-btn" style="display:none">■ Stop</button>' +
+          '<button class="btn btn-sm" id="ts-apply-btn">Apply to this song</button>' +
+          '<button class="btn btn-sm" id="ts-reset-btn">Reset to global</button>' +
+          '<span id="ts-status" style="font-size:12px;color:var(--text-dim,#666);margin-left:auto"></span>' +
+        '</div>' +
+        '<audio id="ts-audio" preload="none" style="display:none"></audio>';
+
+      var inputs = {
+        I: container.querySelector('#ts-i'),
+        ratio: container.querySelector('#ts-ratio'),
+        threshold: container.querySelector('#ts-threshold'),
+      };
+      var vals = {
+        I: container.querySelector('#ts-i-val'),
+        ratio: container.querySelector('#ts-ratio-val'),
+        threshold: container.querySelector('#ts-threshold-val'),
+      };
+      var previewBtn = container.querySelector('#ts-preview-btn');
+      var stopBtn = container.querySelector('#ts-stop-btn');
+      var applyBtn = container.querySelector('#ts-apply-btn');
+      var resetBtn = container.querySelector('#ts-reset-btn');
+      var statusEl = container.querySelector('#ts-status');
+      var audioEl = container.querySelector('#ts-audio');
+
+      function readParams() {
+        return {
+          I: parseFloat(inputs.I.value),
+          ratio: parseFloat(inputs.ratio.value),
+          threshold: parseFloat(inputs.threshold.value),
+        };
+      }
+
+      function fmt(k, v) {
+        if (k === 'I') return v + ' LUFS';
+        if (k === 'ratio') return Number(v) === 1 ? '1:1 (off)' : v + ':1';
+        return v + ' dB';
+      }
+
+      Object.keys(inputs).forEach(function (k) {
+        inputs[k].addEventListener('input', function () {
+          vals[k].textContent = fmt(k, inputs[k].value);
+        });
+      });
+
+      previewBtn.addEventListener('click', async function () {
+        previewBtn.disabled = true;
+        statusEl.textContent = 'Rendering preview…';
+        try {
+          var dataUrl = await window.electronAPI.audioPreviewTrack(trackRelPath, readParams());
+          audioEl.src = dataUrl; // base64 data URL — bypasses file:// restrictions
+          audioEl.style.display = 'block';
+          await audioEl.play();
+          statusEl.textContent = 'Playing preview…';
+          stopBtn.style.display = '';
+          audioEl.onended = function () {
+            stopBtn.style.display = 'none';
+            statusEl.textContent = '';
+          };
+        } catch (e) {
+          statusEl.textContent = 'Preview failed: ' + e.message;
+        } finally {
+          previewBtn.disabled = false;
+        }
+      });
+
+      stopBtn.addEventListener('click', function () {
+        audioEl.pause();
+        audioEl.currentTime = 0;
+        stopBtn.style.display = 'none';
+        statusEl.textContent = '';
+      });
+
+      applyBtn.addEventListener('click', async function () {
+        var params = readParams();
+        if (!confirm('Re-encode this track with the current settings?\n\nLoudness ' + params.I +
+          ' LUFS · Compression ' + params.ratio + ':1 · Threshold ' + params.threshold + ' dB\n\n' +
+          'This also saves these as a per-song override — future "Normalise Songs" batch runs ' +
+          'will use these settings for this song specifically.')) return;
+
+        applyBtn.disabled = true;
+        previewBtn.disabled = true;
+        statusEl.textContent = 'Saving override + processing…';
+        try {
+          await window.electronAPI.audioSetTrackParams(trackRelPath, params);
+          await window.electronAPI.audioNormaliseOne(trackRelPath, params);
+          statusEl.textContent = '✓ Applied';
+          // Re-hydrate so the state line updates
+          hydrateAudioTweakPanel(trackRelPath, container);
+        } catch (e) {
+          statusEl.textContent = 'Apply failed: ' + e.message;
+        } finally {
+          applyBtn.disabled = false;
+          previewBtn.disabled = false;
+        }
+      });
+
+      resetBtn.addEventListener('click', async function () {
+        if (!confirm('Reset this song to use global normalisation defaults?\n\n' +
+          'The next "Normalise Songs" batch run will re-process it with the global settings.')) return;
+        try {
+          await window.electronAPI.audioSetTrackParams(trackRelPath, null);
+          hydrateAudioTweakPanel(trackRelPath, container);
+        } catch (e) {
+          statusEl.textContent = 'Reset failed: ' + e.message;
+        }
+      });
+    }
+
     // ── Helpers ──
     function esc(str) {
       var d = document.createElement('div');
@@ -3008,12 +3206,67 @@
         }
       });
 
-      // ── Audio Maintenance: Mono / Normalise buttons ──
+      // ── Audio Maintenance: Mono / Normalise / Remove + params sliders ──
       var monoBtn = document.getElementById('audio-mono-btn');
       var normBtn = document.getElementById('audio-normalise-btn');
+      var removeNormBtn = document.getElementById('audio-remove-normalise-btn');
+      var removeMonoBtn = document.getElementById('audio-remove-mono-btn');
       var audioStatusEl = document.getElementById('audio-status');
       var audioProgressEl = document.getElementById('audio-progress');
       var unsubProgress = null;
+
+      // ── Param sliders ──
+      var paramInputs = {
+        I: document.getElementById('norm-i'),
+        ratio: document.getElementById('norm-ratio'),
+        threshold: document.getElementById('norm-threshold'),
+      };
+      var paramValEls = {
+        I: document.getElementById('norm-i-val'),
+        ratio: document.getElementById('norm-ratio-val'),
+        threshold: document.getElementById('norm-threshold-val'),
+      };
+
+      function formatParam(key, val) {
+        if (key === 'I') return val + ' LUFS';
+        if (key === 'ratio') return Number(val) === 1 ? '1:1 (off)' : val + ':1';
+        if (key === 'threshold') return val + ' dB';
+        return val;
+      }
+
+      async function loadParams() {
+        if (!isElectron || !window.electronAPI.audioGetParams) return;
+        try {
+          var p = await window.electronAPI.audioGetParams();
+          Object.keys(paramInputs).forEach(function (k) {
+            if (paramInputs[k]) {
+              paramInputs[k].value = p[k];
+              paramValEls[k].textContent = formatParam(k, p[k]);
+            }
+          });
+        } catch (_) {}
+      }
+
+      // Save params on slider release (debounced via 'change' which fires on
+      // mouseup/keyup). 'input' updates the value label live.
+      Object.keys(paramInputs).forEach(function (k) {
+        var inp = paramInputs[k];
+        if (!inp) return;
+        inp.addEventListener('input', function () {
+          paramValEls[k].textContent = formatParam(k, inp.value);
+        });
+        inp.addEventListener('change', async function () {
+          if (!isElectron || !window.electronAPI.audioSetParams) return;
+          var patch = {};
+          patch[k] = parseFloat(inp.value);
+          try {
+            await window.electronAPI.audioSetParams(patch);
+            refreshAudioStatus(); // params changed → more tracks may need normalise now
+          } catch (e) {
+            audioStatusEl.textContent = 'Could not save settings: ' + e.message;
+          }
+        });
+      });
 
       async function refreshAudioStatus() {
         if (!isElectron || !window.electronAPI.audioStatus) return;
@@ -3032,6 +3285,8 @@
       function setAudioBusy(busy) {
         monoBtn.disabled = busy;
         normBtn.disabled = busy;
+        if (removeNormBtn) removeNormBtn.disabled = busy;
+        if (removeMonoBtn) removeMonoBtn.disabled = busy;
       }
 
       function attachProgress() {
@@ -3052,19 +3307,31 @@
       }
 
       async function runAudioOp(kind) {
-        var label = kind === 'mono' ? 'convert all stereo tracks to mono'
-                                    : 'normalise all tracks to a consistent loudness (-10 LUFS, low dynamic range)';
-        if (!confirm('About to ' + label + '.\n\nOriginals are backed up and already-processed tracks are skipped. Continue?')) return;
+        var labels = {
+          mono: { text: 'convert all stereo tracks to mono',
+                  fn: window.electronAPI.audioMonoAll, verb: 'processed' },
+          normalise: { text: 'normalise all tracks with the current settings',
+                       fn: window.electronAPI.audioNormaliseAll, verb: 'processed' },
+          'remove-normalise': { text: 'RESTORE all tracks to their pre-normalise state (un-do normalisation)',
+                                fn: window.electronAPI.audioRemoveNormalise, verb: 'restored' },
+          'remove-mono': { text: 'RESTORE all tracks to their original STEREO state (un-do mono conversion)\n\n' +
+                                  'This will also remove normalisation since restoring stereo invalidates it.',
+                           fn: window.electronAPI.audioRemoveMono, verb: 'restored' },
+        };
+        var cfg = labels[kind];
+        if (!cfg) return;
+        if (!confirm('About to ' + cfg.text + '.\n\nContinue?')) return;
 
         setAudioBusy(true);
         audioProgressEl.textContent = 'Scanning…';
         attachProgress();
 
         try {
-          var fn = kind === 'mono' ? window.electronAPI.audioMonoAll : window.electronAPI.audioNormaliseAll;
-          var result = await fn();
-          var done = (result.converted != null ? result.converted : result.processed) || 0;
-          var summary = '✓ ' + done + ' processed, ' + result.skipped + ' skipped, ' + result.failed + ' failed';
+          var result = await cfg.fn();
+          var done = (result.converted != null ? result.converted
+                    : result.processed != null ? result.processed
+                    : result.restored) || 0;
+          var summary = '✓ ' + done + ' ' + cfg.verb + ', ' + result.skipped + ' skipped, ' + result.failed + ' failed';
           audioProgressEl.textContent = summary;
           if (result.failed && result.failures && result.failures.length) {
             // Show failures inline (scrollable) instead of a blocking alert
@@ -3095,15 +3362,21 @@
       if (monoBtn && normBtn && isElectron && window.electronAPI.audioMonoAll) {
         monoBtn.addEventListener('click', function () { runAudioOp('mono'); });
         normBtn.addEventListener('click', function () { runAudioOp('normalise'); });
+        if (removeNormBtn) removeNormBtn.addEventListener('click', function () { runAudioOp('remove-normalise'); });
+        if (removeMonoBtn) removeMonoBtn.addEventListener('click', function () { runAudioOp('remove-mono'); });
       } else if (monoBtn) {
         monoBtn.disabled = true;
         normBtn.disabled = true;
+        if (removeNormBtn) removeNormBtn.disabled = true;
+        if (removeMonoBtn) removeMonoBtn.disabled = true;
         audioStatusEl.textContent = 'Audio maintenance requires the desktop Manager.';
       }
 
-      // Refresh status alongside the existing open handler (separate listener
-      // — doesn't matter which order they fire in, both are idempotent).
-      btn.addEventListener('click', function () { refreshAudioStatus(); });
+      // Refresh status and reload param sliders every time Settings opens
+      btn.addEventListener('click', function () {
+        refreshAudioStatus();
+        loadParams();
+      });
     })();
 
     async function deployToGitHub() {

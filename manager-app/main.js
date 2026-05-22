@@ -481,25 +481,71 @@ ipcMain.handle('git:deploy', async () => {
 // audible ramp at the start of quiet songs when linear mode silently falls
 // back to dynamic). Now uses measure→single-gain→limiter, which is ramp-free.
 // Bumping the version reprocesses every track on the next Normalise run.
-const NORMALISE_VERSION = 'v2-gain-comp-limit-I-10';
+const NORMALISE_VERSION = 'v3'; // algorithm version — bump if filter chain changes structurally
+
+// Normalisation parameters — defaults can be overridden by the user from the
+// Settings modal and are persisted in userData/config.json under "normaliseParams".
+// Each track's stamp records the exact params it was processed with, so the
+// status check can detect "params changed → needs re-normalise".
+// Defaults tuned for live-gig backing tracks through a column PA (e.g. EV
+// Evolve 50) at moderate-volume venues. Goal: consistent song-to-song level
+// without audibly compressed-sounding material. The PA has its own limiter
+// so we leave headroom (-12 LUFS not -10) and use gentle compression that
+// only touches the loud chorus peaks (threshold -18, ratio 1.5).
+const DEFAULT_NORMALISE_PARAMS = {
+  I: -12,         // target loudness (LUFS) — -16 (quiet) to -6 (loud)
+  ratio: 1.5,     // compressor ratio (1 = none, 6 = heavy)
+  threshold: -18, // compressor threshold (dB) — only signal above this gets compressed
+};
+
+function getNormaliseParams() {
+  const saved = readConfig().normaliseParams || {};
+  // Merge defaults with saved so newly-added fields don't break old configs
+  return { ...DEFAULT_NORMALISE_PARAMS, ...saved };
+}
+
+function paramsMatch(a, b) {
+  if (!a || !b) return false;
+  return a.I === b.I && a.ratio === b.ratio && a.threshold === b.threshold;
+}
 const AUDIO_STATE_FILE = 'audio-state.json'; // at GIGALATOR_ROOT, tracked in git
 const MONO_BACKUP_DIR = 'tracks/_original_stereo';
 const NORM_BACKUP_DIR = 'tracks/_pre_normalise';
 
+// Bundled binaries via ffmpeg-static / ffprobe-static. When the app is
+// packaged with asar, these paths point INTO the asar archive and can't
+// be exec'd directly — Electron's asarUnpack rewrites the path at runtime
+// so we just patch ".asar/" → ".asar.unpacked/" if needed.
+function resolveBundled(rawPath) {
+  if (!rawPath) return null;
+  const unpacked = rawPath.replace('app.asar' + path.sep, 'app.asar.unpacked' + path.sep);
+  if (fs.existsSync(unpacked)) return unpacked;
+  if (fs.existsSync(rawPath)) return rawPath;
+  return null;
+}
+
+let _ffmpegBundled = null, _ffprobeBundled = null;
+try { _ffmpegBundled = resolveBundled(require('ffmpeg-static')); } catch (_) {}
+try { _ffprobeBundled = resolveBundled(require('ffprobe-static').path); } catch (_) {}
+
 function findBinary(name) {
-  // Probe absolute paths FIRST — apps launched from Finder/Launchpad don't
-  // inherit Homebrew's PATH, so bare names like 'ffmpeg' would ENOENT.
-  // Only fall back to the bare name if no absolute candidate exists.
+  // 1) Bundled static binary (always preferred — works on machines without Homebrew)
+  if (name === 'ffmpeg' && _ffmpegBundled) return _ffmpegBundled;
+  if (name === 'ffprobe' && _ffprobeBundled) return _ffprobeBundled;
+
+  // 2) Env-var override (dev escape hatch)
   const envOverride = process.env[name.toUpperCase() + '_BIN'];
+  if (envOverride && fs.existsSync(envOverride)) return envOverride;
+
+  // 3) Common system locations (Homebrew, MacPorts, system)
   const absoluteCandidates = [
-    envOverride,
     '/opt/homebrew/bin/' + name,
     '/usr/local/bin/' + name,
     '/opt/local/bin/' + name,
     '/usr/bin/' + name,
-  ].filter(Boolean);
+  ];
   for (const p of absoluteCandidates) {
-    if (p.startsWith('/') && fs.existsSync(p)) return p;
+    if (fs.existsSync(p)) return p;
   }
   return name; // last resort — relies on PATH
 }
@@ -706,55 +752,19 @@ ipcMain.handle('audio:normaliseAll', async (event) => {
       const fp = fingerprint(absPath);
       const stamp = state.tracks[relPath];
 
-      if (stamp && stamp.normalised === NORMALISE_VERSION && stampMatches(stamp, fp)) {
-        skipped++; continue;
-      }
+      // Effective params: per-song override wins if set, else current globals
+      const params = (stamp && stamp.paramOverride) || getNormaliseParams();
 
-      // Pass 1: measure (output to /dev/null, capture JSON from stderr)
-      // loudnorm writes its JSON to stderr — ffmpeg execFile capture handles it.
-      let measureStderr = '';
-      await new Promise((resolve, reject) => {
-        execFile(ffmpegBin, [
-          '-hide_banner', '-i', absPath,
-          '-af', 'loudnorm=I=-10:TP=-1:LRA=5:print_format=json',
-          '-f', 'null', '-',
-        ], { maxBuffer: 16 * 1024 * 1024 }, (err, stdout, stderr) => {
-          measureStderr = stderr || '';
-          if (err) reject(new Error(distilFfError(stderr, err.message)));
-          else resolve();
-        });
-      });
+      // Skip if already at current version AND params haven't changed AND file unchanged
+      if (
+        stamp &&
+        stamp.normalised === NORMALISE_VERSION &&
+        paramsMatch(stamp.normaliseParams, params) &&
+        stampMatches(stamp, fp)
+      ) { skipped++; continue; }
 
-      // The JSON is the last { ... } block in stderr
-      const jsonMatch = measureStderr.match(/\{[\s\S]*?"input_i"[\s\S]*?\}/);
-      if (!jsonMatch) throw new Error('could not parse loudnorm measurement');
-      const m = JSON.parse(jsonMatch[0]);
-
-      // Pass 2: compute a single linear gain to hit -10 LUFS, then apply
-      // a chain that has NO startup ramp:
-      //   acompressor → static volume gain → look-ahead brick-wall limiter
-      // The compressor reduces dynamic range (so loud and quiet sections sit
-      // closer together) without an envelope-follower attack at t=0 because
-      // it's at unity gain until signal exceeds threshold. The limiter only
-      // engages on peaks, so it doesn't touch quiet intros.
-      const TARGET_LUFS = -10;
-      const measuredI = parseFloat(m.input_i);
-      if (!Number.isFinite(measuredI)) {
-        throw new Error('measured loudness is invalid (' + m.input_i + ') — likely silent or corrupt file');
-      }
-      const gainDb = (TARGET_LUFS - measuredI).toFixed(2);
-      const filterArgs = [
-        // Gentle 2:1 compression above -20 dBFS to tame dynamic range —
-        // attack/release are fast enough to follow musical phrasing but
-        // not so fast they pump audibly. knee=6 smooths the transition.
-        'acompressor=threshold=-20dB:ratio=2:attack=20:release=250:knee=6:makeup=0dB',
-        // Single fixed gain — true linear, no envelope follower.
-        'volume=' + gainDb + 'dB',
-        // Brick-wall limiter at -1 dBTP catches any peaks that would clip
-        // after the gain. limit=0.891 ≈ -1 dB. Short attack to catch
-        // transients cleanly, modest release.
-        'alimiter=level_in=1:level_out=1:limit=0.891:attack=5:release=50',
-      ].join(',');
+      // Two-pass loudnorm measurement + filter assembly (shared helper)
+      const filterArgs = await buildNormaliseFilter(ffmpegBin, absPath, params);
 
       await safeReencode(ffmpegBin, absPath, NORM_BACKUP_DIR, [
         '-vn', // drop attached album-art so the mp3 muxer doesn't choke
@@ -767,6 +777,7 @@ ipcMain.handle('audio:normaliseAll', async (event) => {
         ...(stamp || {}),
         mono: true,
         normalised: NORMALISE_VERSION,
+        normaliseParams: { I: params.I, ratio: params.ratio, threshold: params.threshold },
         ...fingerprint(absPath),
       };
       writeAudioState(state);
@@ -784,9 +795,9 @@ ipcMain.handle('audio:normaliseAll', async (event) => {
 
 // Quick summary of how many tracks need each operation (for UI display)
 ipcMain.handle('audio:status', async () => {
-  const ffprobeBin = findBinary('ffprobe');
   const state = readAudioState();
   const tracks = getAllTrackRelPaths();
+  const params = getNormaliseParams();
 
   let needsMono = 0, needsNormalise = 0, missing = 0;
   for (const relPath of tracks) {
@@ -794,10 +805,240 @@ ipcMain.handle('audio:status', async () => {
     if (!fs.existsSync(absPath)) { missing++; continue; }
     const fp = fingerprint(absPath);
     const stamp = state.tracks[relPath];
+    const effective = (stamp && stamp.paramOverride) || params;
     const isMono = stamp && stamp.mono && stampMatches(stamp, fp);
-    const isNorm = stamp && stamp.normalised === NORMALISE_VERSION && stampMatches(stamp, fp);
+    const isNorm =
+      stamp &&
+      stamp.normalised === NORMALISE_VERSION &&
+      paramsMatch(stamp.normaliseParams, effective) &&
+      stampMatches(stamp, fp);
     if (!isMono) needsMono++;
     if (!isNorm) needsNormalise++;
   }
-  return { total: tracks.length, needsMono, needsNormalise, missing };
+  return { total: tracks.length, needsMono, needsNormalise, missing, params };
+});
+
+// ── Get / Set global normalisation params ──
+ipcMain.handle('audio:getParams', () => getNormaliseParams());
+ipcMain.handle('audio:setParams', (event, partial) => {
+  const merged = { ...getNormaliseParams(), ...(partial || {}) };
+  // Sanity-clamp so the user can't enter wildly broken values
+  merged.I = Math.max(-30, Math.min(-3, Number(merged.I) || -10));
+  merged.ratio = Math.max(1, Math.min(20, Number(merged.ratio) || 2));
+  merged.threshold = Math.max(-40, Math.min(0, Number(merged.threshold) || -20));
+  writeConfig({ normaliseParams: merged });
+  return merged;
+});
+
+// ── Per-song params ──
+// Each track may optionally have a `paramOverride` recorded in audio-state.json.
+// When present, the per-song normalise + skip-check use these instead of the
+// global defaults. Setting null clears the override (track goes back to globals).
+ipcMain.handle('audio:getTrackParams', (event, relPath) => {
+  const state = readAudioState();
+  const stamp = state.tracks[relPath] || {};
+  return {
+    effective: stamp.paramOverride || getNormaliseParams(),
+    isOverride: !!stamp.paramOverride,
+    lastApplied: stamp.normaliseParams || null,
+    normalised: !!stamp.normalised,
+  };
+});
+
+ipcMain.handle('audio:setTrackParams', (event, relPath, paramOverride) => {
+  const state = readAudioState();
+  const stamp = state.tracks[relPath] || {};
+  if (paramOverride === null || paramOverride === undefined) {
+    delete stamp.paramOverride;
+  } else {
+    stamp.paramOverride = {
+      I: Math.max(-30, Math.min(-3, Number(paramOverride.I) || -10)),
+      ratio: Math.max(1, Math.min(20, Number(paramOverride.ratio) || 2)),
+      threshold: Math.max(-40, Math.min(0, Number(paramOverride.threshold) || -20)),
+    };
+  }
+  state.tracks[relPath] = stamp;
+  writeAudioState(state);
+  return stamp.paramOverride || null;
+});
+
+// Shared helper that builds the loudnorm-measure / volume / acompressor / alimiter
+// chain. Used by both normaliseAll, normaliseOne, and previewTrack.
+async function buildNormaliseFilter(ffmpegBin, absPath, params) {
+  let measureStderr = '';
+  await new Promise((resolve, reject) => {
+    execFile(ffmpegBin, [
+      '-hide_banner', '-i', absPath,
+      '-af', 'loudnorm=I=' + params.I + ':TP=-1:LRA=5:print_format=json',
+      '-f', 'null', '-',
+    ], { maxBuffer: 16 * 1024 * 1024 }, (err, stdout, stderr) => {
+      measureStderr = stderr || '';
+      if (err) reject(new Error(distilFfError(stderr, err.message)));
+      else resolve();
+    });
+  });
+  const jsonMatch = measureStderr.match(/\{[\s\S]*?"input_i"[\s\S]*?\}/);
+  if (!jsonMatch) throw new Error('could not parse loudnorm measurement');
+  const m = JSON.parse(jsonMatch[0]);
+  const measuredI = parseFloat(m.input_i);
+  if (!Number.isFinite(measuredI)) {
+    throw new Error('measured loudness invalid (' + m.input_i + ') — silent or corrupt file');
+  }
+  const gainDb = (params.I - measuredI).toFixed(2);
+  return [
+    'acompressor=threshold=' + params.threshold + 'dB:ratio=' + params.ratio +
+      ':attack=20:release=250:knee=6:makeup=0dB',
+    'volume=' + gainDb + 'dB',
+    'alimiter=level_in=1:level_out=1:limit=0.891:attack=5:release=50',
+  ].join(',');
+}
+
+// Render a 5-second preview of the proposed normalise for a single track.
+// Returns the absolute path to the temp file; the renderer <audio>s it.
+ipcMain.handle('audio:previewTrack', async (event, relPath, overrideParams) => {
+  const ffmpegBin = findBinary('ffmpeg');
+  const absPath = path.join(GIGALATOR_ROOT, relPath);
+  if (!fs.existsSync(absPath)) throw new Error('track file not found');
+
+  const params = { ...getNormaliseParams(), ...(overrideParams || {}) };
+  const filterArgs = await buildNormaliseFilter(ffmpegBin, absPath, params);
+
+  // Temp file in userData so it survives across previews and is auto-cleaned
+  // when the app quits (not strictly — but it's a single file we overwrite).
+  const previewPath = path.join(app.getPath('userData'), 'preview.mp3');
+  try { fs.unlinkSync(previewPath); } catch (_) {}
+
+  await runFfBinary(ffmpegBin, [
+    '-y', '-i', absPath,
+    '-vn',
+    '-ss', '0', '-t', '8',  // first 8 seconds (long enough to hear the intro)
+    '-af', filterArgs,
+    '-c:a', 'libmp3lame', '-b:a', '128k', '-ac', '1', '-ar', '44100',
+    '-write_xing', '0', '-id3v2_version', '0', '-map_metadata', '-1',
+    previewPath,
+  ]);
+  if (!fs.existsSync(previewPath) || fs.statSync(previewPath).size === 0) {
+    throw new Error('preview render produced no output');
+  }
+  // Return as base64 — avoids file:// loading restrictions in the renderer
+  // (webSecurity: true blocks cross-origin file:// audio). An 8-second 128kbps
+  // mono mp3 is ~130KB, which is fine to ship over IPC.
+  const buf = fs.readFileSync(previewPath);
+  return 'data:audio/mp3;base64,' + buf.toString('base64');
+});
+
+// Normalise a single track with given params. If params omitted, uses
+// per-song override if set, else global defaults.
+ipcMain.handle('audio:normaliseOne', async (event, relPath, overrideParams) => {
+  const ffmpegBin = findBinary('ffmpeg');
+  const absPath = path.join(GIGALATOR_ROOT, relPath);
+  if (!fs.existsSync(absPath)) throw new Error('track file not found');
+
+  const state = readAudioState();
+  const stamp = state.tracks[relPath] || {};
+  const params = overrideParams
+    ? { ...getNormaliseParams(), ...overrideParams }
+    : (stamp.paramOverride || getNormaliseParams());
+
+  const filterArgs = await buildNormaliseFilter(ffmpegBin, absPath, params);
+
+  await safeReencode(ffmpegBin, absPath, NORM_BACKUP_DIR, [
+    '-vn',
+    '-af', filterArgs,
+    '-c:a', 'libmp3lame', '-b:a', '128k', '-ac', '1', '-ar', '44100',
+    '-write_xing', '0', '-id3v2_version', '0', '-map_metadata', '-1',
+  ]);
+
+  state.tracks[relPath] = {
+    ...stamp,
+    mono: true,
+    normalised: NORMALISE_VERSION,
+    normaliseParams: { I: params.I, ratio: params.ratio, threshold: params.threshold },
+    ...fingerprint(absPath),
+  };
+  writeAudioState(state);
+  return { ok: true, params };
+});
+
+// ── Remove Normalise: restore from _pre_normalise/ backup, clear stamp ──
+ipcMain.handle('audio:removeNormalise', async (event) => {
+  const state = readAudioState();
+  const tracks = getAllTrackRelPaths();
+  let restored = 0, skipped = 0, failed = 0;
+  const failures = [];
+
+  for (let i = 0; i < tracks.length; i++) {
+    const relPath = tracks[i];
+    const absPath = path.join(GIGALATOR_ROOT, relPath);
+    const backupAbs = path.join(GIGALATOR_ROOT, NORM_BACKUP_DIR, path.basename(relPath));
+
+    emitProgress(event, { phase: 'remove-normalise', current: i + 1, total: tracks.length, name: path.basename(relPath) });
+
+    const stamp = state.tracks[relPath];
+    // Nothing to undo if it was never normalised
+    if (!stamp || !stamp.normalised) { skipped++; continue; }
+
+    if (!fs.existsSync(backupAbs)) {
+      failed++;
+      failures.push({ track: relPath, error: 'no pre-normalise backup found' });
+      continue;
+    }
+
+    try {
+      fs.copyFileSync(backupAbs, absPath);
+      // Keep mono stamp (the backup IS the mono-but-not-yet-normalised version),
+      // but drop the normalise stamp + params so the file is now "needs normalise".
+      delete stamp.normalised;
+      delete stamp.normaliseParams;
+      Object.assign(stamp, fingerprint(absPath));
+      state.tracks[relPath] = stamp;
+      writeAudioState(state);
+      restored++;
+    } catch (e) {
+      failed++;
+      failures.push({ track: relPath, error: e.message });
+    }
+  }
+
+  emitProgress(event, { phase: 'remove-normalise', done: true });
+  return { restored, skipped, failed, failures, total: tracks.length };
+});
+
+// ── Remove Mono: restore from _original_stereo/ backup, clear all stamps ──
+ipcMain.handle('audio:removeMono', async (event) => {
+  const state = readAudioState();
+  const tracks = getAllTrackRelPaths();
+  let restored = 0, skipped = 0, failed = 0;
+  const failures = [];
+
+  for (let i = 0; i < tracks.length; i++) {
+    const relPath = tracks[i];
+    const absPath = path.join(GIGALATOR_ROOT, relPath);
+    const backupAbs = path.join(GIGALATOR_ROOT, MONO_BACKUP_DIR, path.basename(relPath));
+
+    emitProgress(event, { phase: 'remove-mono', current: i + 1, total: tracks.length, name: path.basename(relPath) });
+
+    const stamp = state.tracks[relPath];
+    if (!stamp || !stamp.mono) { skipped++; continue; }
+
+    if (!fs.existsSync(backupAbs)) {
+      // Nothing to restore — the file was already mono when first stamped
+      skipped++;
+      continue;
+    }
+
+    try {
+      fs.copyFileSync(backupAbs, absPath);
+      // Clear EVERYTHING — restoring stereo invalidates any normalisation too
+      delete state.tracks[relPath];
+      writeAudioState(state);
+      restored++;
+    } catch (e) {
+      failed++;
+      failures.push({ track: relPath, error: e.message });
+    }
+  }
+
+  emitProgress(event, { phase: 'remove-mono', done: true });
+  return { restored, skipped, failed, failures, total: tracks.length };
 });

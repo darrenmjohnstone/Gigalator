@@ -4,686 +4,1256 @@
     "tracks/500-miles.mp3": {
       "mono": true,
       "size": 2649025,
-      "mtime": 1779185463762,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424417928,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/all-of-me.mp3": {
       "mono": true,
       "size": 4620538,
-      "mtime": 1779185470208,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424424914,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/always-on-my-mind.mp3": {
       "mono": true,
       "size": 3525485,
-      "mtime": 1779185475217,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424429063,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/am-i-ever-gonna-see-your-face-again.mp3": {
       "mono": true,
       "size": 3224973,
-      "mtime": 1779185478652,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424432167,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/american-pie.mp3": {
       "mono": true,
       "size": 4401528,
-      "mtime": 1779185483314,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424436325,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/angels-higher.mp3": {
       "mono": true,
       "size": 1801404,
-      "mtime": 1779185485223,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424440195,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/angels.mp3": {
       "mono": true,
       "size": 4097671,
-      "mtime": 1779185489589,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424444168,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/april-sun-in-cuba.mp3": {
       "mono": true,
       "size": 3185684,
-      "mtime": 1779185493099,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424447208,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/bad-moon-rising.mp3": {
       "mono": true,
       "size": 2186762,
-      "mtime": 1779185499802,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424455691,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/beds-are-burning.mp3": {
       "mono": true,
       "size": 4097671,
-      "mtime": 1779185504251,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424459618,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/before-too-long.mp3": {
       "mono": true,
       "size": 3334478,
-      "mtime": 1779185507974,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424462754,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/better-man.mp3": {
       "mono": true,
       "size": 3152248,
-      "mtime": 1779185511454,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424465734,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/blister-in-the-sun.mp3": {
       "mono": true,
       "size": 2334720,
-      "mtime": 1779185517422,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424471000,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/blue-suede-shoes.mp3": {
       "mono": true,
       "size": 2645681,
-      "mtime": 1779185520366,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424473538,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/blueberry-hill.mp3": {
       "mono": true,
       "size": 2417475,
-      "mtime": 1779185522972,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424475803,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/boys-light-up.mp3": {
       "mono": true,
       "size": 3474076,
-      "mtime": 1779185526646,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424485773,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/bright-side-of-the-road.mp3": {
       "mono": true,
       "size": 3115049,
-      "mtime": 1779185530058,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424488810,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/brown-eyed-girl.mp3": {
       "mono": true,
       "size": 3140545,
-      "mtime": 1779185533464,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424491781,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/cant-buy-me-love.mp3": {
       "mono": true,
       "size": 2190524,
-      "mtime": 1779185535806,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424493879,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/cant-help-falling-in-love.mp3": {
       "mono": true,
       "size": 2899800,
-      "mtime": 1779185539030,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424496650,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/cheap-wine.mp3": {
       "mono": true,
       "size": 3156009,
-      "mtime": 1779185546962,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424503436,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/could-i-have-this-dance.mp3": {
       "mono": true,
       "size": 2970017,
-      "mtime": 1779185550156,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424506386,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/country-roads.mp3": {
       "mono": true,
       "size": 2940760,
-      "mtime": 1779185553379,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424509581,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/crocodile-rock.mp3": {
       "mono": true,
       "size": 3558504,
-      "mtime": 1779185557219,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424513053,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/cup-of-life.mp3": {
       "mono": true,
       "size": 4105613,
-      "mtime": 1779185561700,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424517054,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/desperado.mp3": {
       "mono": true,
       "size": 3483689,
-      "mtime": 1779185565424,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424527024,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/dock-of-the-bay.mp3": {
       "mono": true,
       "size": 3575222,
-      "mtime": 1779185569358,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424530477,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/dont-be-cruel.mp3": {
       "mono": true,
       "size": 2007040,
-      "mtime": 1779185571617,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424532422,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/dont-dream-its-over.mp3": {
       "mono": true,
       "size": 3607405,
-      "mtime": 1779185575532,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424535992,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/dont-stop-believing.mp3": {
       "mono": true,
       "size": 4030380,
-      "mtime": 1779185580039,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424539823,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/down-under.mp3": {
       "mono": true,
       "size": 3167294,
-      "mtime": 1779185583477,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424543048,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/eagle-rock.mp3": {
       "mono": true,
       "size": 4097253,
-      "mtime": 1779185587902,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424547096,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/escape-the-pina-colada-song.mp3": {
       "mono": true,
       "size": 4404871,
-      "mtime": 1779185592746,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424551352,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/every-breath-you-take.mp3": {
       "mono": true,
       "size": 3327373,
-      "mtime": 1779185596375,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424554569,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/feelin-alright.mp3": {
       "mono": true,
       "size": 4102687,
-      "mtime": 1779185600920,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424558540,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/fields-of-gold.mp3": {
       "mono": true,
       "size": 3497482,
-      "mtime": 1779185604805,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424565909,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/flame-trees.mp3": {
       "mono": true,
       "size": 4244793,
-      "mtime": 1779185609398,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424569985,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/fly-me-to-the-moon.mp3": {
       "mono": true,
       "size": 2432940,
-      "mtime": 1779185612030,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424572289,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/fresh-eyes.mp3": {
       "mono": true,
       "size": 3258409,
-      "mtime": 1779185615503,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424575419,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/friends-in-low-places.mp3": {
       "mono": true,
       "size": 4067160,
-      "mtime": 1779185619995,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424579351,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/green-door.mp3": {
       "mono": true,
       "size": 2309224,
-      "mtime": 1779185622567,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424581583,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/hark-the-herald-angels-sing.mp3": {
       "mono": true,
       "size": 2605139,
-      "mtime": 1779185625469,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424584076,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/have-i-told-you-lately.mp3": {
       "mono": true,
       "size": 4089312,
-      "mtime": 1779185629956,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424588125,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/have-yourself-a-merry-little-christmas.mp3": {
       "mono": true,
       "size": 3370422,
-      "mtime": 1779185633726,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424591374,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/heart-of-gold.mp3": {
       "mono": true,
       "size": 2965838,
-      "mtime": 1779185636994,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424594180,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/home.mp3": {
       "mono": true,
       "size": 3639170,
-      "mtime": 1779185641007,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424597707,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/honky-tonk-woman.mp3": {
       "mono": true,
       "size": 3026442,
-      "mtime": 1779185644383,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424600575,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/hound-dog.mp3": {
       "mono": true,
       "size": 2267846,
-      "mtime": 1779185646868,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424602738,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/hurts-so-good.mp3": {
       "mono": true,
       "size": 3395500,
-      "mtime": 1779185650637,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424606191,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/ill-be-home-for-christmas.mp3": {
       "mono": true,
       "size": 3590269,
-      "mtime": 1779185654585,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424609741,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/im-a-believer.mp3": {
       "mono": true,
       "size": 2685805,
-      "mtime": 1779185657523,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424612339,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/is-this-love.mp3": {
       "mono": true,
       "size": 3545129,
-      "mtime": 1779185670467,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424623634,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/its-beginning-to-look-a-lot-like-christmas.mp3": {
       "mono": true,
       "size": 3304385,
-      "mtime": 1779185674188,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424626898,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/its-now-or-never.mp3": {
       "mono": true,
       "size": 3010977,
-      "mtime": 1779185677602,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424629872,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/ive-got-you-under-my-skin.mp3": {
       "mono": true,
       "size": 3555996,
-      "mtime": 1779185681580,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424635395,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/jailhouse-rock.mp3": {
       "mono": true,
       "size": 2206406,
-      "mtime": 1779185684073,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424641656,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/jessies-girl.mp3": {
       "mono": true,
       "size": 3038563,
-      "mtime": 1779185687542,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424644626,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/jingle-bell-rock.mp3": {
       "mono": true,
       "size": 2070569,
-      "mtime": 1779185689819,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424646633,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/jingle-bells.mp3": {
       "mono": true,
       "size": 1940166,
-      "mtime": 1779185691957,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424648528,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/joy-to-the-world.mp3": {
       "mono": true,
       "size": 1731604,
-      "mtime": 1779185693924,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424650240,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/just-the-way-you-are.mp3": {
       "mono": true,
       "size": 3530501,
-      "mtime": 1779185697829,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424653701,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/khe-sanh.mp3": {
       "mono": true,
       "size": 3772499,
-      "mtime": 1779185702068,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424657474,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/la-bamba.mp3": {
       "mono": true,
       "size": 2211840,
-      "mtime": 1779185704517,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424659813,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/let-it-be.mp3": {
       "mono": true,
       "size": 3495392,
-      "mtime": 1779185708367,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424663292,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/long-and-winding-road.mp3": {
       "mono": true,
       "size": 3553489,
-      "mtime": 1779185712371,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424667064,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/long-train-running.mp3": {
       "mono": true,
       "size": 3237929,
-      "mtime": 1779185715996,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424676341,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/love-is-all-around.mp3": {
       "mono": true,
       "size": 3873227,
-      "mtime": 1779185720261,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424680238,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/lyin-eyes.mp3": {
       "mono": true,
       "size": 6123937,
-      "mtime": 1779185727051,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424686362,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/mamma-mia.mp3": {
       "mono": true,
       "size": 3685564,
-      "mtime": 1779185731063,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424690145,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/marys-boy-child.mp3": {
       "mono": true,
       "size": 3794651,
-      "mtime": 1779185735338,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424693956,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/message-in-a-bottle.mp3": {
       "mono": true,
       "size": 3960163,
-      "mtime": 1779185739767,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424701826,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/message-to-my-girl.mp3": {
       "mono": true,
       "size": 3317760,
-      "mtime": 1779185743500,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424705216,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/midnight-hour.mp3": {
       "mono": true,
       "size": 2240679,
-      "mtime": 1779185746039,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424707439,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/moondance.mp3": {
       "mono": true,
       "size": 4529005,
-      "mtime": 1779185751019,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424711868,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/mustang-sally.mp3": {
       "mono": true,
       "size": 3876571,
-      "mtime": 1779185755375,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424715740,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/my-girl.mp3": {
       "mono": true,
       "size": 2807431,
-      "mtime": 1779185759506,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424718925,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/my-happiness.mp3": {
       "mono": true,
       "size": 4449593,
-      "mtime": 1779185764424,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424723462,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/never-tear-us-apart.mp3": {
       "mono": true,
       "size": 3659650,
-      "mtime": 1779185768409,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424727045,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/o-holy-night.mp3": {
       "mono": true,
       "size": 2945358,
-      "mtime": 1779185771676,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424733022,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/oh-pretty-woman.mp3": {
       "mono": true,
       "size": 2677864,
-      "mtime": 1779185774627,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424735655,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/perfect-ed-sheeran.mp3": {
       "mono": true,
       "size": 4625136,
-      "mtime": 1779185779634,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424743367,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/proud-mary.mp3": {
       "mono": true,
       "size": 2861766,
-      "mtime": 1779185782807,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424746198,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/quando-quando-quando.mp3": {
       "mono": true,
       "size": 3277217,
-      "mtime": 1779185786354,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424749443,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/rhinestone-cowboy.mp3": {
       "mono": true,
       "size": 3278471,
-      "mtime": 1779185790043,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424752687,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/ring-of-fire.mp3": {
       "mono": true,
       "size": 2502739,
-      "mtime": 1779185792832,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424755157,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/riptide.mp3": {
       "mono": true,
       "size": 3456104,
-      "mtime": 1779185796656,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424758498,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/rock-around-the-clock.mp3": {
       "mono": true,
       "size": 2578808,
-      "mtime": 1779185799505,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424765172,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/rock-dj.mp3": {
       "mono": true,
       "size": 3803846,
-      "mtime": 1779185803760,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424768907,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/rockin-robin.mp3": {
       "mono": true,
       "size": 2545371,
-      "mtime": 1779185806582,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424771394,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/rude.mp3": {
       "mono": true,
       "size": 3562684,
-      "mtime": 1779185810568,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424774905,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/rudolf.mp3": {
       "mono": true,
       "size": 2363559,
-      "mtime": 1779185813229,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424777227,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/run-to-paradise.mp3": {
       "mono": true,
       "size": 3732375,
-      "mtime": 1779185817325,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424780839,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/runaway.mp3": {
       "mono": true,
       "size": 2318419,
-      "mtime": 1779185819913,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424783120,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/santa-claus-is-coming-to-town.mp3": {
       "mono": true,
       "size": 2723840,
-      "mtime": 1779185822949,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424785775,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/shake-a-tail-feather.mp3": {
       "mono": true,
       "size": 2853407,
-      "mtime": 1779185826112,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424788557,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/shake-rattle-and-roll.mp3": {
       "mono": true,
       "size": 2174641,
-      "mtime": 1779185828566,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424790705,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/shape-of-you.mp3": {
       "mono": true,
       "size": 3757871,
-      "mtime": 1779185832821,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424794450,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/she-believes-in-me.mp3": {
       "mono": true,
       "size": 4101015,
-      "mtime": 1779185837439,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424798518,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/she-loves-you.mp3": {
       "mono": true,
       "size": 2382785,
-      "mtime": 1779185840085,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424800877,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/she-will-be-loved.mp3": {
       "mono": true,
       "size": 4121495,
-      "mtime": 1779185844659,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424805030,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/signed-sealed-delivered.mp3": {
       "mono": true,
       "size": 2591764,
-      "mtime": 1779185847567,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424807673,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/so-this-is-christmas.mp3": {
       "mono": true,
       "size": 3553489,
-      "mtime": 1779185851588,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424811307,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/something.mp3": {
       "mono": true,
       "size": 3009306,
-      "mtime": 1779185854957,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424814379,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/south-of-the-border.mp3": {
       "mono": true,
       "size": 4150334,
-      "mtime": 1779185859627,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424818486,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/stand-by-me.mp3": {
       "mono": true,
       "size": 3245871,
-      "mtime": 1779185863282,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424821712,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/still-got-the-blues.mp3": {
       "mono": true,
       "size": 6079216,
-      "mtime": 1779185870080,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424827669,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/summer-of-69.mp3": {
       "mono": true,
       "size": 3469061,
-      "mtime": 1779185873953,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424831089,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/sunday-morning.mp3": {
       "mono": true,
       "size": 3955147,
-      "mtime": 1779185878331,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424834944,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/superstition.mp3": {
       "mono": true,
       "size": 4191712,
-      "mtime": 1779185882989,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424839078,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/sway.mp3": {
       "mono": true,
       "size": 3200731,
-      "mtime": 1779185886587,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424842420,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/sweet-caroline.mp3": {
       "mono": true,
       "size": 3408039,
-      "mtime": 1779185890437,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424845787,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/sweet-home-alabama.mp3": {
       "mono": true,
       "size": 3438550,
-      "mtime": 1779185894280,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424849182,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/take-it-easy.mp3": {
       "mono": true,
       "size": 3399262,
-      "mtime": 1779185898083,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424852537,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/temple-of-the-king.mp3": {
       "mono": true,
       "size": 4289097,
-      "mtime": 1779185902827,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424856669,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/tennessee-waltz.mp3": {
       "mono": true,
@@ -694,176 +1264,321 @@
     "tracks/thatll-be-the-day.mp3": {
       "mono": true,
       "size": 2366902,
-      "mtime": 1779185908533,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424861411,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/the-christmas-song.mp3": {
       "mono": true,
       "size": 3832685,
-      "mtime": 1779185912777,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424865107,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/the-gambler.mp3": {
       "mono": true,
       "size": 3414726,
-      "mtime": 1779185916594,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424868444,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/the-lady-is-a-tramp.mp3": {
       "mono": true,
       "size": 2908160,
-      "mtime": 1779185920970,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424871406,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/the-last-waltz.mp3": {
       "mono": true,
       "size": 3255066,
-      "mtime": 1779185924640,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424874631,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/the-wanderer.mp3": {
       "mono": true,
       "size": 2518204,
-      "mtime": 1779185927508,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424877122,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/the-way-you-look-tonight.mp3": {
       "mono": true,
       "size": 3322775,
-      "mtime": 1779185931201,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424880404,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/the-wonder-of-you.mp3": {
       "mono": true,
       "size": 2443807,
-      "mtime": 1779185933950,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424882792,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/there-goes-my-everything.mp3": {
       "mono": true,
       "size": 2949120,
-      "mtime": 1779185937310,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424885722,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/thinking-out-loud.mp3": {
       "mono": true,
       "size": 4571219,
-      "mtime": 1779185942405,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424890196,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/this-love.mp3": {
       "mono": true,
       "size": 3356212,
-      "mtime": 1779185946150,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424893473,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/to-her-door.mp3": {
       "mono": true,
       "size": 3293936,
-      "mtime": 1779185949826,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424900032,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/unchained-melody.mp3": {
       "mono": true,
       "size": 3634155,
-      "mtime": 1779185953934,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424903596,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/video-killed-the-radio-star.mp3": {
       "mono": true,
       "size": 3179833,
-      "mtime": 1779185957488,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424906719,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/viva-la-vida.mp3": {
       "mono": true,
       "size": 3943862,
-      "mtime": 1779185961910,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424910570,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/walk-of-life.mp3": {
       "mono": true,
       "size": 3770827,
-      "mtime": 1779185966162,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424914281,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/what-about-me.mp3": {
       "mono": true,
       "size": 3358720,
-      "mtime": 1779185969892,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424917587,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/when-the-war-is-over.mp3": {
       "mono": true,
       "size": 4422008,
-      "mtime": 1779185976420,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424925711,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/when-you-say-nothing-at-all.mp3": {
       "mono": true,
       "size": 3301459,
-      "mtime": 1779185980127,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424929012,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/woman.mp3": {
       "mono": true,
       "size": 3651709,
-      "mtime": 1779185984200,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424932581,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/wonderwall.mp3": {
       "mono": true,
       "size": 4119823,
-      "mtime": 1779185988818,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424936675,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/ymca.mp3": {
       "mono": true,
       "size": 3622870,
-      "mtime": 1779185992854,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424940201,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/you-raise-me-up.mp3": {
       "mono": true,
       "size": 4185861,
-      "mtime": 1779185998966,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424949556,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/youre-the-voice.mp3": {
       "mono": true,
       "size": 4905169,
-      "mtime": 1779186004451,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424954346,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/as-it-was2.mp3": {
       "mono": true,
       "size": 4097671,
-      "mtime": 1779185497357,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424450805,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/blinding-lights2.mp3": {
       "mono": true,
       "size": 3181087,
-      "mtime": 1779185514871,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424468758,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/celebration.mp3": {
       "mono": true,
       "size": 4033724,
-      "mtime": 1779185543441,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424500431,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/im-yours.m4a": {
       "mono": true,
       "size": 3841044,
-      "mtime": 1779185661797,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424615977,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/inxs-dont-change-official-music-video-a-164bpm-438hz.mp3": {
       "mono": true,
-      "normalised": "v2-gain-comp-limit-I-10",
+      "normalised": "v3",
       "size": 4324205,
-      "mtime": 1779185666556
+      "mtime": 1779424620234,
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/wheatus-teenage-dirtbag-e-95bpm-442hz.mp3": {
       "mono": true,
@@ -874,128 +1589,233 @@
     "tracks/wheatus-teenage-dirtbag-e-95bpm-440hz.mp3": {
       "mono": true,
       "size": 3951804,
-      "mtime": 1779258429700,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424921343,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/jack-diane.m4a": {
       "mono": true,
       "size": 4214700,
-      "mtime": 1779368905349,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424639502,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/mental-as-anything-live-it-up-hq-g-122bpm-440hz.mp3": {
       "mono": true,
       "size": 3945534,
-      "mtime": 1779368909764,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424697863,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/roadhouse-blues.m4a": {
       "mono": true,
       "size": 4238524,
-      "mtime": 1779368914427,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424762628,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/14-piano-man-as-made-famous-by-billy-joel-karaoke-version.m4a": {
       "mono": true,
       "size": 5490311,
-      "mtime": 1779372445694,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424408897,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/3145-you-are-the-sunshine-of-my-life-jazz.m4a": {
       "mono": true,
       "size": 2495634,
-      "mtime": 1779372448772,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424411256,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/3994-my-way-2.m4a": {
       "mono": true,
       "size": 4420754,
-      "mtime": 1779372454408,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424415460,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/all-of-me.m4a": {
       "mono": true,
       "size": 2855915,
-      "mtime": 1779372457720,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424420599,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/amore.m4a": {
       "mono": true,
       "size": 2271608,
-      "mtime": 1779372460402,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424438466,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/autumn-leaves.m4a": {
       "mono": true,
       "size": 2970017,
-      "mtime": 1779372463968,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424453599,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/bon-jovi-medley.m4a": {
       "mono": true,
       "size": 6985769,
-      "mtime": 1779372472594,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424482453,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/december-63.m4a": {
       "mono": true,
       "size": 3628721,
-      "mtime": 1779372476914,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424520595,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/delilah.m4a": {
       "mono": true,
       "size": 3350778,
-      "mtime": 1779372480914,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424523763,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/feeling-good.m4a": {
       "mono": true,
       "size": 3939265,
-      "mtime": 1779372487072,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424562351,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/ive-got-the-world-on-a-string.m4a": {
       "mono": true,
       "size": 2195539,
-      "mtime": 1779372489665,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424632000,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/long-train-running.m4a": {
       "mono": true,
       "size": 3237929,
-      "mtime": 1779372493470,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424671980,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/new-york-new-york.m4a": {
       "mono": true,
       "size": 3160189,
-      "mtime": 1779372497152,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424730134,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/oz-home.m4a": {
       "mono": true,
       "size": 3282651,
-      "mtime": 1779372501140,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424738928,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/tennessee-waltz.m4a": {
       "mono": true,
       "size": 2450494,
-      "mtime": 1779372504145,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424859061,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/time-warp.m4a": {
       "mono": true,
       "size": 3351196,
-      "mtime": 1779372508031,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424896796,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/you-can-leave-your-hat-on.m4a": {
       "mono": true,
       "size": 4474671,
-      "mtime": 1779372513300,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "mtime": 1779424944577,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     }
   }
 }

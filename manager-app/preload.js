@@ -26,6 +26,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   audioStatus: () => ipcRenderer.invoke('audio:status'),
   audioMonoAll: () => ipcRenderer.invoke('audio:monoAll'),
   audioNormaliseAll: () => ipcRenderer.invoke('audio:normaliseAll'),
+  audioRemoveNormalise: () => ipcRenderer.invoke('audio:removeNormalise'),
+  audioRemoveMono: () => ipcRenderer.invoke('audio:removeMono'),
+  audioGetParams: () => ipcRenderer.invoke('audio:getParams'),
+  audioSetParams: (partial) => ipcRenderer.invoke('audio:setParams', partial),
+  audioGetTrackParams: (relPath) => ipcRenderer.invoke('audio:getTrackParams', relPath),
+  audioSetTrackParams: (relPath, overrideOrNull) => ipcRenderer.invoke('audio:setTrackParams', relPath, overrideOrNull),
+  audioPreviewTrack: (relPath, params) => ipcRenderer.invoke('audio:previewTrack', relPath, params),
+  audioNormaliseOne: (relPath, params) => ipcRenderer.invoke('audio:normaliseOne', relPath, params),
   onAudioProgress: (cb) => {
     const wrapped = (_e, payload) => cb(payload);
     ipcRenderer.on('audio:progress', wrapped);
