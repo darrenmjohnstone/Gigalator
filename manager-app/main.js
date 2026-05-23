@@ -621,6 +621,80 @@ async function getChannelCount(ffprobeBin, absPath) {
   return parseInt(out.trim(), 10) || 0;
 }
 
+// Auto-rename a non-mp3 track to .mp3 across the whole project:
+//   - the file in tracks/
+//   - every reference in songs.json (preserves the rest of the JSON verbatim)
+//   - the key in audio-state.json
+//   - any sibling file in tracks/_original_stereo/ and tracks/_pre_normalise/
+// Returns the new relPath (or the original if no rename was needed).
+// Throws if a destination collision would occur — caller decides what to do.
+function ensureMp3Extension(relPath) {
+  const ext = path.extname(relPath).toLowerCase();
+  if (ext === '.mp3' || ext === '') return relPath;
+
+  const absPath = path.join(GIGALATOR_ROOT, relPath);
+  if (!fs.existsSync(absPath)) return relPath; // missing file — caller will surface a useful error
+
+  const newRelPath = relPath.slice(0, -ext.length) + '.mp3';
+  const newAbsPath = path.join(GIGALATOR_ROOT, newRelPath);
+  if (fs.existsSync(newAbsPath)) {
+    throw new Error('cannot auto-rename to ' + newRelPath + ' — destination already exists');
+  }
+
+  // 1) Rename the file
+  fs.renameSync(absPath, newAbsPath);
+
+  // 2) Update songs.json (string replace inside quotes — preserves field order, comments-style, etc.)
+  const songsJsonPath = path.join(GIGALATOR_ROOT, 'songs', 'songs.json');
+  if (fs.existsSync(songsJsonPath)) {
+    const before = fs.readFileSync(songsJsonPath, 'utf8');
+    const after = before.split('"' + relPath + '"').join('"' + newRelPath + '"');
+    if (after !== before) fs.writeFileSync(songsJsonPath, after, 'utf8');
+  }
+
+  // 3) Update audio-state.json key
+  const state = readAudioState();
+  if (state.tracks[relPath]) {
+    state.tracks[newRelPath] = state.tracks[relPath];
+    delete state.tracks[relPath];
+    writeAudioState(state);
+  }
+
+  // 4) Rename backups so future Remove operations still find them
+  for (const subdir of [MONO_BACKUP_DIR, NORM_BACKUP_DIR]) {
+    const oldBackup = path.join(GIGALATOR_ROOT, subdir, path.basename(relPath));
+    const newBackup = path.join(GIGALATOR_ROOT, subdir, path.basename(newRelPath));
+    if (fs.existsSync(oldBackup) && !fs.existsSync(newBackup)) {
+      try { fs.renameSync(oldBackup, newBackup); } catch (_) {}
+    }
+  }
+
+  console.log('[audio] auto-renamed ' + relPath + ' → ' + newRelPath);
+  return newRelPath;
+}
+
+// Pre-pass: bulk-rename any non-mp3 tracks before processing. Emits its
+// progress through the same channel so the user sees "Renaming X..." rather
+// than a confusing silent gap before the first track starts processing.
+function autoRenameNonMp3(event, allTracks) {
+  const renames = [];
+  for (const relPath of allTracks) {
+    const ext = path.extname(relPath).toLowerCase();
+    if (ext === '.mp3' || ext === '') continue;
+    try {
+      emitProgress(event, { phase: 'rename', name: path.basename(relPath) });
+      const newPath = ensureMp3Extension(relPath);
+      if (newPath !== relPath) renames.push({ old: relPath, new: newPath });
+    } catch (e) {
+      console.warn('[audio] skip rename for ' + relPath + ': ' + e.message);
+    }
+  }
+  if (renames.length) {
+    console.log('[audio] auto-renamed ' + renames.length + ' non-mp3 tracks before processing');
+  }
+  return renames;
+}
+
 // Collect every unique relative track path from songs.json
 function getAllTrackRelPaths() {
   const songsJsonPath = path.join(GIGALATOR_ROOT, 'songs', 'songs.json');
@@ -675,6 +749,10 @@ async function safeReencode(ffmpegBin, absPath, backupDir, ffmpegArgs) {
 ipcMain.handle('audio:monoAll', async (event) => {
   const ffmpegBin = findBinary('ffmpeg');
   const ffprobeBin = findBinary('ffprobe');
+  // Pre-pass: rename any non-mp3 tracks (e.g. user-added .m4a files) so iOS
+  // Safari plays them reliably. Re-reads tracks AFTER rename so the loop
+  // works with the post-rename paths.
+  autoRenameNonMp3(event, getAllTrackRelPaths());
   const state = readAudioState();
   const tracks = getAllTrackRelPaths();
 
@@ -734,6 +812,7 @@ ipcMain.handle('audio:monoAll', async (event) => {
 // Two-pass loudnorm: pass 1 measures the file, pass 2 applies correction.
 ipcMain.handle('audio:normaliseAll', async (event) => {
   const ffmpegBin = findBinary('ffmpeg');
+  autoRenameNonMp3(event, getAllTrackRelPaths());
   const state = readAudioState();
   const tracks = getAllTrackRelPaths();
 
@@ -931,6 +1010,8 @@ ipcMain.handle('audio:previewTrack', async (event, relPath, overrideParams) => {
 // per-song override if set, else global defaults.
 ipcMain.handle('audio:normaliseOne', async (event, relPath, overrideParams) => {
   const ffmpegBin = findBinary('ffmpeg');
+  // Auto-rename non-mp3 first so the song editor's track reference becomes valid mp3
+  try { relPath = ensureMp3Extension(relPath); } catch (_) {}
   const absPath = path.join(GIGALATOR_ROOT, relPath);
   if (!fs.existsSync(absPath)) throw new Error('track file not found');
 

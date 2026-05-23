@@ -14,8 +14,8 @@
     },
     "tracks/all-of-me.mp3": {
       "mono": true,
-      "size": 4620538,
-      "mtime": 1779424424914,
+      "size": 2855915,
+      "mtime": 1779424420599,
       "normalised": "v3",
       "normaliseParams": {
         "I": -12,
@@ -719,7 +719,7 @@
     "tracks/long-train-running.mp3": {
       "mono": true,
       "size": 3237929,
-      "mtime": 1779424676341,
+      "mtime": 1779424671980,
       "normalised": "v3",
       "normaliseParams": {
         "I": -12,
@@ -1257,9 +1257,14 @@
     },
     "tracks/tennessee-waltz.mp3": {
       "mono": true,
-      "size": 2697926,
-      "mtime": 1779185905891,
-      "normalised": "v2-gain-comp-limit-I-10"
+      "size": 2450494,
+      "mtime": 1779424859061,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
     },
     "tracks/thatll-be-the-day.mp3": {
       "mono": true,
@@ -1558,17 +1563,6 @@
         "threshold": -18
       }
     },
-    "tracks/im-yours.m4a": {
-      "mono": true,
-      "size": 3841044,
-      "mtime": 1779424615977,
-      "normalised": "v3",
-      "normaliseParams": {
-        "I": -12,
-        "ratio": 1.5,
-        "threshold": -18
-      }
-    },
     "tracks/inxs-dont-change-official-music-video-a-164bpm-438hz.mp3": {
       "mono": true,
       "normalised": "v3",
@@ -1597,17 +1591,6 @@
         "threshold": -18
       }
     },
-    "tracks/jack-diane.m4a": {
-      "mono": true,
-      "size": 4214700,
-      "mtime": 1779424639502,
-      "normalised": "v3",
-      "normaliseParams": {
-        "I": -12,
-        "ratio": 1.5,
-        "threshold": -18
-      }
-    },
     "tracks/mental-as-anything-live-it-up-hq-g-122bpm-440hz.mp3": {
       "mono": true,
       "size": 3945534,
@@ -1619,18 +1602,7 @@
         "threshold": -18
       }
     },
-    "tracks/roadhouse-blues.m4a": {
-      "mono": true,
-      "size": 4238524,
-      "mtime": 1779424762628,
-      "normalised": "v3",
-      "normaliseParams": {
-        "I": -12,
-        "ratio": 1.5,
-        "threshold": -18
-      }
-    },
-    "tracks/14-piano-man-as-made-famous-by-billy-joel-karaoke-version.m4a": {
+    "tracks/14-piano-man-as-made-famous-by-billy-joel-karaoke-version.mp3": {
       "mono": true,
       "size": 5490311,
       "mtime": 1779424408897,
@@ -1641,7 +1613,7 @@
         "threshold": -18
       }
     },
-    "tracks/3145-you-are-the-sunshine-of-my-life-jazz.m4a": {
+    "tracks/3145-you-are-the-sunshine-of-my-life-jazz.mp3": {
       "mono": true,
       "size": 2495634,
       "mtime": 1779424411256,
@@ -1652,7 +1624,7 @@
         "threshold": -18
       }
     },
-    "tracks/3994-my-way-2.m4a": {
+    "tracks/3994-my-way-2.mp3": {
       "mono": true,
       "size": 4420754,
       "mtime": 1779424415460,
@@ -1663,18 +1635,7 @@
         "threshold": -18
       }
     },
-    "tracks/all-of-me.m4a": {
-      "mono": true,
-      "size": 2855915,
-      "mtime": 1779424420599,
-      "normalised": "v3",
-      "normaliseParams": {
-        "I": -12,
-        "ratio": 1.5,
-        "threshold": -18
-      }
-    },
-    "tracks/amore.m4a": {
+    "tracks/amore.mp3": {
       "mono": true,
       "size": 2271608,
       "mtime": 1779424438466,
@@ -1685,7 +1646,7 @@
         "threshold": -18
       }
     },
-    "tracks/autumn-leaves.m4a": {
+    "tracks/autumn-leaves.mp3": {
       "mono": true,
       "size": 2970017,
       "mtime": 1779424453599,
@@ -1696,7 +1657,7 @@
         "threshold": -18
       }
     },
-    "tracks/bon-jovi-medley.m4a": {
+    "tracks/bon-jovi-medley.mp3": {
       "mono": true,
       "size": 6985769,
       "mtime": 1779424482453,
@@ -1707,7 +1668,18 @@
         "threshold": -18
       }
     },
-    "tracks/december-63.m4a": {
+    "tracks/come-fly-with-me.mp3": {
+      "mono": true,
+      "size": 2801162,
+      "mtime": 1779425537387,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
+    },
+    "tracks/december-63.mp3": {
       "mono": true,
       "size": 3628721,
       "mtime": 1779424520595,
@@ -1718,18 +1690,7 @@
         "threshold": -18
       }
     },
-    "tracks/delilah.m4a": {
-      "mono": true,
-      "size": 3350778,
-      "mtime": 1779424523763,
-      "normalised": "v3",
-      "normaliseParams": {
-        "I": -12,
-        "ratio": 1.5,
-        "threshold": -18
-      }
-    },
-    "tracks/feeling-good.m4a": {
+    "tracks/feeling-good.mp3": {
       "mono": true,
       "size": 3939265,
       "mtime": 1779424562351,
@@ -1740,7 +1701,18 @@
         "threshold": -18
       }
     },
-    "tracks/ive-got-the-world-on-a-string.m4a": {
+    "tracks/im-yours.mp3": {
+      "mono": true,
+      "size": 3841044,
+      "mtime": 1779424615977,
+      "normalised": "v3",
+      "normaliseParams": {
+        "I": -12,
+        "ratio": 1.5,
+        "threshold": -18
+      }
+    },
+    "tracks/ive-got-the-world-on-a-string.mp3": {
       "mono": true,
       "size": 2195539,
       "mtime": 1779424632000,
@@ -1751,10 +1723,10 @@
         "threshold": -18
       }
     },
-    "tracks/long-train-running.m4a": {
+    "tracks/jack-diane.mp3": {
       "mono": true,
-      "size": 3237929,
-      "mtime": 1779424671980,
+      "size": 4214700,
+      "mtime": 1779424639502,
       "normalised": "v3",
       "normaliseParams": {
         "I": -12,
@@ -1762,7 +1734,7 @@
         "threshold": -18
       }
     },
-    "tracks/new-york-new-york.m4a": {
+    "tracks/new-york-new-york.mp3": {
       "mono": true,
       "size": 3160189,
       "mtime": 1779424730134,
@@ -1773,7 +1745,7 @@
         "threshold": -18
       }
     },
-    "tracks/oz-home.m4a": {
+    "tracks/oz-home.mp3": {
       "mono": true,
       "size": 3282651,
       "mtime": 1779424738928,
@@ -1784,10 +1756,10 @@
         "threshold": -18
       }
     },
-    "tracks/tennessee-waltz.m4a": {
+    "tracks/roadhouse-blues.mp3": {
       "mono": true,
-      "size": 2450494,
-      "mtime": 1779424859061,
+      "size": 4238524,
+      "mtime": 1779424762628,
       "normalised": "v3",
       "normaliseParams": {
         "I": -12,
@@ -1795,7 +1767,7 @@
         "threshold": -18
       }
     },
-    "tracks/time-warp.m4a": {
+    "tracks/time-warp.mp3": {
       "mono": true,
       "size": 3351196,
       "mtime": 1779424896796,
@@ -1806,7 +1778,7 @@
         "threshold": -18
       }
     },
-    "tracks/you-can-leave-your-hat-on.m4a": {
+    "tracks/you-can-leave-your-hat-on.mp3": {
       "mono": true,
       "size": 4474671,
       "mtime": 1779424944577,
@@ -1817,10 +1789,10 @@
         "threshold": -18
       }
     },
-    "tracks/come-fly-with-me.m4a": {
+    "tracks/delilah.mp3": {
       "mono": true,
-      "size": 2801162,
-      "mtime": 1779425537387,
+      "size": 3350778,
+      "mtime": 1779424523763,
       "normalised": "v3",
       "normaliseParams": {
         "I": -12,
